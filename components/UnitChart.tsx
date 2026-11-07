@@ -6,7 +6,7 @@ const ROW_HEIGHT = 30;
 const ACCENT = "#6366f1";
 const ACCENT_SELECTED = "#3730a3";
 
-const shorten = (name: string): string => (name.length > 20 ? `${name.slice(0, 19)}…` : name);
+const shorten = (name: string): string => (name.length > 24 ? `${name.slice(0, 23)}…` : name);
 
 export function UnitChart({
   units,
@@ -42,7 +42,7 @@ export function UnitChart({
             <YAxis
               type="category"
               dataKey="unit"
-              width={130}
+              width={150}
               tick={{ fontSize: 12 }}
               tickFormatter={shorten}
               interval={0}

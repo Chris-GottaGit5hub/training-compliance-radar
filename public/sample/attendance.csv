@@ -1,0 +1,382 @@
+employee_id,training_title,training_date,hours,delivery,cost
+EMP-0001,Process Improvement Basics,2026-08-01,16,classroom,4300
+EMP-0002,Government Procurement Updates,2026-04-05,6,elearning,0
+EMP-0002,Communication Skills Workshop,2025-05-25,2.5,elearning,0
+EMP-0003,Internal Controls Orientation,2026-04-26,3,elearning,0
+EMP-0004,Excel for Office Work,2026-02-20,2,elearning,0
+EMP-0004,Strategic Planning Forum,2025-08-16,2,elearning,0
+EMP-0005,Ethics and Public Accountability,2026-06-29,4,classroom,1900
+EMP-0006,Strategic Planning Forum,2026-08-10,4,classroom,1850
+EMP-0007,Stress Management and Wellness,2026-02-21,4,classroom,5350
+EMP-0007,Stress Management and Wellness,2026-03-06,8,classroom,3250
+EMP-0008,Ethics and Public Accountability,2026-05-23,8,classroom,2750
+EMP-0009,Strategic Planning Forum,2026-01-16,5.5,elearning,0
+EMP-0009,Anti-Money Laundering Briefing,2026-06-27,8,classroom,5650
+EMP-0009,Communication Skills Workshop,2026-04-07,3,elearning,0
+EMP-0010,Data Privacy Act Awareness,2026-07-21,5,elearning,0
+EMP-0010,Communication Skills Workshop,2025-06-04,1.5,elearning,0
+EMP-0011,Anti-Money Laundering Briefing,2026-06-26,5,elearning,0
+EMP-0013,Effective Business Writing,2026-01-13,8,classroom,2250
+EMP-0013,Effective Business Writing,2026-04-29,2.5,elearning,0
+EMP-0014,Data Privacy Act Awareness,2026-06-04,4,classroom,2100
+EMP-0014,Ethics and Public Accountability,2026-03-20,8,classroom,1900
+EMP-0015,Basic Occupational Safety and Health,2026-05-29,16,classroom,4600
+EMP-0016,Leadership and Supervision Workshop,2026-04-05,3,elearning,0
+EMP-0017,Internal Controls Orientation,2026-04-12,8,classroom,3700
+EMP-0018,Government Procurement Updates,2026-08-06,1,elearning,0
+EMP-0019,Information Security Awareness,2026-03-21,5.5,elearning,0
+EMP-0020,Records Management Seminar,2026-11-28,16,classroom,3850
+EMP-0021,Data Privacy Act Awareness,2026-07-26,24,classroom,4550
+EMP-0021,Government Procurement Updates,2025-01-02,16,external,29600
+EMP-0023,Information Security Awareness,2026-05-14,4,classroom,5550
+EMP-0024,Excel for Office Work,2026-09-21,24,classroom,6350
+EMP-0025,Leadership and Supervision Workshop,2026-05-11,16,classroom,2750
+EMP-0025,Effective Business Writing,2026-01-07,24,classroom,3950
+EMP-0025,Financial Reporting Standards Update,2026-01-29,8,classroom,5100
+EMP-0026,Government Procurement Updates,2026-09-08,8,classroom,5850
+EMP-0026,Process Improvement Basics,2025-05-06,24,external,14500
+EMP-0027,Stress Management and Wellness,2026-09-14,8,classroom,4800
+EMP-0028,Project Management Essentials,2026-04-19,2,elearning,0
+EMP-0029,Anti-Money Laundering Briefing,2026-02-08,8,classroom,4600
+EMP-0030,Anti-Money Laundering Briefing,2026-03-20,16,classroom,2650
+EMP-0031,Financial Reporting Standards Update,2026-05-11,16,external,16600
+EMP-0032,Strategic Planning Forum,2026-05-12,4,classroom,5350
+EMP-0032,Ethics and Public Accountability,2026-05-07,2.5,elearning,0
+EMP-0032,Anti-Money Laundering Briefing,2026-06-22,40,external,14600
+EMP-0033,Project Management Essentials,2026-03-31,8,classroom,5150
+EMP-0034,Internal Controls Orientation,2026-05-17,16,classroom,5050
+EMP-0035,Excel for Office Work,2026-07-03,5.5,elearning,0
+EMP-0035,Excel for Office Work,2026-04-19,1.5,elearning,0
+EMP-0036,Customer Service Excellence,2026-01-26,4,classroom,4750
+EMP-0038,Government Procurement Updates,2026-02-05,2,elearning,0
+EMP-0038,Information Security Awareness,2026-03-18,4,classroom,5050
+EMP-0039,Project Management Essentials,2026-07-14,24,external,16900
+EMP-0039,Anti-Money Laundering Briefing,2026-06-01,8,classroom,6500
+EMP-0040,Communication Skills Workshop,2026-09-28,8,classroom,2450
+EMP-0041,Stress Management and Wellness,2026-01-20,16,classroom,3700
+EMP-0041,Stress Management and Wellness,2026-08-07,8,classroom,2350
+EMP-0041,Effective Business Writing,2025-09-25,4,classroom,6150
+EMP-0042,Records Management Seminar,2026-07-09,8,classroom,6350
+EMP-0042,Anti-Money Laundering Briefing,2026-05-08,24,classroom,1600
+EMP-0043,Data Privacy Act Awareness,2026-08-03,24,classroom,6450
+EMP-0045,Information Security Awareness,2026-02-07,24,classroom,2850
+EMP-0046,Internal Controls Orientation,2026-01-15,16,classroom,4600
+EMP-0046,Process Improvement Basics,2026-09-02,8,classroom,3400
+EMP-0047,Financial Reporting Standards Update,2026-07-24,8,classroom,5100
+EMP-0048,Process Improvement Basics,2026-03-17,6,elearning,0
+EMP-0050,Stress Management and Wellness,2026-02-07,3,elearning,0
+EMP-0050,Effective Business Writing,2026-07-05,3,elearning,0
+EMP-0050,Records Management Seminar,2026-06-13,8,classroom,5100
+EMP-0051,Stress Management and Wellness,2026-12-10,40,external,28000
+EMP-0052,Excel for Office Work,2026-07-07,2.5,elearning,0
+EMP-0052,Strategic Planning Forum,2026-01-19,3,elearning,0
+EMP-0052,Government Procurement Updates,2025-11-13,6,elearning,0
+EMP-0053,Data Privacy Act Awareness,2026-07-16,3.5,elearning,0
+EMP-0053,Government Procurement Updates,2025-12-08,2,elearning,0
+EMP-0054,Customer Service Excellence,2026-03-04,1.5,elearning,0
+EMP-0054,Process Improvement Basics,2025-01-28,8,classroom,1900
+EMP-0055,Internal Controls Orientation,2026-02-28,16,classroom,4350
+EMP-0055,Records Management Seminar,2025-09-19,16,classroom,6050
+EMP-0056,Process Improvement Basics,2026-08-15,40,external,25800
+EMP-0057,Financial Reporting Standards Update,2026-09-20,4.5,elearning,0
+EMP-0057,Stress Management and Wellness,2026-09-08,8,classroom,3300
+EMP-0057,Effective Business Writing,2026-01-13,1.5,elearning,0
+EMP-0058,Records Management Seminar,2026-07-03,5,elearning,0
+EMP-0059,Stress Management and Wellness,2026-09-08,24,classroom,4050
+EMP-0062,Data Privacy Act Awareness,2025-07-25,8,external,19200
+EMP-0063,Effective Business Writing,2026-08-28,2.5,elearning,0
+EMP-0064,Basic Occupational Safety and Health,2026-02-18,8,classroom,1800
+EMP-0064,Information Security Awareness,2026-07-24,4,classroom,5550
+EMP-0065,Stress Management and Wellness,2026-10-13,24,external,8100
+EMP-0066,Customer Service Excellence,2026-04-14,8,classroom,5850
+EMP-0067,Leadership and Supervision Workshop,2026-04-01,40,external,21400
+EMP-0068,Anti-Money Laundering Briefing,2026-02-22,8,classroom,2200
+EMP-0069,Customer Service Excellence,2026-08-20,3.5,elearning,0
+EMP-0069,Information Security Awareness,2026-09-19,4,classroom,1850
+EMP-0069,Financial Reporting Standards Update,2026-04-30,4,classroom,3650
+EMP-0070,Data Privacy Act Awareness,2026-01-11,24,classroom,3800
+EMP-0070,Communication Skills Workshop,2025-01-28,8,classroom,1850
+EMP-0071,Anti-Money Laundering Briefing,2026-09-07,5.5,elearning,0
+EMP-0072,Excel for Office Work,2026-08-22,1.5,elearning,0
+EMP-0073,Strategic Planning Forum,2026-05-28,4,classroom,5400
+EMP-0073,Government Procurement Updates,2026-09-13,8,classroom,2450
+EMP-0073,Strategic Planning Forum,2026-06-16,8,classroom,3100
+EMP-0074,Ethics and Public Accountability,2026-11-16,24,external,10600
+EMP-0075,Anti-Money Laundering Briefing,2026-03-11,4,classroom,3600
+EMP-0076,Effective Business Writing,2026-02-26,24,external,28300
+EMP-0077,Government Procurement Updates,2026-05-06,24,external,25400
+EMP-0078,Financial Reporting Standards Update,2025-10-09,1.5,elearning,0
+EMP-0079,Basic Occupational Safety and Health,2026-06-07,4,classroom,3700
+EMP-0081,Communication Skills Workshop,2026-06-28,1.5,elearning,0
+EMP-0082,Stress Management and Wellness,2026-07-30,40,external,29200
+EMP-0082,Data Privacy Act Awareness,2025-08-09,5,elearning,0
+EMP-0083,Data Privacy Act Awareness,2026-02-16,4.5,elearning,0
+EMP-0084,Stress Management and Wellness,2026-04-22,8,classroom,5100
+EMP-0086,Basic Occupational Safety and Health,2026-05-16,24,external,27700
+EMP-0086,Effective Business Writing,2025-12-20,40,external,26100
+EMP-0087,Financial Reporting Standards Update,2026-04-09,4,classroom,4200
+EMP-0088,Records Management Seminar,2026-06-30,24,classroom,5500
+EMP-0089,Government Procurement Updates,2026-01-11,8,classroom,2900
+EMP-0090,Records Management Seminar,2026-09-21,1,elearning,0
+EMP-0091,Basic Occupational Safety and Health,2026-05-15,2,elearning,0
+EMP-0091,Strategic Planning Forum,2026-08-31,4,elearning,0
+EMP-0092,Process Improvement Basics,2026-02-07,3,elearning,0
+EMP-0093,Leadership and Supervision Workshop,2026-07-29,8,classroom,3750
+EMP-0095,Information Security Awareness,2026-03-16,4,elearning,0
+EMP-0096,Process Improvement Basics,2026-04-03,4,classroom,3800
+EMP-0096,Government Procurement Updates,2026-01-29,8,classroom,5250
+EMP-0096,Government Procurement Updates,2026-02-02,8,classroom,5800
+EMP-0097,Financial Reporting Standards Update,2026-09-24,40,external,28900
+EMP-0098,Project Management Essentials,2026-08-18,4.5,elearning,0
+EMP-0099,Stress Management and Wellness,2026-03-01,6,elearning,0
+EMP-0103,Data Privacy Act Awareness,2026-04-24,24,classroom,6200
+EMP-0103,Ethics and Public Accountability,2026-09-04,3,elearning,0
+EMP-0103,Excel for Office Work,2025-08-11,5,elearning,0
+EMP-0104,Ethics and Public Accountability,2026-08-14,4,classroom,5600
+EMP-0104,Internal Controls Orientation,2026-05-07,8,classroom,5000
+EMP-0104,Data Privacy Act Awareness,2026-07-22,3.5,elearning,0
+EMP-0105,Basic Occupational Safety and Health,2026-05-04,24,external,12800
+EMP-0106,Ethics and Public Accountability,2026-04-27,16,classroom,6100
+EMP-0107,Data Privacy Act Awareness,2026-03-21,16,classroom,3450
+EMP-0109,Information Security Awareness,2026-07-17,4,classroom,4100
+EMP-0109,Stress Management and Wellness,2025-01-08,4,classroom,5650
+EMP-0110,Anti-Money Laundering Briefing,2026-06-26,8,classroom,3500
+EMP-0111,Internal Controls Orientation,2026-06-12,4,classroom,1750
+EMP-0111,Financial Reporting Standards Update,2025-12-18,4,classroom,4350
+EMP-0112,Anti-Money Laundering Briefing,2026-04-21,4,classroom,6200
+EMP-0113,Communication Skills Workshop,2026-07-01,4,classroom,5550
+EMP-0115,Customer Service Excellence,2026-05-04,24,classroom,2350
+EMP-0115,Internal Controls Orientation,2026-09-30,24,classroom,6150
+EMP-0115,Strategic Planning Forum,2026-03-17,16,external,7100
+EMP-0116,Government Procurement Updates,2026-11-16,3.5,elearning,0
+EMP-0117,Customer Service Excellence,2026-05-10,24,external,22900
+EMP-0118,Ethics and Public Accountability,2026-03-19,4,classroom,4400
+EMP-0119,Records Management Seminar,2026-07-18,6,elearning,0
+EMP-0119,Stress Management and Wellness,2026-07-29,4.5,elearning,0
+EMP-0120,Data Privacy Act Awareness,2026-06-17,8,classroom,5000
+EMP-0121,Project Management Essentials,2026-08-09,24,classroom,5350
+EMP-0121,Basic Occupational Safety and Health,2026-06-26,16,classroom,5950
+EMP-0122,Internal Controls Orientation,2026-06-18,8,classroom,6400
+EMP-0122,Project Management Essentials,2026-06-27,3,elearning,0
+EMP-0124,Process Improvement Basics,2026-10-08,4,elearning,0
+EMP-0125,Leadership and Supervision Workshop,2026-09-10,16,classroom,5650
+EMP-0125,Communication Skills Workshop,2026-04-09,16,classroom,6150
+EMP-0126,Process Improvement Basics,2026-08-30,8,classroom,6250
+EMP-0126,Customer Service Excellence,2026-09-20,3.5,elearning,0
+EMP-0126,Government Procurement Updates,2026-01-26,16,classroom,1600
+EMP-0127,Leadership and Supervision Workshop,2026-05-11,1,elearning,0
+EMP-0127,Government Procurement Updates,2026-04-03,2,elearning,0
+EMP-0127,Basic Occupational Safety and Health,2026-08-13,5,elearning,0
+EMP-0128,Leadership and Supervision Workshop,2026-09-12,2.5,elearning,0
+EMP-0129,Anti-Money Laundering Briefing,2026-04-11,16,classroom,4750
+EMP-0130,Stress Management and Wellness,2025-09-19,24,external,29700
+EMP-0131,Excel for Office Work,2026-09-14,24,external,12500
+EMP-0131,Data Privacy Act Awareness,2025-10-23,8,classroom,3600
+EMP-0132,Basic Occupational Safety and Health,2026-06-27,16,classroom,1550
+EMP-0132,Excel for Office Work,2026-01-10,2,elearning,0
+EMP-0133,Government Procurement Updates,2026-10-06,1.5,elearning,0
+EMP-0134,Stress Management and Wellness,2026-07-19,8,external,11500
+EMP-0135,Customer Service Excellence,2026-01-29,3,elearning,0
+EMP-0136,Leadership and Supervision Workshop,2026-09-27,5.5,elearning,0
+EMP-0137,Government Procurement Updates,2026-02-13,8,classroom,5600
+EMP-0137,Leadership and Supervision Workshop,2026-05-11,8,classroom,2350
+EMP-0139,Process Improvement Basics,2026-08-31,40,external,25700
+EMP-0141,Basic Occupational Safety and Health,2026-07-02,16,classroom,5650
+EMP-0142,Government Procurement Updates,2026-08-19,8,external,22400
+EMP-0142,Internal Controls Orientation,2026-05-12,4,classroom,2450
+EMP-0142,Leadership and Supervision Workshop,2026-04-07,8,classroom,5600
+EMP-0143,Information Security Awareness,2026-12-13,1.5,elearning,0
+EMP-0144,Data Privacy Act Awareness,2026-11-20,4,classroom,3400
+EMP-0145,Communication Skills Workshop,2026-02-18,8,classroom,2600
+EMP-0146,Financial Reporting Standards Update,2026-03-06,4,classroom,4450
+EMP-0146,Anti-Money Laundering Briefing,2026-04-03,24,external,6900
+EMP-0146,Process Improvement Basics,2025-12-30,8,classroom,1900
+EMP-0147,Project Management Essentials,2026-07-22,8,external,18500
+EMP-0147,Ethics and Public Accountability,2026-07-25,8,classroom,5200
+EMP-0149,Communication Skills Workshop,2026-06-03,2,elearning,0
+EMP-0149,Records Management Seminar,2026-02-20,16,classroom,2250
+EMP-0149,Excel for Office Work,2026-01-11,16,classroom,4850
+EMP-0151,Financial Reporting Standards Update,2025-10-27,8,classroom,4000
+EMP-0152,Ethics and Public Accountability,2026-03-13,8,classroom,2150
+EMP-0153,Excel for Office Work,2026-08-14,16,classroom,2850
+EMP-0154,Government Procurement Updates,2026-09-16,4,classroom,5450
+EMP-0155,Project Management Essentials,2025-08-27,8,external,23900
+EMP-0156,Data Privacy Act Awareness,2026-10-28,4,elearning,0
+EMP-0157,Government Procurement Updates,2026-09-04,5.5,elearning,0
+EMP-0158,Project Management Essentials,2026-02-12,8,classroom,4650
+EMP-0158,Leadership and Supervision Workshop,2025-12-12,16,external,6800
+EMP-0159,Information Security Awareness,2026-07-08,1.5,elearning,0
+EMP-0159,Anti-Money Laundering Briefing,2025-10-06,5,elearning,0
+EMP-0160,Strategic Planning Forum,2026-06-13,8,classroom,2400
+EMP-0161,Customer Service Excellence,2026-03-23,5.5,elearning,0
+EMP-0161,Stress Management and Wellness,2026-08-18,8,classroom,2000
+EMP-0162,Strategic Planning Forum,2026-02-26,8,classroom,4500
+EMP-0163,Data Privacy Act Awareness,2026-05-08,24,classroom,5750
+EMP-0164,Process Improvement Basics,2026-01-07,4,classroom,5650
+EMP-0164,Effective Business Writing,2026-03-18,8,classroom,5100
+EMP-0165,Communication Skills Workshop,2026-09-25,4,classroom,5850
+EMP-0166,Information Security Awareness,2026-05-02,4,classroom,2400
+EMP-0167,Internal Controls Orientation,2025-06-22,8,classroom,2700
+EMP-0169,Project Management Essentials,2026-07-02,1.5,elearning,0
+EMP-0170,Excel for Office Work,2026-01-22,4,classroom,4500
+EMP-0171,Customer Service Excellence,2026-01-16,40,external,29000
+EMP-0171,Stress Management and Wellness,2025-11-25,8,classroom,1750
+EMP-0172,Anti-Money Laundering Briefing,2026-09-19,8,classroom,3000
+EMP-0173,Information Security Awareness,2026-07-01,5.5,elearning,0
+EMP-0173,Stress Management and Wellness,2026-06-07,24,classroom,2500
+EMP-0173,Stress Management and Wellness,2026-05-13,6,elearning,0
+EMP-0174,Process Improvement Basics,2026-08-17,8,classroom,5250
+EMP-0176,Government Procurement Updates,2026-07-09,5,elearning,0
+EMP-0177,Government Procurement Updates,2026-10-18,8,classroom,5050
+EMP-0177,Anti-Money Laundering Briefing,2025-02-25,24,classroom,4850
+EMP-0180,Government Procurement Updates,2026-05-11,16,classroom,5000
+EMP-0181,Records Management Seminar,2026-07-29,24,classroom,3000
+EMP-0183,Financial Reporting Standards Update,2026-07-20,1,elearning,0
+EMP-0183,Stress Management and Wellness,2026-07-31,3,elearning,0
+EMP-0184,Effective Business Writing,2026-04-16,8,classroom,2600
+EMP-0184,Anti-Money Laundering Briefing,2026-07-11,8,classroom,6350
+EMP-0184,Basic Occupational Safety and Health,2026-09-03,8,classroom,5550
+EMP-0185,Records Management Seminar,2026-05-14,8,classroom,4200
+EMP-0186,Data Privacy Act Awareness,2026-05-10,8,classroom,5950
+EMP-0186,Information Security Awareness,2025-09-06,3.5,elearning,0
+EMP-0187,Financial Reporting Standards Update,2026-06-17,0.5,elearning,0
+EMP-0187,Leadership and Supervision Workshop,2026-10-30,5,elearning,0
+EMP-0188,Financial Reporting Standards Update,2026-01-30,8,classroom,5650
+EMP-0189,Financial Reporting Standards Update,2026-01-31,8,classroom,2450
+EMP-0190,Anti-Money Laundering Briefing,2026-05-21,16,classroom,5600
+EMP-0191,Strategic Planning Forum,2026-04-17,0.5,elearning,0
+EMP-0192,Basic Occupational Safety and Health,2026-02-09,8,classroom,2300
+EMP-0193,Project Management Essentials,2026-01-15,16,classroom,2800
+EMP-0195,Internal Controls Orientation,2026-07-11,24,classroom,4150
+EMP-0195,Ethics and Public Accountability,2026-09-16,40,external,24800
+EMP-0195,Customer Service Excellence,2025-03-12,24,classroom,5250
+EMP-0197,Process Improvement Basics,2026-11-14,8,classroom,3750
+EMP-0198,Leadership and Supervision Workshop,2026-03-21,5,elearning,0
+EMP-0198,Financial Reporting Standards Update,2026-01-30,8,classroom,6100
+EMP-0199,Financial Reporting Standards Update,2026-07-18,1,elearning,0
+EMP-0199,Leadership and Supervision Workshop,2025-03-04,16,external,7600
+EMP-0201,Excel for Office Work,2026-05-26,40,external,13000
+EMP-0202,Financial Reporting Standards Update,2026-03-14,8,classroom,5900
+EMP-0204,Excel for Office Work,2025-04-25,3,elearning,0
+EMP-0205,Basic Occupational Safety and Health,2026-08-23,16,classroom,6000
+EMP-0206,Ethics and Public Accountability,2026-01-27,40,external,12400
+EMP-0206,Anti-Money Laundering Briefing,2025-01-28,4.5,elearning,0
+EMP-0207,Effective Business Writing,2026-07-31,8,classroom,3050
+EMP-0208,Customer Service Excellence,2026-02-22,2,elearning,0
+EMP-0209,Excel for Office Work,2026-02-18,1.5,elearning,0
+EMP-0209,Anti-Money Laundering Briefing,2025-07-28,1.5,elearning,0
+EMP-0210,Strategic Planning Forum,2026-03-30,4,classroom,4100
+EMP-0211,Project Management Essentials,2026-04-03,8,classroom,6050
+EMP-0212,Internal Controls Orientation,2026-09-23,6,elearning,0
+EMP-0213,Anti-Money Laundering Briefing,2026-03-22,24,classroom,4550
+EMP-0213,Data Privacy Act Awareness,2026-04-15,24,external,20200
+EMP-0214,Basic Occupational Safety and Health,2026-05-25,8,external,20100
+EMP-0214,Strategic Planning Forum,2026-08-14,24,classroom,2900
+EMP-0215,Internal Controls Orientation,2026-08-16,40,external,8800
+EMP-0216,Internal Controls Orientation,2026-04-01,4,classroom,2050
+EMP-0216,Customer Service Excellence,2026-01-31,8,external,21400
+EMP-0217,Customer Service Excellence,2026-03-23,8,classroom,6350
+EMP-0217,Process Improvement Basics,2025-11-30,16,classroom,4700
+EMP-0218,Records Management Seminar,2026-03-09,4,classroom,3050
+EMP-0220,Leadership and Supervision Workshop,2026-09-15,5,elearning,0
+EMP-0220,Basic Occupational Safety and Health,2026-05-15,8,external,29900
+EMP-0221,Ethics and Public Accountability,2026-09-07,4,elearning,0
+EMP-0222,Customer Service Excellence,2026-04-09,8,classroom,6100
+EMP-0223,Effective Business Writing,2026-03-25,5.5,elearning,0
+EMP-0224,Leadership and Supervision Workshop,2026-08-22,3.5,elearning,0
+EMP-0224,Internal Controls Orientation,2026-08-29,40,external,27000
+EMP-0224,Effective Business Writing,2025-01-29,3.5,elearning,0
+EMP-0225,Data Privacy Act Awareness,2026-03-04,8,classroom,1900
+EMP-0226,Process Improvement Basics,2026-06-27,2.5,elearning,0
+EMP-0226,Ethics and Public Accountability,2026-04-09,3,elearning,0
+EMP-0227,Ethics and Public Accountability,2026-08-17,4.5,elearning,0
+EMP-0228,Project Management Essentials,2026-02-19,16,external,25000
+EMP-0229,Government Procurement Updates,2026-04-05,16,external,19600
+EMP-0230,Ethics and Public Accountability,2026-04-12,24,classroom,2600
+EMP-0231,Records Management Seminar,2026-09-14,40,external,25800
+EMP-0232,Effective Business Writing,2026-09-07,16,external,28700
+EMP-0232,Records Management Seminar,2026-05-27,8,classroom,6250
+EMP-0233,Basic Occupational Safety and Health,2026-08-04,8,classroom,3350
+EMP-0233,Leadership and Supervision Workshop,2026-05-05,24,classroom,4300
+EMP-0234,Ethics and Public Accountability,2026-08-27,24,classroom,1850
+EMP-0235,Government Procurement Updates,2026-05-23,8,classroom,2450
+EMP-0235,Financial Reporting Standards Update,2026-01-22,1.5,elearning,0
+EMP-0236,Government Procurement Updates,2026-07-26,4,elearning,0
+EMP-0236,Ethics and Public Accountability,2026-04-06,4.5,elearning,0
+EMP-0237,Records Management Seminar,2026-08-05,1,elearning,0
+EMP-0238,Project Management Essentials,2026-05-15,5.5,elearning,0
+EMP-0239,Information Security Awareness,2026-09-27,16,external,22900
+EMP-0240,Stress Management and Wellness,2026-07-24,3,elearning,0
+EMP-0240,Excel for Office Work,2026-03-16,2.5,elearning,0
+EMP-0241,Stress Management and Wellness,2026-11-03,16,classroom,6350
+EMP-0242,Government Procurement Updates,2026-04-27,16,classroom,1550
+EMP-0242,Leadership and Supervision Workshop,2026-05-17,24,classroom,2600
+EMP-0243,Stress Management and Wellness,2026-12-15,4,classroom,4800
+EMP-0244,Data Privacy Act Awareness,2026-09-29,1,elearning,0
+EMP-0245,Information Security Awareness,2026-02-22,4,classroom,3500
+EMP-0246,Information Security Awareness,2026-10-25,8,classroom,4450
+EMP-0247,Internal Controls Orientation,2026-02-27,16,external,9200
+EMP-0247,Ethics and Public Accountability,2026-07-21,2.5,elearning,0
+EMP-0248,Effective Business Writing,2026-07-31,4,classroom,5150
+EMP-0250,Records Management Seminar,2026-10-26,1.5,elearning,0
+EMP-0251,Strategic Planning Forum,2026-06-13,2,elearning,0
+EMP-0251,Basic Occupational Safety and Health,2026-05-27,24,classroom,3850
+EMP-0251,Effective Business Writing,2026-02-25,6,elearning,0
+EMP-0253,Internal Controls Orientation,2026-09-12,8,external,5800
+EMP-0254,Leadership and Supervision Workshop,2026-10-10,2.5,elearning,0
+EMP-0255,Anti-Money Laundering Briefing,2026-03-14,24,classroom,3200
+EMP-0256,Anti-Money Laundering Briefing,2026-02-26,2.5,elearning,0
+EMP-0256,Communication Skills Workshop,2026-07-16,5.5,elearning,0
+EMP-0256,Records Management Seminar,2025-08-19,5,elearning,0
+EMP-0257,Communication Skills Workshop,2026-09-01,4,classroom,2600
+EMP-0257,Excel for Office Work,2026-01-14,8,classroom,3350
+EMP-0257,Stress Management and Wellness,2025-05-17,16,classroom,5200
+EMP-0258,Information Security Awareness,2026-06-15,2,elearning,0
+EMP-0259,Records Management Seminar,2026-01-25,1,elearning,0
+EMP-0260,Effective Business Writing,2026-06-23,16,external,29900
+EMP-0262,Effective Business Writing,2026-11-12,6,elearning,0
+EMP-0263,Customer Service Excellence,2026-09-11,16,classroom,2550
+EMP-0263,Project Management Essentials,2026-03-29,8,classroom,4450
+EMP-0265,Project Management Essentials,2026-11-29,4.5,elearning,0
+EMP-0266,Strategic Planning Forum,2026-12-17,6,elearning,0
+EMP-0268,Project Management Essentials,2026-08-01,4,classroom,1900
+EMP-0269,Excel for Office Work,2026-02-11,1,elearning,0
+EMP-0269,Information Security Awareness,2026-09-12,8,classroom,1850
+EMP-0269,Effective Business Writing,2026-07-24,4.5,elearning,0
+EMP-0269,Customer Service Excellence,2025-12-20,2.5,elearning,0
+EMP-0270,Anti-Money Laundering Briefing,2026-02-13,16,classroom,4650
+EMP-0271,Financial Reporting Standards Update,2026-06-28,4,classroom,4850
+EMP-0272,Effective Business Writing,2026-05-14,16,classroom,3450
+EMP-0272,Effective Business Writing,2026-08-09,40,external,27700
+EMP-0273,Strategic Planning Forum,2026-01-13,4,classroom,3200
+EMP-0274,Ethics and Public Accountability,2026-02-27,16,external,5300
+EMP-0275,Basic Occupational Safety and Health,2026-06-26,24,classroom,5950
+EMP-0275,Records Management Seminar,2026-07-31,2.5,elearning,0
+EMP-0276,Basic Occupational Safety and Health,2026-05-12,24,classroom,4650
+EMP-0279,Government Procurement Updates,2026-07-31,4,classroom,5250
+EMP-0279,Anti-Money Laundering Briefing,2026-08-11,16,classroom,4850
+EMP-0279,Information Security Awareness,2026-08-11,16,external,12700
+EMP-0280,Project Management Essentials,2026-07-03,16,classroom,2300
+EMP-0280,Communication Skills Workshop,2026-07-04,16,classroom,4650
+EMP-0281,Excel for Office Work,2026-03-14,40,external,22800
+EMP-0281,Strategic Planning Forum,2026-07-02,8,external,18600
+EMP-0283,Financial Reporting Standards Update,2026-01-23,16,external,14500
+EMP-0283,Stress Management and Wellness,2026-04-22,8,classroom,4000
+EMP-0284,Stress Management and Wellness,2026-05-06,8,classroom,4650
+EMP-0285,Customer Service Excellence,2025-07-06,8,classroom,4100
+EMP-0286,Strategic Planning Forum,2026-03-06,1,elearning,0
+EMP-0287,Anti-Money Laundering Briefing,2026-10-18,4,classroom,3200
+EMP-0289,Communication Skills Workshop,2026-05-30,0.5,elearning,0
+EMP-0290,Information Security Awareness,2026-09-22,24,classroom,3400
+EMP-0291,Information Security Awareness,2026-08-26,8,classroom,2550
+EMP-0292,Internal Controls Orientation,2026-08-10,24,classroom,2750
+EMP-0293,Data Privacy Act Awareness,2026-05-30,6,elearning,0
+EMP-0294,Process Improvement Basics,2026-04-25,24,external,20200
+EMP-0295,Internal Controls Orientation,2026-05-28,16,classroom,2150
+EMP-0296,Project Management Essentials,2026-02-12,1,elearning,0
+EMP-0297,Records Management Seminar,2026-07-20,3,elearning,0
+EMP-0297,Records Management Seminar,2026-03-22,8,classroom,5000
+EMP-0299,Records Management Seminar,2026-05-11,5,elearning,0
+EMP-0300,Financial Reporting Standards Update,2026-05-26,40,external,5200
+EMP-0300,Leadership and Supervision Workshop,2026-02-03,40,external,26100
+EMP-0300,Strategic Planning Forum,2025-10-24,2,elearning,0

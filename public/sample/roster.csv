@@ -1,0 +1,301 @@
+employee_id,name,unit,position,employment_type,hire_date,separation_date,licensed
+EMP-0001,Edgar Villanueva,Human Resources,Recruitment Officer,contractual,2024-01-23,,yes
+EMP-0002,Beatriz Del Rosario,Human Resources,Training Specialist,regular,2022-04-12,,yes
+EMP-0003,Carmela Dizon,Human Resources,Recruitment Officer,regular,2016-07-05,,yes
+EMP-0004,Ariel Manalo,Human Resources,HR Officer,regular,2008-10-29,,yes
+EMP-0005,Ramon Valdez,Human Resources,Training Specialist,casual,2013-02-13,,yes
+EMP-0006,Christian Hernandez,Human Resources,Recruitment Officer,regular,2016-12-19,,yes
+EMP-0007,Grace De Leon,Human Resources,HR Officer,regular,2006-04-13,,no
+EMP-0008,Cristina Concepcion,Human Resources,Training Specialist,regular,2012-02-19,,yes
+EMP-0009,Michelle Mendoza,Human Resources,HR Officer,regular,2020-09-10,,yes
+EMP-0010,Ariel Padilla,Human Resources,Training Specialist,regular,2015-11-02,,yes
+EMP-0011,Nathaniel Pascual,Human Resources,Training Specialist,regular,2017-08-02,,yes
+EMP-0012,Sheila Castillo,Human Resources,Recruitment Officer,regular,2026-10-20,,yes
+EMP-0013,Liza Villanueva,Human Resources,Payroll Analyst,regular,2017-12-21,,yes
+EMP-0014,Carmela Santos,Human Resources,Payroll Analyst,casual,2021-03-08,,yes
+EMP-0015,Jerome Mendoza,Human Resources,Recruitment Officer,regular,2024-07-24,,yes
+EMP-0016,Jerome Panganiban,Human Resources,HR Officer,regular,2018-03-11,,yes
+EMP-0017,Carlo Del Rosario,Human Resources,Payroll Analyst,regular,2007-11-18,,no
+EMP-0018,Rey Mendoza,Human Resources,Recruitment Officer,regular,2009-04-05,,yes
+EMP-0019,Joel Aquino,Human Resources,Recruitment Officer,regular,2025-10-16,,yes
+EMP-0020,Patricia Villanueva,Human Resources,Training Specialist,regular,2021-08-08,,no
+EMP-0021,Beatriz De Leon,Finance,Finance Clerk,regular,2015-06-22,,no
+EMP-0022,Edgar Reyes,Finance,Accountant,regular,2026-10-29,,yes
+EMP-0023,Miguel Manalo,Finance,Finance Clerk,regular,2006-06-12,,yes
+EMP-0024,Sheila Domingo,Finance,Treasury Officer,contractual,2009-09-24,,no
+EMP-0025,Paolo Domingo,Finance,Finance Clerk,casual,2017-10-09,,yes
+EMP-0026,Nathaniel Garcia,Finance,Budget Analyst,regular,2011-11-27,,no
+EMP-0027,Liza Bautista,Finance,Treasury Officer,regular,2020-10-22,,no
+EMP-0028,Edgar Del Rosario,Finance,Finance Clerk,regular,2026-03-12,,yes
+EMP-0029,Kristine Padilla,Finance,Treasury Officer,contractual,2008-02-27,,yes
+EMP-0030,Victor Villanueva,Finance,Budget Analyst,casual,2021-09-30,,no
+EMP-0031,Cristina Garcia,Finance,Treasury Officer,regular,2026-02-21,,no
+EMP-0032,Ana Lacson,Finance,Accountant,regular,2011-10-05,,yes
+EMP-0033,Jerome Panganiban,Finance,Budget Analyst,casual,2025-08-04,,no
+EMP-0034,Miguel Valdez,Finance,Finance Clerk,regular,2019-03-25,,no
+EMP-0035,Dennis Mendoza,Finance,Budget Analyst,contractual,2011-10-11,,yes
+EMP-0036,Joanna Manalo,Finance,Accountant,regular,2021-06-29,,yes
+EMP-0037,Ramon Rivera,Finance,Accountant,regular,2026-10-25,,yes
+EMP-0038,Arnold Lopez,Finance,Accountant,contractual,2025-08-29,,yes
+EMP-0039,Sheila Lacson,Finance,Treasury Officer,regular,2020-04-20,,yes
+EMP-0040,Jennifer Flores,Finance,Accountant,contractual,2026-08-27,,yes
+EMP-0041,Mark Tolentino,Finance,Accountant,casual,2020-11-27,,yes
+EMP-0042,Victor Reyes,Finance,Accountant,regular,2020-11-06,,yes
+EMP-0043,Carlo Villanueva,Finance,Finance Clerk,regular,2010-11-28,,yes
+EMP-0044,John Paul Aquino,Finance,Treasury Officer,regular,2026-10-23,,yes
+EMP-0045,Edgar Villanueva,Finance,Treasury Officer,regular,2024-08-02,,yes
+EMP-0046,Nathaniel Del Rosario,Finance,Accountant,casual,2013-06-09,,no
+EMP-0047,Jose Reyes,Finance,Accountant,regular,2013-05-21,,no
+EMP-0048,Camille Rivera,Finance,Finance Clerk,casual,2022-06-14,,yes
+EMP-0049,Victor Navarro,Finance,Budget Analyst,regular,2026-10-17,,yes
+EMP-0050,Kristine Soriano,Finance,Budget Analyst,contractual,2020-04-24,,yes
+EMP-0051,Elena Castillo,Information Technology,Network Engineer,regular,2025-05-04,,yes
+EMP-0052,Kristine De Leon,Information Technology,Network Engineer,regular,2006-06-19,,yes
+EMP-0053,Jennifer Bautista,Information Technology,Systems Analyst,regular,2021-11-28,,yes
+EMP-0054,Beatriz Ocampo,Information Technology,Help Desk Associate,regular,2012-12-21,,yes
+EMP-0055,Mark Pascual,Information Technology,Developer,casual,2013-04-20,,yes
+EMP-0056,Maria Gonzales,Information Technology,Developer,regular,2024-06-01,,yes
+EMP-0057,Carlo Domingo,Information Technology,Help Desk Associate,contractual,2013-02-22,,yes
+EMP-0058,Lorna Santiago,Information Technology,Developer,regular,2019-01-16,,yes
+EMP-0059,Jennifer Mercado,Information Technology,Systems Analyst,regular,2026-07-28,,no
+EMP-0060,Miguel Panganiban,Information Technology,Network Engineer,contractual,2017-10-30,,yes
+EMP-0061,Elena Padilla,Information Technology,Systems Analyst,regular,2013-04-29,,yes
+EMP-0062,Edgar Ocampo,Information Technology,Help Desk Associate,contractual,2018-12-07,2026-07-06,yes
+EMP-0063,Jerome Garcia,Information Technology,Systems Analyst,regular,2015-02-20,2026-10-16,yes
+EMP-0064,Carmela Rivera,Information Technology,Help Desk Associate,regular,2026-02-17,,yes
+EMP-0065,Patricia Macaraeg,Information Technology,Network Engineer,regular,2020-01-26,,yes
+EMP-0066,Maria Mendoza,Information Technology,Help Desk Associate,regular,2010-05-28,,yes
+EMP-0067,Christian Mercado,Information Technology,Network Engineer,contractual,2014-03-03,,no
+EMP-0068,Jose Soriano,Information Technology,Network Engineer,contractual,2020-07-15,,no
+EMP-0069,Miguel Domingo,Information Technology,Developer,regular,2023-02-16,,yes
+EMP-0070,Miguel Dela Cruz,Information Technology,Systems Analyst,regular,2007-09-13,,no
+EMP-0071,Noel Ramos,Information Technology,Systems Analyst,regular,2026-06-26,,yes
+EMP-0072,Christian Villanueva,Information Technology,Systems Analyst,regular,2019-09-23,,yes
+EMP-0073,Beatriz Panganiban,Information Technology,Network Engineer,regular,2010-01-26,,no
+EMP-0074,Rey Macaraeg,Information Technology,Network Engineer,regular,2021-12-16,,no
+EMP-0075,Kristine Castillo,Information Technology,Systems Analyst,regular,2014-11-17,,no
+EMP-0076,Christian Mendoza,Information Technology,Systems Analyst,contractual,2013-10-20,,no
+EMP-0077,John Paul Flores,Information Technology,Help Desk Associate,casual,2010-05-04,,no
+EMP-0078,Joel Macaraeg,Information Technology,Developer,regular,2006-12-29,2026-08-21,yes
+EMP-0079,Dennis Valdez,Information Technology,Network Engineer,contractual,2025-06-03,,yes
+EMP-0080,Mark Mercado,Information Technology,Systems Analyst,regular,2016-10-06,,no
+EMP-0081,Ramon Magno,Legal Services,Attorney,regular,2026-04-18,,yes
+EMP-0082,Arnold Manalo,Legal Services,Legal Assistant,regular,2023-04-01,,yes
+EMP-0083,Kristine Evangelista,Legal Services,Legal Assistant,regular,2012-12-26,,yes
+EMP-0084,Arnold Villanueva,Legal Services,Attorney,regular,2007-10-17,,yes
+EMP-0085,Jose Pascual,Legal Services,Legal Assistant,regular,2026-10-22,,yes
+EMP-0086,Carmela Padilla,Legal Services,Paralegal,casual,2021-08-06,2026-05-31,yes
+EMP-0087,Mark Padilla,Legal Services,Paralegal,contractual,2013-10-12,,yes
+EMP-0088,Arnold Gonzales,Legal Services,Attorney,regular,2007-12-27,,yes
+EMP-0089,Grace Ocampo,Legal Services,Legal Assistant,regular,2013-03-13,2026-04-20,yes
+EMP-0090,Rosario Aguilar,Legal Services,Paralegal,regular,2011-03-23,,yes
+EMP-0091,Jose Reyes,Legal Services,Legal Assistant,regular,2012-10-16,,yes
+EMP-0092,Dennis Flores,Legal Services,Attorney,regular,2006-04-21,,yes
+EMP-0093,Jose Rivera,Branch Operations,Branch Associate,regular,2012-04-12,,yes
+EMP-0094,Jose Cruz,Branch Operations,Teller,contractual,2017-12-23,,no
+EMP-0095,Ramon Lopez,Branch Operations,Branch Associate,regular,2008-08-27,,yes
+EMP-0096,Sheila Dizon,Branch Operations,Customer Service Representative,casual,2010-07-10,,no
+EMP-0097,Victor Del Rosario,Branch Operations,Customer Service Representative,regular,2016-08-27,,yes
+EMP-0098,John Paul Dizon,Branch Operations,Branch Associate,regular,2009-03-05,,yes
+EMP-0099,Angelica Ramos,Branch Operations,Branch Associate,regular,2023-03-30,,yes
+EMP-0100,Cristina Aquino,Branch Operations,Branch Associate,casual,2026-06-14,,yes
+EMP-0101,Michelle Mendoza,Branch Operations,Customer Service Representative,regular,2014-02-03,,no
+EMP-0102,Camille Cruz,Branch Operations,Teller,regular,2007-09-22,,no
+EMP-0103,Juan Cruz,Branch Operations,Customer Service Representative,regular,2018-01-13,,yes
+EMP-0104,Rosario Lacson,Branch Operations,Customer Service Representative,regular,2026-04-08,,yes
+EMP-0105,Maricel Cruz,Branch Operations,Branch Associate,regular,2019-04-17,,yes
+EMP-0106,Mark Ramos,Branch Operations,Branch Associate,regular,2019-01-12,,yes
+EMP-0107,Jennifer Macaraeg,Branch Operations,Customer Service Representative,casual,2007-07-27,,yes
+EMP-0108,Joel Santos,Branch Operations,Operations Officer,regular,2026-10-21,,no
+EMP-0109,Dennis Soriano,Branch Operations,Teller,regular,2021-01-30,,no
+EMP-0110,Rey Castillo,Branch Operations,Teller,regular,2010-02-19,,yes
+EMP-0111,Joanna Aquino,Branch Operations,Teller,regular,2025-05-01,,no
+EMP-0112,Leo Gonzales,Branch Operations,Teller,regular,2010-02-21,,yes
+EMP-0113,Sheila Torres,Branch Operations,Customer Service Representative,contractual,2023-12-03,,no
+EMP-0114,Miguel Dela Cruz,Branch Operations,Teller,regular,2026-10-04,,no
+EMP-0115,Angelica Magno,Branch Operations,Operations Officer,regular,2024-12-04,2026-10-12,no
+EMP-0116,Dennis Lopez,Branch Operations,Customer Service Representative,regular,2014-11-01,,yes
+EMP-0117,Elena Reyes,Branch Operations,Customer Service Representative,regular,2012-08-30,,yes
+EMP-0118,Carmela Manalo,Branch Operations,Branch Associate,regular,2025-03-22,,no
+EMP-0119,Rosario Ramos,Branch Operations,Teller,regular,2010-10-02,,yes
+EMP-0120,Jose Fernandez,Branch Operations,Operations Officer,regular,2013-09-17,,yes
+EMP-0121,Rosario Santiago,Branch Operations,Operations Officer,contractual,2026-06-20,,yes
+EMP-0122,Ariel Salazar,Branch Operations,Customer Service Representative,regular,2023-04-14,,yes
+EMP-0123,Jennifer Aquino,Branch Operations,Customer Service Representative,regular,2025-10-08,,yes
+EMP-0124,Lorna Santos,Branch Operations,Customer Service Representative,regular,2022-04-07,,yes
+EMP-0125,Ana Dizon,Branch Operations,Operations Officer,regular,2009-05-13,,no
+EMP-0126,Jerome Dizon,Branch Operations,Customer Service Representative,casual,2009-10-18,,yes
+EMP-0127,Leo Bautista,Branch Operations,Teller,regular,2010-12-28,,yes
+EMP-0128,Miguel Cruz,Branch Operations,Branch Associate,regular,2026-04-04,,yes
+EMP-0129,John Paul Aguilar,Branch Operations,Teller,regular,2022-09-13,,no
+EMP-0130,Joanna Gonzales,Branch Operations,Operations Officer,regular,2009-04-22,,yes
+EMP-0131,Maricel Concepcion,Branch Operations,Branch Associate,regular,2008-02-27,,yes
+EMP-0132,Jerome Cruz,Branch Operations,Teller,regular,2017-05-14,,yes
+EMP-0133,Rey Aguilar,Branch Operations,Branch Associate,regular,2011-07-22,,yes
+EMP-0134,Juan Gonzales,Branch Operations,Operations Officer,regular,2020-06-19,,no
+EMP-0135,Katrina Hernandez,Branch Operations,Teller,regular,2008-12-11,,yes
+EMP-0136,Cristina Santos,Branch Operations,Branch Associate,regular,2013-10-13,,yes
+EMP-0137,John Paul Santos,Branch Operations,Branch Associate,contractual,2021-04-03,,yes
+EMP-0138,Beatriz Garcia,Branch Operations,Teller,casual,2023-10-12,2026-04-30,yes
+EMP-0139,Jose Valdez,Branch Operations,Teller,regular,2026-06-12,,yes
+EMP-0140,Paolo Torres,Branch Operations,Customer Service Representative,regular,2018-02-07,,yes
+EMP-0141,Maria Manalo,Branch Operations,Operations Officer,regular,2013-08-05,,yes
+EMP-0142,Jennifer Concepcion,Branch Operations,Customer Service Representative,regular,2011-11-29,,yes
+EMP-0143,Carlo Torres,Branch Operations,Branch Associate,regular,2025-03-21,,yes
+EMP-0144,Paolo Manalo,Branch Operations,Operations Officer,regular,2007-01-09,,yes
+EMP-0145,Carmela De Leon,Branch Operations,Customer Service Representative,regular,2006-04-22,,yes
+EMP-0146,John Paul Macaraeg,Branch Operations,Branch Associate,contractual,2024-03-01,,no
+EMP-0147,Lorna Mendoza,Branch Operations,Teller,regular,2026-06-23,,no
+EMP-0148,Elena Santiago,Credit Management,Loan Officer,regular,2009-05-13,2026-05-17,yes
+EMP-0149,Paolo De Leon,Credit Management,Account Officer,regular,2009-02-15,,yes
+EMP-0150,John Paul Padilla,Credit Management,Credit Analyst,regular,2020-09-03,,yes
+EMP-0151,Carmela Dizon,Credit Management,Account Officer,contractual,2015-02-19,,no
+EMP-0152,Kristine Lopez,Credit Management,Credit Analyst,casual,2016-11-07,,yes
+EMP-0153,Katrina Villanueva,Credit Management,Loan Officer,regular,2019-11-23,,yes
+EMP-0154,Victor Ocampo,Credit Management,Account Officer,regular,2008-05-25,,yes
+EMP-0155,Carlo Padilla,Credit Management,Credit Analyst,regular,2009-08-06,,no
+EMP-0156,Angelica Evangelista,Credit Management,Credit Analyst,regular,2025-11-25,,yes
+EMP-0157,Jose Aguilar,Credit Management,Credit Analyst,regular,2026-08-25,,yes
+EMP-0158,Ramon Garcia,Credit Management,Credit Analyst,regular,2011-10-26,,yes
+EMP-0159,Lorna Mercado,Credit Management,Credit Analyst,regular,2015-05-24,,yes
+EMP-0160,Edgar Lopez,Credit Management,Loan Officer,regular,2023-02-25,,yes
+EMP-0161,Carlo Magno,Credit Management,Credit Analyst,regular,2021-12-20,,yes
+EMP-0162,Beatriz Panganiban,Credit Management,Account Officer,casual,2026-02-23,,yes
+EMP-0163,Michelle Villanueva,Credit Management,Credit Analyst,regular,2008-11-17,,no
+EMP-0164,Mark Fernandez,Credit Management,Loan Officer,regular,2023-03-18,,no
+EMP-0165,Lorna Garcia,Credit Management,Credit Analyst,regular,2025-10-12,,no
+EMP-0166,Joanna Magno,Credit Management,Loan Officer,regular,2014-03-13,,yes
+EMP-0167,Maricel Ramos,Credit Management,Credit Analyst,contractual,2020-07-04,,yes
+EMP-0168,Juan Lacson,Credit Management,Credit Analyst,contractual,2013-04-13,,no
+EMP-0169,Elena Panganiban,Credit Management,Loan Officer,regular,2010-07-15,,yes
+EMP-0170,Victor Dela Cruz,Credit Management,Loan Officer,regular,2025-02-14,,no
+EMP-0171,Maricel Mendoza,Credit Management,Account Officer,regular,2020-09-24,,no
+EMP-0172,Michelle Fernandez,Credit Management,Credit Analyst,regular,2021-09-25,,no
+EMP-0173,Grace Salazar,Credit Management,Credit Analyst,regular,2007-05-14,,yes
+EMP-0174,Mark Mendoza,Credit Management,Credit Analyst,regular,2017-09-28,,no
+EMP-0175,Jennifer Villanueva,Credit Management,Credit Analyst,regular,2020-10-09,,yes
+EMP-0176,Arnold Mendoza,Credit Management,Loan Officer,regular,2026-05-31,,yes
+EMP-0177,Sheila Aguilar,Credit Management,Loan Officer,regular,2012-11-21,,no
+EMP-0178,Rey Aguilar,Risk Management,Compliance Officer,regular,2026-10-28,,yes
+EMP-0179,Arnold Bautista,Risk Management,Risk Analyst,regular,2026-10-27,,yes
+EMP-0180,Leo De Leon,Risk Management,Risk Associate,regular,2020-06-01,,yes
+EMP-0181,Jose Salazar,Risk Management,Compliance Officer,regular,2022-11-02,,no
+EMP-0182,Elena Tolentino,Risk Management,Risk Associate,contractual,2016-12-02,,yes
+EMP-0183,Liza Dela Cruz,Risk Management,Compliance Officer,regular,2014-10-30,,yes
+EMP-0184,Maria Santiago,Risk Management,Compliance Officer,regular,2008-07-25,,no
+EMP-0185,Angelica Reyes,Risk Management,Risk Associate,regular,2010-06-12,,yes
+EMP-0186,Maria Dela Cruz,Risk Management,Risk Associate,contractual,2008-08-24,2026-05-17,yes
+EMP-0187,Michelle Padilla,Risk Management,Risk Associate,regular,2018-08-03,,yes
+EMP-0188,Sheila Macaraeg,Risk Management,Compliance Officer,regular,2020-01-21,,no
+EMP-0189,Sheila Salazar,Risk Management,Risk Analyst,regular,2011-07-01,,yes
+EMP-0190,Rosario Reyes,Risk Management,Compliance Officer,regular,2008-09-06,,no
+EMP-0191,Dennis Santiago,Risk Management,Risk Analyst,regular,2011-12-18,,yes
+EMP-0192,Kristine Aquino,Risk Management,Risk Associate,regular,2020-06-20,,no
+EMP-0193,Jennifer Padilla,Internal Audit,Auditor,regular,2007-10-14,,yes
+EMP-0194,Joel Lopez,Internal Audit,Audit Analyst,regular,2026-10-17,,no
+EMP-0195,Sheila Rivera,Internal Audit,Auditor,regular,2016-09-19,,no
+EMP-0196,Arnold Magno,Internal Audit,Audit Associate,regular,2009-08-27,,no
+EMP-0197,Nathaniel Hernandez,Internal Audit,Audit Analyst,regular,2021-05-28,,yes
+EMP-0198,Michelle Dela Cruz,Internal Audit,Audit Associate,regular,2012-02-07,,yes
+EMP-0199,Victor Lopez,Internal Audit,Audit Analyst,contractual,2017-04-04,,yes
+EMP-0200,Nathaniel Mercado,Internal Audit,Auditor,regular,2018-08-05,2026-06-28,yes
+EMP-0201,John Paul Lopez,Internal Audit,Auditor,casual,2009-03-20,,yes
+EMP-0202,Edgar Mercado,Internal Audit,Auditor,regular,2022-03-14,,no
+EMP-0203,Jerome Concepcion,Internal Audit,Auditor,contractual,2016-08-11,,no
+EMP-0204,Victor Santiago,Internal Audit,Audit Associate,regular,2007-06-30,2026-02-13,yes
+EMP-0205,Jerome Padilla,Internal Audit,Audit Associate,casual,2006-01-21,,yes
+EMP-0206,Michelle Bautista,Internal Audit,Auditor,regular,2023-07-20,,yes
+EMP-0207,Miguel Castillo,Corporate Planning,Research Analyst,regular,2008-05-07,,no
+EMP-0208,Arnold Garcia,Corporate Planning,Planning Officer,regular,2006-09-22,,yes
+EMP-0209,Cristina Villanueva,Corporate Planning,Planning Officer,casual,2023-03-14,,yes
+EMP-0210,Dennis Dizon,Corporate Planning,Planning Associate,casual,2024-04-14,,yes
+EMP-0211,Camille Evangelista,Corporate Planning,Research Analyst,regular,2007-03-15,,yes
+EMP-0212,Rosario Aguilar,Corporate Planning,Planning Officer,regular,2018-07-19,,yes
+EMP-0213,Joel Mendoza,Corporate Planning,Research Analyst,casual,2020-04-23,,yes
+EMP-0214,Carmela Fernandez,Corporate Planning,Planning Associate,regular,2010-05-04,,no
+EMP-0215,Christian Concepcion,Corporate Planning,Planning Associate,casual,2015-05-18,,yes
+EMP-0216,Lorna Gonzales,Corporate Planning,Planning Associate,regular,2018-03-01,,no
+EMP-0217,Ana Gonzales,Corporate Planning,Research Analyst,regular,2010-02-20,2026-05-22,no
+EMP-0218,Nathaniel Reyes,Corporate Planning,Research Analyst,regular,2006-06-23,,no
+EMP-0219,Ana Hernandez,Procurement,Bids and Awards Staff,casual,2026-10-02,,no
+EMP-0220,Edgar Fernandez,Procurement,Procurement Officer,regular,2017-03-24,,yes
+EMP-0221,Elena Garcia,Procurement,Supply Clerk,regular,2023-02-20,,yes
+EMP-0222,John Paul Rivera,Procurement,Bids and Awards Staff,regular,2026-01-19,,no
+EMP-0223,Ariel Manalo,Procurement,Procurement Officer,regular,2019-12-15,,yes
+EMP-0224,Elena Flores,Procurement,Bids and Awards Staff,regular,2023-08-07,,yes
+EMP-0225,Beatriz Lacson,Procurement,Supply Clerk,contractual,2018-08-06,,yes
+EMP-0226,Joanna Ocampo,Procurement,Procurement Officer,regular,2018-11-02,,yes
+EMP-0227,Ana Domingo,Procurement,Procurement Officer,regular,2013-12-04,,yes
+EMP-0228,Dennis Soriano,Procurement,Bids and Awards Staff,regular,2006-04-09,2026-02-23,yes
+EMP-0229,Jose Aguilar,Procurement,Procurement Officer,regular,2009-09-22,2026-10-04,yes
+EMP-0230,Carmela Gonzales,Procurement,Bids and Awards Staff,regular,2010-09-29,,yes
+EMP-0231,Ana Padilla,Procurement,Supply Clerk,contractual,2026-07-22,,yes
+EMP-0232,Ariel Santos,Procurement,Supply Clerk,casual,2010-07-02,,no
+EMP-0233,Paolo Concepcion,Procurement,Supply Clerk,casual,2016-08-31,,no
+EMP-0234,Nathaniel Mercado,Procurement,Supply Clerk,regular,2018-04-08,,no
+EMP-0235,Angelica Padilla,Procurement,Procurement Officer,regular,2024-12-25,,yes
+EMP-0236,Rosario Navarro,Procurement,Procurement Officer,regular,2020-03-03,,yes
+EMP-0237,Ariel Lacson,Administrative Services,Driver,regular,2026-06-14,,yes
+EMP-0238,Miguel Soriano,Administrative Services,Records Officer,contractual,2026-03-10,,yes
+EMP-0239,Maria Domingo,Administrative Services,Utility Worker,casual,2024-04-24,,no
+EMP-0240,Angelica Padilla,Administrative Services,Driver,regular,2015-05-02,,yes
+EMP-0241,Jerome Castillo,Administrative Services,Utility Worker,regular,2018-04-19,,yes
+EMP-0242,Camille De Leon,Administrative Services,Records Officer,regular,2013-04-26,,yes
+EMP-0243,Katrina De Leon,Administrative Services,Driver,regular,2026-01-29,,no
+EMP-0244,Arnold Villanueva,Administrative Services,Driver,regular,2023-03-07,,yes
+EMP-0245,Mark Navarro,Administrative Services,Administrative Aide,regular,2025-07-13,2026-03-09,yes
+EMP-0246,Miguel Ocampo,Administrative Services,Records Officer,casual,2015-11-18,,yes
+EMP-0247,John Paul Garcia,Administrative Services,Driver,regular,2021-07-01,,yes
+EMP-0248,Grace Dela Cruz,Administrative Services,Records Officer,casual,2021-09-03,,no
+EMP-0249,Noel De Leon,Administrative Services,Utility Worker,regular,2026-10-29,,no
+EMP-0250,Jose Flores,Administrative Services,Administrative Aide,regular,2026-10-23,,yes
+EMP-0251,Miguel De Leon,Administrative Services,Driver,regular,2017-09-07,2026-10-07,yes
+EMP-0252,Michelle Valdez,Administrative Services,Records Officer,casual,2013-10-15,,no
+EMP-0253,Rey Navarro,Administrative Services,Driver,regular,2021-03-31,,yes
+EMP-0254,Grace Aguilar,Administrative Services,Records Officer,casual,2008-07-01,2026-11-06,yes
+EMP-0255,Elena Aguilar,Administrative Services,Utility Worker,regular,2019-03-12,,yes
+EMP-0256,Ariel Evangelista,Administrative Services,Administrative Aide,regular,2014-03-30,,yes
+EMP-0257,Kristine Ocampo,Administrative Services,Records Officer,contractual,2011-09-02,,no
+EMP-0258,Camille Mendoza,Administrative Services,Records Officer,regular,2015-03-09,,yes
+EMP-0259,Katrina Navarro,Administrative Services,Driver,regular,2012-09-22,,yes
+EMP-0260,Cristina Bautista,Administrative Services,Administrative Aide,regular,2009-09-09,,yes
+EMP-0261,Cristina Valdez,Administrative Services,Driver,regular,2026-10-01,,yes
+EMP-0262,Patricia Santiago,Administrative Services,Driver,contractual,2011-08-15,,yes
+EMP-0263,Carlo Rivera,Administrative Services,Utility Worker,regular,2023-06-17,,no
+EMP-0264,Ariel Salazar,Administrative Services,Administrative Aide,contractual,2022-10-05,,yes
+EMP-0265,Christian Soriano,Administrative Services,Records Officer,regular,2022-06-01,,yes
+EMP-0266,Angelica Flores,Administrative Services,Records Officer,regular,2015-11-16,,yes
+EMP-0267,Juan Lopez,Administrative Services,Records Officer,regular,2012-08-13,,yes
+EMP-0268,Nathaniel Macaraeg,Administrative Services,Records Officer,regular,2018-12-27,,no
+EMP-0269,Jose Lacson,Administrative Services,Driver,regular,2021-12-10,,yes
+EMP-0270,Kristine Mendoza,Administrative Services,Driver,casual,2023-07-19,,no
+EMP-0271,Maria Garcia,Administrative Services,Administrative Aide,regular,2013-09-02,,yes
+EMP-0272,Rosario Aguilar,Administrative Services,Utility Worker,regular,2019-06-07,,yes
+EMP-0273,Ana Del Rosario,Administrative Services,Records Officer,regular,2021-04-07,,yes
+EMP-0274,Grace Dizon,Administrative Services,Utility Worker,regular,2016-04-24,2026-10-30,yes
+EMP-0275,Paolo Dela Cruz,Administrative Services,Records Officer,regular,2007-06-09,,yes
+EMP-0276,Maricel Castillo,Administrative Services,Records Officer,casual,2008-04-09,,yes
+EMP-0277,Carlo Domingo,Corporate Communications,Communications Officer,regular,2013-09-17,,yes
+EMP-0278,Juan Aguilar,Corporate Communications,Communications Officer,regular,2011-09-07,,no
+EMP-0279,Jose Mercado,Corporate Communications,Graphic Artist,regular,2026-06-30,,no
+EMP-0280,Paolo Ramos,Corporate Communications,Communications Officer,casual,2025-03-28,,no
+EMP-0281,Victor Del Rosario,Corporate Communications,Content Writer,contractual,2006-08-13,,no
+EMP-0282,Michelle Lacson,Corporate Communications,Content Writer,regular,2017-01-15,2026-06-20,yes
+EMP-0283,Edgar Castillo,Corporate Communications,Content Writer,casual,2011-08-11,,yes
+EMP-0284,Rey Hernandez,Corporate Communications,Graphic Artist,regular,2009-03-07,,yes
+EMP-0285,Michelle Mendoza,Corporate Communications,Graphic Artist,contractual,2020-09-26,,yes
+EMP-0286,John Paul Aquino,Corporate Communications,Content Writer,casual,2024-02-27,,yes
+EMP-0287,Joanna Bautista,Corporate Communications,Communications Officer,regular,2009-06-23,,no
+EMP-0288,Jose Garcia,Corporate Communications,Content Writer,regular,2026-10-27,,yes
+EMP-0289,Maricel Flores,Corporate Communications,Content Writer,regular,2007-12-16,,yes
+EMP-0290,Elena Reyes,Corporate Communications,Graphic Artist,regular,2015-12-08,,yes
+EMP-0291,Ariel Domingo,Corporate Communications,Graphic Artist,regular,2026-03-07,,yes
+EMP-0292,Kristine Evangelista,Corporate Communications,Communications Officer,casual,2024-09-02,,no
+EMP-0293,Edgar Dela Cruz,Corporate Communications,Content Writer,contractual,2016-01-24,,yes
+EMP-0294,Paolo Flores,Corporate Communications,Graphic Artist,contractual,2018-01-10,,no
+EMP-0295,Elena De Leon,Corporate Communications,Graphic Artist,regular,2017-06-21,,no
+EMP-0296,Katrina Padilla,Corporate Communications,Communications Officer,regular,2016-04-12,,yes
+EMP-0297,Michelle Panganiban,Corporate Communications,Graphic Artist,regular,2017-08-31,,yes
+EMP-0298,Victor Panganiban,Corporate Communications,Graphic Artist,regular,2020-06-03,,yes
+EMP-0299,Maria Garcia,Corporate Communications,Content Writer,contractual,2013-12-05,,yes
+EMP-0300,Noel Padilla,Corporate Communications,Content Writer,regular,2007-08-18,,yes

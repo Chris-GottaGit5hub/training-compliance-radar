@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAtRiskCsv, csvCell, exportFileName, type AtRiskRow } from "@/lib/analysis";
+import { buildAtRiskCsv, csvCell, exportFileName, memoFileName, type AtRiskRow } from "@/lib/analysis";
 
 const row = (overrides: Partial<AtRiskRow> = {}): AtRiskRow => ({
   employeeId: "E1",
@@ -77,5 +77,13 @@ describe("exportFileName", () => {
   it("uses all-units for null or an unsluggable label", () => {
     expect(exportFileName(null, "2026-09-30")).toBe("at-risk-all-units-2026-09-30.csv");
     expect(exportFileName("???", "2026-09-30")).toBe("at-risk-all-units-2026-09-30.csv");
+  });
+});
+
+describe("memoFileName", () => {
+  it("names memo downloads after the unit and as-of date", () => {
+    expect(memoFileName("Branch Operations", "2026-09-30")).toBe(
+      "memo-branch-operations-2026-09-30.txt",
+    );
   });
 });

@@ -45,3 +45,8 @@ export function exportFileName(label: string | null, asOfDate: string): string {
       .replace(/^-+|-+$/g, "") || "all-units";
   return `at-risk-${slug}-${asOfDate}.csv`;
 }
+
+/** e.g. memo-branch-operations-2026-09-30.txt */
+export function memoFileName(unit: string, asOfDate: string): string {
+  return exportFileName(unit, asOfDate).replace(/^at-risk-/, "memo-").replace(/\.csv$/, ".txt");
+}

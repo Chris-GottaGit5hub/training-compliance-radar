@@ -1,0 +1,121 @@
+import { z } from "zod";
+import { isRealDate } from "./dates";
+
+export const EMPLOYMENT_TYPES = ["regular", "contractual", "casual"] as const;
+export const DELIVERY_TYPES = ["classroom", "elearning", "external"] as const;
+export const PROVIDERS = ["linkedin_learning", "in_house"] as const;
+
+export const ROSTER_COLUMNS = [
+  "employee_id",
+  "name",
+  "unit",
+  "position",
+  "employment_type",
+  "hire_date",
+  "separation_date",
+  "licensed",
+] as const;
+export const ATTENDANCE_COLUMNS = [
+  "employee_id",
+  "training_title",
+  "training_date",
+  "hours",
+  "delivery",
+  "cost",
+] as const;
+export const CATALOG_COLUMNS = [
+  "course_id",
+  "title",
+  "skill_area",
+  "duration_minutes",
+  "provider",
+  "url",
+  "cost_per_head",
+] as const;
+
+/** Columns that may be absent from the header (their cells are optional). */
+export const OPTIONAL_COLUMNS: readonly string[] = ["separation_date", "url"];
+
+type RawIssue = { input?: unknown };
+const missingOr = (message: string) => (issue: RawIssue) =>
+  issue.input === undefined ? "is required" : message;
+
+const text = z
+  .string({ error: "is required" })
+  .min(1, "is required");
+
+const dateString = z
+  .string({ error: "is required" })
+  .refine(isRealDate, "must be a real date written as YYYY-MM-DD");
+
+const emptyToUndefined = z.literal("").transform(() => undefined);
+
+const lowerEnum = <T extends readonly [string, ...string[]]>(values: T) =>
+  z.preprocess(
+    (v) => (typeof v === "string" ? v.trim().toLowerCase() : v),
+    z.enum(values, { error: missingOr(`must be one of: ${values.join(", ")}`) }),
+  );
+
+const toNumber = (v: unknown): unknown =>
+  typeof v === "string" ? (v.trim() === "" ? undefined : Number(v)) : v;
+
+const number = () => z.number({ error: missingOr("must be a number") });
+
+const nonNegative = z.preprocess(
+  toNumber,
+  number().min(0, "must be 0 or more"),
+);
+const positiveInt = z.preprocess(
+  toNumber,
+  number().int("must be a whole number").positive("must be greater than 0"),
+);
+
+const isHttpsUrl = (value: string): boolean => {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+export const rosterRowSchema = z
+  .object({
+    employee_id: text,
+    name: text,
+    unit: text,
+    position: text,
+    employment_type: lowerEnum(EMPLOYMENT_TYPES),
+    hire_date: dateString,
+    separation_date: z.union([emptyToUndefined, dateString]).optional(),
+    licensed: lowerEnum(["yes", "no"] as const),
+  })
+  .refine((r) => !r.separation_date || r.separation_date >= r.hire_date, {
+    path: ["separation_date"],
+    message: "must be on or after hire_date",
+  });
+
+export const attendanceRowSchema = z.object({
+  employee_id: text,
+  training_title: text,
+  training_date: dateString,
+  hours: nonNegative,
+  delivery: lowerEnum(DELIVERY_TYPES),
+  cost: nonNegative,
+});
+
+export const catalogRowSchema = z.object({
+  course_id: text,
+  title: text,
+  skill_area: text,
+  duration_minutes: positiveInt,
+  provider: lowerEnum(PROVIDERS),
+  url: z
+    .union([emptyToUndefined, z.string().refine(isHttpsUrl, "must be an https URL")])
+    .optional(),
+  cost_per_head: nonNegative,
+});
+
+export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number];
+export type RosterRow = z.infer<typeof rosterRowSchema>;
+export type AttendanceRow = z.infer<typeof attendanceRowSchema>;
+export type CatalogRow = z.infer<typeof catalogRowSchema>;

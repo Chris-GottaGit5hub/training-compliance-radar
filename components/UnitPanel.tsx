@@ -7,8 +7,10 @@ import {
   type AtRiskRow,
 } from "@/lib/analysis";
 import type { UnitSummary } from "@/lib/engine";
-import { ComingNextButton } from "./ComingNextButton";
+import type { CatalogRow } from "@/lib/schemas";
+import { AiPanel } from "./AiPanel";
 import { downloadTextFile } from "./download";
+import type { AiActions } from "./useAiActions";
 import type { useRadarState } from "./useRadarState";
 import { Card, StepHeading, buttonClass } from "./ui";
 
@@ -56,11 +58,15 @@ function UnitDetails({
   unit,
   rows,
   asOfDate,
+  catalog,
+  ai,
   onClose,
 }: {
   unit: UnitSummary;
   rows: AtRiskRow[];
   asOfDate: string;
+  catalog: CatalogRow[] | null;
+  ai: AiActions;
   onClose: () => void;
 }) {
   const heading = useRef<HTMLHeadingElement>(null);
@@ -93,21 +99,6 @@ function UnitDetails({
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <ComingNextButton label="Generate memo" />
-        <ComingNextButton label="Recommend courses" />
-        <button
-          type="button"
-          disabled={rows.length === 0}
-          onClick={() =>
-            downloadTextFile(exportFileName(unit.unit, asOfDate), buildAtRiskCsv(rows))
-          }
-          className={buttonClass("primary")}
-        >
-          Export at-risk CSV
-        </button>
-      </div>
-
       {rows.length === 0 ? (
         <p className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900">
           Nobody in this unit is at risk as of {asOfDate}.
@@ -115,12 +106,32 @@ function UnitDetails({
       ) : (
         <EmployeeTable rows={rows} />
       )}
+
+      <AiPanel
+        unit={unit}
+        rows={rows}
+        catalog={catalog}
+        ai={ai}
+        asOfDate={asOfDate}
+        exportButton={
+          <button
+            type="button"
+            disabled={rows.length === 0}
+            onClick={() =>
+              downloadTextFile(exportFileName(unit.unit, asOfDate), buildAtRiskCsv(rows))
+            }
+            className={buttonClass("secondary")}
+          >
+            Export at-risk CSV
+          </button>
+        }
+      />
     </div>
   );
 }
 
-export function UnitPanel({ state }: { state: RadarState }) {
-  const { analysis, roster, config, selectedUnit, selectUnit } = state;
+export function UnitPanel({ state, ai }: { state: RadarState; ai: AiActions }) {
+  const { analysis, roster, catalog, config, selectedUnit, selectUnit } = state;
   const unit = analysis?.org.unitsRanked.find((u) => u.unit === selectedUnit);
   const rows = useMemo(
     () =>
@@ -135,7 +146,7 @@ export function UnitPanel({ state }: { state: RadarState }) {
           id="step-unit-title"
           step={4}
           title="Unit panel"
-          description="At-risk employees for one unit, with next actions."
+          description="At-risk employees for one unit, with AI drafting and export."
         />
         {unit && config ? (
           <UnitDetails
@@ -143,6 +154,8 @@ export function UnitPanel({ state }: { state: RadarState }) {
             unit={unit}
             rows={rows}
             asOfDate={config.asOfDate}
+            catalog={catalog}
+            ai={ai}
             onClose={() => selectUnit(null)}
           />
         ) : (

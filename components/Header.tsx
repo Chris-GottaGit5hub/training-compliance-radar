@@ -1,6 +1,16 @@
-import { ComingNextButton } from "./ComingNextButton";
+import { buttonClass } from "./ui";
 
-export function Header() {
+export function Header({
+  canSummarize,
+  disabledReason,
+  loading,
+  onSummary,
+}: {
+  canSummarize: boolean;
+  disabledReason: string;
+  loading: boolean;
+  onSummary: () => void;
+}) {
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -26,7 +36,15 @@ export function Header() {
             </p>
           </div>
         </div>
-        <ComingNextButton label="Executive summary" />
+        <button
+          type="button"
+          onClick={onSummary}
+          disabled={!canSummarize || loading}
+          title={canSummarize ? undefined : disabledReason}
+          className={buttonClass("secondary")}
+        >
+          {loading ? "Writing summary…" : "Executive summary"}
+        </button>
       </div>
       <p
         role="note"

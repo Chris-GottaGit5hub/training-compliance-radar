@@ -1,4 +1,6 @@
 # training-compliance-radar
+
+[![CI](https://github.com/Chris-GottaGit5hub/training-compliance-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/Chris-GottaGit5hub/training-compliance-radar/actions/workflows/ci.yml)
 Privacy-first AI app that flags employees at risk of missing the 1-training-per-year rule
 
 ## AI provider

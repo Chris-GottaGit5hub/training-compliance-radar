@@ -29,7 +29,7 @@ Government agencies expect every employee to complete at least one L&D intervent
 - Real employee data (synthetic data only in the public repo)
 
 ## 5. Success Metrics
-1. **Prediction:** on the synthetic back-test, ≥ 80% of year-end non-compliant employees are flagged as at-risk by Sep 30.
+1. **Prediction:** on the synthetic back-test, report recall (share of year-end non-compliant employees flagged at the checkpoint) and precision (share of flagged employees still non-compliant at year end) at both Jun 30 and Sep 30. Target: recall ≥ 80% at both checkpoints. Precision is informational: 1 − precision is the group trained after being flagged, which early nudges target.
 2. **Speed:** from upload to a full dashboard plus all unit memos in **under 5 minutes** (vs. days of manual cross-matching).
 3. **Accuracy & safety:** 100% of unit tests pass for the compliance rules; 0 hallucinated course links (all picks validated against the catalog).
 

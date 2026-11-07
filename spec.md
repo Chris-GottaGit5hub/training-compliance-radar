@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.1)
+# spec.md — Training Compliance Radar (v1.2)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -75,6 +75,7 @@ type Status = 'COMPLIANT' | 'AT_RISK' | 'EXEMPT' | 'EXCLUDED' | 'NOT_COVERED';
 interface EmployeeResult { employeeId: string; unit: string; status: Status; reason: string; qualifyingCount: number; }
 ```
 ### 3.2 Unit summary
+`summarizeUnits(results, roster)` takes the roster as well as the results, because `EmployeeResult` carries no licensing; it reads `licensed` there to fill `atRiskLicensed` and `atRiskUnlicensed`.
 ```ts
 interface UnitSummary { unit: string; covered: number; compliant: number; atRisk: number;
   atRiskLicensed: number; atRiskUnlicensed: number;
@@ -111,9 +112,12 @@ Other rules:
 - `caughtEarly` = count of employees AT_RISK at **both** runs.
 - `notCoveredAtCheckpoint` = employees AT_RISK at deadline whose checkpoint status was not AT_RISK or COMPLIANT (e.g., hired after the checkpoint). They stay in the denominator.
 - `recall` = caughtEarly / nonCompliantAtYearEnd; `precision` = caughtEarly / flaggedAtCheckpoint; each is `null` when its denominator is 0.
-- Returns counts only (no IDs).
+- Returns counts only (no IDs). `recall` and `precision` are 0–1 ratios (unrounded).
+- **Reporting:** the app reports recall **and** precision at two checkpoints, Jun 30 and Sep 30 of `year` (two calls to `backtest`).
+- **Reading precision:** `1 − precision` is the share of employees flagged at the checkpoint who were not AT_RISK at year end, i.e. who were trained before year-end (or separated). They are the group early nudges target. Recall alone is easy to satisfy because an untrained, still-covered employee stays AT_RISK until trained; precision shows how many flags were later closed.
 
 ### 4.2 Cost-to-close
+`costToClose(results, roster, catalog, config)` likewise takes the roster to read each employee's licensing.
 - A catalog course **qualifies** if `duration_minutes ≥ minHours × 60`.
 - Licensed AT_RISK employee → cheapest qualifying `linkedin_learning` course, **only if `elearningCounts` is true**; otherwise use the unlicensed route.
 - Unlicensed AT_RISK employee → cheapest qualifying `in_house` course `cost_per_head`.
@@ -175,7 +179,7 @@ States: loading spinners on AI buttons; error banners with retry; empty states. 
 
 ## 8. Acceptance Criteria (Given / When / Then)
 1. Given sample data and asOf = Sep 30, when processed, then dashboard KPIs equal engine outputs and units are ranked per §4.
-2. Given an employee hired Oct 15 (cutoff Oct 1), then status = EXEMPT.
+2. Given an employee hired Oct 15 (cutoff Oct 1) and an as-of date of Nov 30, then status = EXEMPT. (Evaluated as of Sep 30 the same employee is NOT_COVERED by rule 1, because rules are applied in order.)
 3. Given an employee separated Mar 31 and asOf = Sep 30, then status = EXCLUDED.
 4. Given an employee with one e-learning course of 0.5 h and minHours = 1, then status = AT_RISK.
 5. Given elearningCounts = false and only e-learning attended, then status = AT_RISK.
@@ -198,3 +202,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 |---|---|---|---|
 | 1.0 | 2026-11-07 | Initial spec | — |
 | 1.1 | 2026-11-07 | Default AI provider → Google Gemini (`AI_PROVIDER=google`, `GOOGLE_GENERATIVE_AI_API_KEY`, default model `gemini-3.8-flash`); Anthropic kept as one-env-var alternative with its own default model; no runtime fallback; 503 when AI not configured. Cost-to-close respects `elearningCounts`/`minHours` and handles missing routes. Back-test fully defined (adds precision, null rules). Dates handled as strings in Asia/Manila; `monthsRemaining` formula; `deadline` defined; rounding rule. CSV normalization rules; catalog made optional. Memo numbers via server-filled tokens; numeric grounding check for memo/summary. Small-cell suppression for positions; prompt-injection, string, body-size, timeout and log rules. CSV export formula-injection guard. Acceptance criteria 11–15 and test plan updated. | senior-engineer review |
+| 1.2 | 2026-11-08 | Acceptance criterion 2 now states the Nov 30 as-of date (a Sep 30 evaluation gives NOT_COVERED by rule 1). Back-test reports recall and precision at Jun 30 and Sep 30, with a note that 1 − precision is the group early nudges target. `summarizeUnits` and `costToClose` take the roster to read licensing. | clarifications from engine implementation |

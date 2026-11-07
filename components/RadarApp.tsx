@@ -3,6 +3,7 @@
 import { DataStep } from "./DataStep";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { RulesStep } from "./RulesStep";
 import { Stepper, type StepInfo } from "./Stepper";
 import { useRadarState } from "./useRadarState";
 
@@ -32,6 +33,7 @@ export function RadarApp() {
         <Stepper steps={steps} />
         <div className="space-y-6">
           <DataStep state={state} />
+          <RulesStep state={state} />
         </div>
       </main>
       <Footer />

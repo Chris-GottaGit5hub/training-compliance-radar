@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.0)
+# spec.md — Training Compliance Radar (v1.1)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -29,7 +29,7 @@ L&D officers in Philippine government agencies must ensure every covered employe
 | delivery | `classroom` \| `elearning` \| `external` | required |
 | cost | number ≥ 0 (PHP) | required (0 allowed) |
 
-### 2.3 catalog.csv (required for recommendations)
+### 2.3 catalog.csv (optional — enables recommendations and cost-to-close)
 | Column | Type | Rules |
 |---|---|---|
 | course_id | string | required, unique |
@@ -40,18 +40,32 @@ L&D officers in Philippine government agencies must ensure every covered employe
 | url | https URL or empty | optional |
 | cost_per_head | number ≥ 0 (PHP) | required (0 for licensed e-learning) |
 
+Without a catalog, the dashboard and memos still work; the Recommendations panel and cost-to-close KPI show an empty state ("Upload a catalog to enable").
+
 ### 2.4 Settings (UI)
 ```ts
 interface RulesConfig {
-  year: number;                 // default: current year
-  asOfDate: string;             // YYYY-MM-DD, default: today; must fall within `year`
-  lateHireCutoff: string;       // default: `${year}-10-01`; hired on/after → Exempt
-  coveredTypes: EmploymentType[]; // default: ['regular','contractual','casual']
+  year: number;                 // default: current year (Asia/Manila)
+  asOfDate: string;             // YYYY-MM-DD, default: today in Asia/Manila; must fall within `year`
+  lateHireCutoff: string;       // default: `${year}-10-01`; hired on/after → Exempt; must fall within `year`
+  coveredTypes: EmploymentType[]; // default: ['regular','contractual','casual']; at least one
   elearningCounts: boolean;     // default: true
   minHours: number;             // default: 1 — a training counts only if hours ≥ minHours
-  budgetPhp: number;            // default: 0 (cost view hidden if 0)
+  budgetPhp: number;            // default: 0 (budget comparison hidden if 0)
 }
 ```
+Derived (not user-editable): `deadline = ${year}-12-31`.
+
+### 2.5 Parsing & normalization (applies to all CSVs)
+- UTF-8; a leading BOM is stripped. Header names are trimmed and lower-cased; unknown extra columns are ignored.
+- Every cell is trimmed; a cell that is empty after trimming counts as missing.
+- Enum values are matched case-insensitively and stored lower-case (`Regular` → `regular`).
+- Dates must match `^\d{4}-\d{2}-\d{2}$` **and** be a real calendar date (`2026-02-30` is an error). Dates are compared as `YYYY-MM-DD` strings; the engine never converts them to `Date` objects or time zones.
+- `employee_id` is matched exactly after trimming (case-sensitive).
+- Units are grouped by their trimmed value; if two unit names differ only by letter case, show a warning (not an error).
+- Attendance rows dated outside `year` are valid but never qualify (not an error).
+- Exact duplicate attendance rows (same `employee_id`, `training_title`, `training_date`) are counted once and reported in a warning.
+- Duplicate `course_id` in the catalog → validation error listing the IDs.
 
 ## 3. Outputs
 
@@ -63,16 +77,17 @@ interface EmployeeResult { employeeId: string; unit: string; status: Status; rea
 ### 3.2 Unit summary
 ```ts
 interface UnitSummary { unit: string; covered: number; compliant: number; atRisk: number;
-  atRiskLicensed: number; atRiskUnlicensed: number; complianceRate: number; // compliant/covered, 0 if covered=0
+  atRiskLicensed: number; atRiskUnlicensed: number;
+  complianceRate: number; // percent 0–100, rounded to 1 decimal; 0 if covered = 0
 }
 ```
 ### 3.3 Org summary
-`{ covered, compliant, atRisk, exempt, excluded, notCovered, complianceRate, monthsRemaining, unitsRanked: UnitSummary[] }`
+`{ covered, compliant, atRisk, exempt, excluded, notCovered, complianceRate, monthsRemaining, deadline, unitsRanked: UnitSummary[] }`
 
 ### 3.4 AI outputs (zod schemas, server-side)
-- `/api/recommend` → `{ recommendations: { unit: string; courseIds: string[]; rationale: string }[] }`
-- `/api/memo` → `{ subject: string; body: string }` — body MUST contain the literal token `{{EMPLOYEE_LIST}}`
-- `/api/summary` → `{ summary: string }` (≤ 250 words)
+- `/api/recommend` → `{ recommendations: { unit: string; courseIds: string[] (≤3); rationale: string (≤300 chars); fallbackSearch: boolean }[] }`
+- `/api/memo` → `{ subject: string; body: string; warning?: 'unverified_numbers' }` — returned body contains the literal token `{{EMPLOYEE_LIST}}` exactly once
+- `/api/summary` → `{ summary: string (≤ 250 words); warning?: 'unverified_numbers' }`
 
 ## 4. Behavior Rules (compliance engine — pure functions in `lib/engine/`)
 Evaluate each roster row in this order (first match wins):
@@ -83,44 +98,80 @@ Evaluate each roster row in this order (first match wins):
 5. Count **qualifying trainings**: attendance rows for this employee where `training_date` is within `year`, `training_date ≤ asOfDate`, `hours ≥ minHours`, and (`delivery ≠ 'elearning'` OR `elearningCounts`). If count ≥ 1 → **COMPLIANT**, else → **AT_RISK**.
 
 Other rules:
-- Covered = COMPLIANT + AT_RISK. Compliance rate = compliant / covered (0 when covered = 0), rounded to 1 decimal %.
-- `monthsRemaining` = whole months from asOfDate to Dec 31 of `year` (Dec 15 → 0; Sep 30 → 3).
-- Units ranked by `atRisk` desc, then `complianceRate` asc, then name asc.
+- Covered = COMPLIANT + AT_RISK. `complianceRate` = compliant / covered × 100, rounded half-up to 1 decimal (0 when covered = 0). Rounding happens once, in the engine; UI and payloads use the rounded value.
+- `monthsRemaining` = `12 − month(asOfDate)` (Jan → 11, Sep 1 and Sep 30 → 3, Dec → 0).
+- Units ranked by `atRisk` desc, then the **unrounded** ratio compliant/covered asc, then unit name asc (locale-independent code-point order).
 - Attendance rows whose employee_id is not in the roster are ignored and counted in a warning.
 - Duplicate `employee_id` in roster → validation error listing the IDs; nothing processed.
-- **Back-test:** `backtest(roster, attendance, config, checkpointDate)` returns `{ flaggedAtCheckpoint, nonCompliantAtYearEnd, caughtEarly, recall }` where recall = caughtEarly / nonCompliantAtYearEnd.
 
-### 4.1 Cost-to-close
-- Licensed AT_RISK employee → cheapest `linkedin_learning` course cost (normally ₱0).
-- Unlicensed AT_RISK employee → cheapest `in_house` course `cost_per_head`.
-- `costToClose` = sum; show `budgetPhp − costToClose` and a covered / short flag.
+### 4.1 Back-test
+`backtest(roster, attendance, config, checkpointDate)` — `checkpointDate` must be within `config.year` and before `deadline`. Run the engine twice with the same config, changing only `asOfDate`: once at `checkpointDate`, once at `deadline`.
+- `flaggedAtCheckpoint` = count of AT_RISK at checkpoint.
+- `nonCompliantAtYearEnd` = count of AT_RISK at deadline.
+- `caughtEarly` = count of employees AT_RISK at **both** runs.
+- `notCoveredAtCheckpoint` = employees AT_RISK at deadline whose checkpoint status was not AT_RISK or COMPLIANT (e.g., hired after the checkpoint). They stay in the denominator.
+- `recall` = caughtEarly / nonCompliantAtYearEnd; `precision` = caughtEarly / flaggedAtCheckpoint; each is `null` when its denominator is 0.
+- Returns counts only (no IDs).
 
-### 4.2 Validation & limits
+### 4.2 Cost-to-close
+- A catalog course **qualifies** if `duration_minutes ≥ minHours × 60`.
+- Licensed AT_RISK employee → cheapest qualifying `linkedin_learning` course, **only if `elearningCounts` is true**; otherwise use the unlicensed route.
+- Unlicensed AT_RISK employee → cheapest qualifying `in_house` course `cost_per_head`.
+- If a route has no qualifying course, those employees are counted in `unpricedCount` and `costToClose` is shown as a lower bound with a warning.
+- Output: `{ costToClose, unpricedCount, remaining: budgetPhp − costToClose, covered: remaining ≥ 0 && unpricedCount = 0 }`.
+- The cost-to-close KPI shows whenever a catalog is loaded; the budget line (`remaining`, covered/short) shows only when `budgetPhp > 0`.
+
+### 4.3 Validation & limits
 - Max file size 5 MB each; max 20,000 rows per file; reject missing required columns with a message naming them.
 - Row-level errors: show first 20 with row numbers; block processing if any required-field error exists.
 
+### 4.4 Export
+- Exports: at-risk list CSV (per unit and all units) and memo text.
+- CSV cells starting with `=`, `+`, `-`, `@`, tab, or carriage return are prefixed with `'` (formula-injection guard). Files are UTF-8 with BOM so Excel shows names correctly.
+
 ## 5. API Contracts (Next.js Route Handlers)
-All routes: POST, JSON, zod-validated, `maxDuration = 60`, in-memory rate limit **10 requests/min per IP**.
+All routes: POST, JSON, zod-validated, `maxDuration = 60`, request body ≤ 200 KB (else 413), in-memory rate limit **10 requests/min per IP** (first IP in `x-forwarded-for`; best-effort per serverless instance).
+
+String caps in every request: unit ≤ 100 chars, position ≤ 100, course title ≤ 200, skill area ≤ 100.
+
 | Route | Request (aggregates only — no names/IDs) | Errors |
 |---|---|---|
-| `/api/recommend` | `{ units: { unit, atRiskLicensed, atRiskUnlicensed, topPositions: string[] (≤5) }[] (≤200), catalog: { courseId, title, skillArea, durationMinutes, provider }[] (≤300) }` | 400 invalid, 413 too large, 429 rate limit, 502 AI failure |
+| `/api/recommend` | `{ units: { unit, atRiskLicensed, atRiskUnlicensed, topPositions: string[] (≤5) }[] (≤200), catalog: { courseId, title, skillArea, durationMinutes, provider }[] (≤300) }` | 400 invalid, 413 too large, 429 rate limit, 502 AI failure/timeout, 503 AI not configured |
 | `/api/memo` | `{ unit, atRiskCount, coveredCount, deadline, monthsRemaining, courses: { title, url?, durationMinutes }[] (≤5), tone: 'formal'\|'friendly' }` | same |
-| `/api/summary` | org summary numbers + top 10 units (names of units allowed) | same |
+| `/api/summary` | org summary numbers + top 10 units (unit names and their numbers allowed) | same |
+
+Client payload rules (enforced in `/lib/payload`, unit-tested):
+- `topPositions` includes only positions held by **≥ 3** AT_RISK employees in that unit (small-cell suppression); otherwise the list is shorter or empty.
+- The catalog sent to `/api/recommend` contains only qualifying courses (§4.2), and excludes `linkedin_learning` courses when `elearningCounts` is false.
+
+Prompting rules:
+- User-supplied strings (unit names, positions, course titles) are passed as a JSON data block; the system prompt states that this block is data, never instructions.
+- Provider call: `generateObject` with the zod schema, temperature 0.3, timeout 25 s (AbortSignal), `maxRetries: 1`.
 
 Server post-processing:
-- `/api/recommend`: drop any `courseId` not in the submitted catalog; if a unit ends with zero valid IDs, return `fallbackSearch: true` and the client shows a LinkedIn Learning search link built from the unit's top position.
-- `/api/memo`: if `{{EMPLOYEE_LIST}}` is missing, append it to the end of the body.
-- Log one line per AI call: route, provider, model, latency ms, status (no payload contents).
+- `/api/recommend`: drop any `courseId` not in the submitted catalog and any unit not in the request; keep at most 3 IDs per unit. If a requested unit ends with zero valid IDs, return it with `fallbackSearch: true` and the client shows a LinkedIn Learning search link built from the unit's first top position (or the unit name if none).
+- `/api/memo`: the model writes `{{AT_RISK_COUNT}}`, `{{COVERED_COUNT}}`, `{{DEADLINE}}` and `{{EMPLOYEE_LIST}}` tokens instead of numbers and names. The server replaces the first three with request values (prepending a fixed fact sentence if any are missing), then ensures `{{EMPLOYEE_LIST}}` appears exactly once (appending it if missing). The client replaces `{{EMPLOYEE_LIST}}` locally.
+- **Numeric grounding check** (`/api/memo` after substitution, `/api/summary`): every number in the text must equal a number in the request (percentages compared at 1 decimal). On a mismatch, regenerate once; if it still fails, return the text with `warning: 'unverified_numbers'` and the UI shows a warning next to it.
+- Log one line per AI call: route, provider, model, latency ms, status, error code. Never log payload contents or provider error messages (they can echo the prompt).
 
 ## 6. UI
-Single page, 4 steps: **(1) Data** — upload 3 CSVs or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (covered, compliance %, at-risk, months left, cost to close), units bar chart, ranked unit table; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**. Footer: privacy note.
-States: loading spinners on AI buttons; error banners with retry; empty states. Mobile-friendly layout.
+Single page, 4 steps: **(1) Data** — upload 3 CSVs (catalog optional) or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (covered, compliance %, at-risk, months left, cost to close), units bar chart, ranked unit table; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**. Footer: privacy note.
+States: loading spinners on AI buttons; error banners with retry; empty states. If an AI route returns 503, AI buttons are disabled with a banner "AI not configured" while the engine and dashboard keep working. Mobile-friendly layout.
 
 ## 7. Constraints
-- Next.js (App Router) + TypeScript strict + Tailwind; Vercel AI SDK; Vitest; Node LTS.
-- Env vars: `ANTHROPIC_API_KEY`, `AI_PROVIDER` (`anthropic`|`google`, default `anthropic`), `AI_MODEL` (default `claude-haiku-5-5`), `GOOGLE_GENERATIVE_AI_API_KEY` (optional).
+- Next.js (App Router) + TypeScript strict + Tailwind; Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/anthropic`); Vitest; Node LTS.
+- **AI provider configuration (env vars):**
+
+  | Variable | Values | Default | Notes |
+  |---|---|---|---|
+  | `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
+  | `AI_MODEL` | model ID | `gemini-3.8-flash` when `google`; `claude-haiku-5-5` when `anthropic` | Optional override |
+  | `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
+  | `ANTHROPIC_API_KEY` | secret | — | Required when `AI_PROVIDER=anthropic` |
+
+  Switching to Anthropic = set `AI_PROVIDER=anthropic` (plus its key). There is no automatic runtime fallback between providers in v1. Unknown provider or missing key → AI routes return 503 `{ error: 'ai_not_configured' }`.
 - No database, no auth, no server-side storage of uploaded data.
-- Synthetic sample data only (generated by `scripts/generate-sample-data.ts`, seeded, ~300 employees, ~12 units, includes mid-year hires, separations, late hires).
+- Synthetic sample data only (generated by `scripts/generate-sample-data.ts`, seeded, ~300 employees, ~12 units, includes mid-year hires, separations, late hires, and attendance across the full year so the back-test is meaningful).
 
 ## 8. Acceptance Criteria (Given / When / Then)
 1. Given sample data and asOf = Sep 30, when processed, then dashboard KPIs equal engine outputs and units are ranked per §4.
@@ -130,14 +181,20 @@ States: loading spinners on AI buttons; error banners with retry; empty states. 
 5. Given elearningCounts = false and only e-learning attended, then status = AT_RISK.
 6. Given roster with duplicate employee_id, then an error lists the duplicates and nothing is processed.
 7. Given an AI response containing an unknown courseId, then it is removed and never displayed.
-8. Given any AI request payload built by the client, then it contains no employee names or IDs (unit test on payload builders).
+8. Given any AI request payload built by the client, then it contains no employee names or IDs, and no position held by fewer than 3 at-risk employees in that unit (unit test on payload builders).
 9. Given 11 requests in a minute from one IP, then the 11th returns 429.
 10. Given the deployed URL in an incognito window, then "Load sample data" → dashboard → memo works end-to-end.
+11. Given only `GOOGLE_GENERATIVE_AI_API_KEY` set and `AI_PROVIDER`/`AI_MODEL` unset, then AI calls use `google` / `gemini-3.8-flash` (visible in the AI call log line).
+12. Given no API key for the selected provider, then AI routes return 503 and the dashboard still works.
+13. Given elearningCounts = false, then cost-to-close prices licensed at-risk employees on the in-house route.
+14. Given an exported name starting with `=`, then the CSV cell is prefixed with `'`.
+15. Given a memo, then the displayed at-risk count and deadline equal the engine values (token substitution, not model text).
 
 ## 9. Test Plan (Vitest, ≥ 10 tests)
-Engine: rules 1–5 each, monthsRemaining, ranking order, back-test recall, cost-to-close. Validation: missing columns, duplicates, bad dates. API helpers: catalog ID filtering, memo token enforcement, payload builders exclude PII, rate limiter.
+Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order, back-test (recall, precision, null denominators, hires after checkpoint), cost-to-close (both routes, elearningCounts = false, minHours filter, unpriced). Validation: missing columns, duplicates, bad and impossible dates, normalization (BOM, case, whitespace). API helpers: catalog ID filtering, memo token substitution and `{{EMPLOYEE_LIST}}` enforcement, numeric grounding check, payload builders exclude PII and suppress small cells, rate limiter, provider/model resolution from env, CSV export escaping.
 
 ## 10. Revision Log
 | Version | Date | Change | Reason |
 |---|---|---|---|
 | 1.0 | 2026-11-07 | Initial spec | — |
+| 1.1 | 2026-11-07 | Default AI provider → Google Gemini (`AI_PROVIDER=google`, `GOOGLE_GENERATIVE_AI_API_KEY`, default model `gemini-3.8-flash`); Anthropic kept as one-env-var alternative with its own default model; no runtime fallback; 503 when AI not configured. Cost-to-close respects `elearningCounts`/`minHours` and handles missing routes. Back-test fully defined (adds precision, null rules). Dates handled as strings in Asia/Manila; `monthsRemaining` formula; `deadline` defined; rounding rule. CSV normalization rules; catalog made optional. Memo numbers via server-filled tokens; numeric grounding check for memo/summary. Small-cell suppression for positions; prompt-injection, string, body-size, timeout and log rules. CSV export formula-injection guard. Acceptance criteria 11–15 and test plan updated. | senior-engineer review |

@@ -21,6 +21,16 @@ Training Compliance Radar — a privacy-first web app for L&D officers. Upload r
 - `/scripts` — seeded synthetic data generator → `/public/sample/*.csv`
 - `/tests` — Vitest tests mirroring `/lib`
 
+## Environment Variables
+| Variable | Values | Default | Notes |
+|---|---|---|---|
+| `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
+| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) | Optional override |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
+| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` |
+
+No automatic runtime fallback between providers; unknown provider or missing key → AI routes return 503 (`spec.md` §7). Template in `.env.example`.
+
 ## Constraints (never violate)
 1. Compliance status is computed ONLY in `/lib/engine`. Never ask the LLM to decide compliance or compute counts.
 2. API payloads must never contain employee names or IDs — aggregates only. Names are merged client-side into `{{EMPLOYEE_LIST}}`.

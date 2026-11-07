@@ -3,7 +3,7 @@
 Read `AGENTS.md` (project rules) and `spec.md` (source of truth) before any task. Summary for Claude Code:
 
 ## What this is
-Training Compliance Radar: Next.js + TypeScript + Tailwind app. Deterministic compliance engine in `/lib/engine`; AI (Vercel AI SDK, Claude via `@ai-sdk/anthropic`, Gemini fallback) only for memos, catalog-grounded recommendations, and summaries.
+Training Compliance Radar: Next.js + TypeScript + Tailwind app. Deterministic compliance engine in `/lib/engine`; AI (Vercel AI SDK; Google Gemini via `@ai-sdk/google` by default, Claude via `@ai-sdk/anthropic` as a one-env-var alternative) only for memos, catalog-grounded recommendations, and summaries.
 
 ## Commands
 `npm run dev` · `npm test` · `npm run lint` · `npm run typecheck` · `npm run build` · `npm run sample-data`
@@ -22,4 +22,9 @@ Training Compliance Radar: Next.js + TypeScript + Tailwind app. Deterministic co
 - Synthetic data only.
 
 ## Env vars
-`ANTHROPIC_API_KEY`, `AI_PROVIDER` (anthropic|google), `AI_MODEL` (default `claude-haiku-5-5`), `GOOGLE_GENERATIVE_AI_API_KEY` (optional). Template in `.env.example`.
+- `AI_PROVIDER` — `google` (default) | `anthropic`
+- `AI_MODEL` — optional override; defaults to `gemini-3.8-flash` (google) or `claude-haiku-5-5` (anthropic)
+- `GOOGLE_GENERATIVE_AI_API_KEY` — required when `AI_PROVIDER=google`
+- `ANTHROPIC_API_KEY` — required only when `AI_PROVIDER=anthropic`
+
+No automatic runtime fallback; missing key → AI routes return 503 (spec §7). Template in `.env.example`.

@@ -9,7 +9,7 @@ Source of truth for behavior is [`spec.md`](../spec.md); project rules are in [`
 |---|---|---|
 | 0 | Spec, PRD, architecture, validation docs; scaffold; schemas, engine, sample data, tests | ✅ Complete |
 | 1 | UI per spec §6 | ✅ Complete (pushed, `5468db9`) |
-| 2 | AI routes per spec §5 and UI wiring | ⬜ Not started |
+| 2 | AI routes per spec §5 and UI wiring | ✅ Complete |
 | 3 | CI and security | ⬜ Not started |
 | 4 | Docs, reflection, demo script, v2 issue | ⬜ Not started |
 
@@ -28,7 +28,7 @@ Single page, four steps (spec §6): data upload or sample data → rules form �
 
 Done when: sample data loads, KPIs equal engine output, errors are row-numbered, layout works on mobile. Verified in the browser on the production build.
 
-## Checkpoint 2 — AI routes
+## Checkpoint 2 — AI routes ✅
 
 Scope (spec §3.4, §5, §7):
 

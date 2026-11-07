@@ -1,5 +1,6 @@
 "use client";
 
+import { DashboardStep } from "./DashboardStep";
 import { DataStep } from "./DataStep";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
@@ -34,6 +35,7 @@ export function RadarApp() {
         <div className="space-y-6">
           <DataStep state={state} />
           <RulesStep state={state} />
+          <DashboardStep state={state} />
         </div>
       </main>
       <Footer />

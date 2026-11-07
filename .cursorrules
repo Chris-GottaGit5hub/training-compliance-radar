@@ -1,0 +1,16 @@
+# .cursorrules — Training Compliance Radar
+# Source of truth: spec.md. Project rules: AGENTS.md.
+
+Always use TypeScript strict mode. Never use `any`.
+Use Next.js App Router conventions; API logic lives in /app/api/*/route.ts.
+Prefer functional React components. Use Tailwind utilities only; no inline styles or custom CSS files beyond globals.
+Name components PascalCase; hooks with use* prefix.
+Keep files under 200 lines. Use early returns over nested ifs.
+Compliance logic lives ONLY in /lib/engine as pure functions. Never ask the LLM to decide compliance or compute numbers.
+Never send employee names or IDs to API routes, logs, or the LLM. Build payloads with /lib/payload helpers only.
+Validate all inputs with zod on the server. Enforce size limits and rate limiting on every API route.
+Never hardcode secrets or use NEXT_PUBLIC_ for secrets. Read keys from process.env.
+Filter AI course recommendations against the provided catalog before returning them.
+Write Vitest tests for all exported functions in /lib.
+Use conventional commit messages (feat:, fix:, test:, docs:, ci:, chore:).
+When unsure, ask a clarifying question before generating code. Explain what you changed and why. Prefer small, focused changes over large rewrites.

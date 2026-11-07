@@ -10,8 +10,8 @@ Source of truth for behavior is [`spec.md`](../spec.md); project rules are in [`
 | 0 | Spec, PRD, architecture, validation docs; scaffold; schemas, engine, sample data, tests | ✅ Complete |
 | 1 | UI per spec §6 | ✅ Complete (pushed, `5468db9`) |
 | 2 | AI routes per spec §5 and UI wiring | ✅ Complete |
-| 3 | CI and security | ⬜ Not started |
-| 4 | Docs, reflection, demo script, v2 issue | ⬜ Not started |
+| 3 | CI and security | ✅ Complete (CI green on GitHub) |
+| 4 | Docs, reflection, demo script, v2 issue | ✅ Complete (issue #1) |
 
 Update this table as each checkpoint lands.
 
@@ -43,7 +43,7 @@ Scope (spec §3.4, §5, §7):
 
 Done when: lint, typecheck, test, build are green; with no API key the UI shows "AI not configured" and the rest still works.
 
-## Checkpoint 3 — CI and security
+## Checkpoint 3 — CI and security ✅
 
 - `.github/workflows/ci.yml`: `npm ci`, lint, typecheck, test, build, `npm audit --audit-level=high` (report-only), gitleaks.
 - Confirm no secrets exist in git history.
@@ -51,7 +51,7 @@ Done when: lint, typecheck, test, build are green; with no API key the UI shows 
 
 Done when: the workflow file is valid and the history scan is clean.
 
-## Checkpoint 4 — Docs
+## Checkpoint 4 — Docs ✅
 
 - `README.md`: problem, live URL, screenshots placeholder, features, architecture link, setup, env vars, tests, back-test results, privacy note (including the Gemini free-tier note), limitations, roadmap, submission checklist mapped to the brief.
 - `docs/reflection.md` (draft with `[CHRIS: personalize]` markers).

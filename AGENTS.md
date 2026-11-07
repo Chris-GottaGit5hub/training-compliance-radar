@@ -15,7 +15,7 @@ Training Compliance Radar — a privacy-first web app for L&D officers. Upload r
 - `/app` — Next.js App Router pages and `/app/api/*` route handlers (recommend, memo, summary)
 - `/lib/engine` — pure compliance engine (no I/O, no AI) + back-test + cost-to-close
 - `/lib/schemas` — zod schemas for CSV rows, settings, API requests/responses
-- `/lib/ai` — provider selection, prompts, `generateObject` calls, catalog-ID filtering
+- `/lib/ai` — provider selection, prompts, structured-output (`generateText` + `Output.object`) calls, catalog-ID filtering
 - `/lib/payload` — builders that turn engine results into aggregate-only API payloads
 - `/components` — React UI components
 - `/scripts` — seeded synthetic data generator → `/public/sample/*.csv`

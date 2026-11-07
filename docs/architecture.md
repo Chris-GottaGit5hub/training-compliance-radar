@@ -17,7 +17,7 @@ flowchart LR
   D -->|aggregates only| A2[/api/memo/]
   D -->|aggregates only| A3[/api/summary/]
   A1 & A2 & A3 --> G[Guards: zod validation,<br/>size limits, rate limit]
-  G --> L[Vercel AI SDK<br/>generateObject]
+  G --> L[Vercel AI SDK<br/>generateText + Output.object]
   L --> C[(Gemini API default<br/>Claude via env var)]
   A1 --> K[Catalog ID check]
   D --> X[CSV / text export]
@@ -31,7 +31,7 @@ flowchart LR
 | Charts | Recharts | Simple React charts |
 | CSV | papaparse (client-side) | Keeps raw employee data in the browser |
 | Validation | zod (client + server) | One schema source for CSV rows and API payloads |
-| LLM layer | Vercel AI SDK (`ai`, `@ai-sdk/google` default — `gemini-3.8-flash`; `@ai-sdk/anthropic` alternative — `claude-haiku-5-5`) | Structured output via `generateObject` + zod; provider swap by one env var (`AI_PROVIDER`) |
+| LLM layer | Vercel AI SDK (`ai`, `@ai-sdk/google` default — `gemini-3.8-flash`; `@ai-sdk/anthropic` alternative — `claude-haiku-5-5`) | Structured output via `generateText + Output.object` + zod; provider swap by one env var (`AI_PROVIDER`) |
 | Orchestration | Next.js Route Handlers (`/api/*`), serverless on Vercel | No always-on server needed |
 | Data / retrieval | Curated course catalog CSV (no vector DB) | Small, controlled list; grounding by ID validation |
 | Database / Auth | **None in v1 (deliberate)** | Privacy-first; nothing to store or protect |

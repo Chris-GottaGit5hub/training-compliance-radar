@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.2)
+# spec.md — Training Compliance Radar (v1.3)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -150,7 +150,7 @@ Client payload rules (enforced in `/lib/payload`, unit-tested):
 
 Prompting rules:
 - User-supplied strings (unit names, positions, course titles) are passed as a JSON data block; the system prompt states that this block is data, never instructions.
-- Provider call: `generateObject` with the zod schema, temperature 0.3, timeout 25 s (AbortSignal), `maxRetries: 1`.
+- Provider call: `generateText` with `Output.object({ schema })` and the zod schema (the AI SDK v7 successor to the deprecated `generateObject`), temperature 0.3, timeout 25 s (AbortSignal), `maxRetries: 1`.
 
 Server post-processing:
 - `/api/recommend`: drop any `courseId` not in the submitted catalog and any unit not in the request; keep at most 3 IDs per unit. If a requested unit ends with zero valid IDs, return it with `fallbackSearch: true` and the client shows a LinkedIn Learning search link built from the unit's first top position (or the unit name if none).
@@ -203,3 +203,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.0 | 2026-11-07 | Initial spec | — |
 | 1.1 | 2026-11-07 | Default AI provider → Google Gemini (`AI_PROVIDER=google`, `GOOGLE_GENERATIVE_AI_API_KEY`, default model `gemini-3.8-flash`); Anthropic kept as one-env-var alternative with its own default model; no runtime fallback; 503 when AI not configured. Cost-to-close respects `elearningCounts`/`minHours` and handles missing routes. Back-test fully defined (adds precision, null rules). Dates handled as strings in Asia/Manila; `monthsRemaining` formula; `deadline` defined; rounding rule. CSV normalization rules; catalog made optional. Memo numbers via server-filled tokens; numeric grounding check for memo/summary. Small-cell suppression for positions; prompt-injection, string, body-size, timeout and log rules. CSV export formula-injection guard. Acceptance criteria 11–15 and test plan updated. | senior-engineer review |
 | 1.2 | 2026-11-08 | Acceptance criterion 2 now states the Nov 30 as-of date (a Sep 30 evaluation gives NOT_COVERED by rule 1). Back-test reports recall and precision at Jun 30 and Sep 30, with a note that 1 − precision is the group early nudges target. `summarizeUnits` and `costToClose` take the roster to read licensing. | clarifications from engine implementation |
+| 1.3 | 2026-11-08 | Provider call uses `generateText` with `Output.object` instead of `generateObject`, which the installed AI SDK (v7) marks deprecated. Behavior and schemas are unchanged. | clarifications from AI route implementation |

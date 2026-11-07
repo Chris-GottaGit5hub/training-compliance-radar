@@ -147,3 +147,9 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# vercel
+.vercel
+
+# next-env types (generated)
+next-env.d.ts

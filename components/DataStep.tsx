@@ -11,7 +11,7 @@ const BOXES: { kind: CsvKind; label: string; required: boolean; columns: string 
     label: "Roster",
     required: true,
     columns:
-      "employee_id, name, unit, position, employment_type, hire_date, separation_date, licensed",
+      "employee_id, name, unit, position, employment_type, hire_date, separation_date, licensed. Optional: pay_grade, group, sector",
   },
   {
     kind: "attendance",
@@ -23,7 +23,8 @@ const BOXES: { kind: CsvKind; label: string; required: boolean; columns: string 
     kind: "catalog",
     label: "Course catalog",
     required: false,
-    columns: "course_id, title, skill_area, duration_minutes, provider, url, cost_per_head",
+    columns:
+      "course_id, title, skill_area, duration_minutes, provider, url, cost_per_head. Optional: unlicensed_fee, recommended",
   },
 ];
 

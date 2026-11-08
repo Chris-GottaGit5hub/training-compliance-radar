@@ -1,7 +1,7 @@
 import { dataYear, withYear } from "@/lib/analysis";
 import { EMPLOYMENT_TYPES, type EmploymentType, type RulesConfig } from "@/lib/schemas";
 import type { useRadarState } from "./useRadarState";
-import { DateField, NumberField } from "./RuleFields";
+import { DateField, NumberField, TargetFields } from "./RuleFields";
 import { Banner, Card, StepHeading, buttonClass } from "./ui";
 
 type RadarState = ReturnType<typeof useRadarState>;
@@ -76,14 +76,20 @@ function RulesForm({
         />
         <NumberField
           id="rules-budget"
-          label="Budget (₱)"
+          label="Annual training budget (₱)"
           value={config.budgetPhp}
           step={100}
-          hint="Leave at 0 to hide the budget comparison."
+          hint="Your yearly allocation. Leave at 0 to hide budget reports."
           error={errors.budgetPhp}
           onChange={(budgetPhp) => patch({ budgetPhp })}
         />
       </div>
+
+      <TargetFields
+        targets={config.milestoneTargets}
+        error={errors.milestoneTargets}
+        onChange={(milestoneTargets) => patch({ milestoneTargets })}
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <fieldset aria-describedby={errors.coveredTypes ? "rules-types-error" : undefined}>

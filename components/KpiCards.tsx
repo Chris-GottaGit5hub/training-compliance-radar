@@ -55,24 +55,42 @@ interface Props {
   hasCatalog: boolean;
 }
 
+function TargetKpi({ analysis }: { analysis: Analysis }) {
+  const { milestones } = analysis;
+  const m = milestones.find((x) => x.state === "upcoming") ?? milestones[milestones.length - 1];
+  if (!m) return null;
+  return (
+    <Kpi label="Next target" value={`${m.targetPct}% by ${m.label}`}>
+      {m.needed === 0
+        ? "Target already reached"
+        : `${m.needed.toLocaleString("en-PH")} more to train (${m.targetTrained.toLocaleString("en-PH")} needed)`}
+    </Kpi>
+  );
+}
+
 export function KpiCards(props: Props) {
   const { org } = props.analysis;
+  const fmt = (n: number) => n.toLocaleString("en-PH");
   const licensed = org.unitsRanked.reduce((sum, u) => sum + u.atRiskLicensed, 0);
   return (
-    <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-      <Kpi label="Covered employees" value={org.covered.toLocaleString("en-PH")}>
-        {org.exempt} exempt · {org.excluded} excluded · {org.notCovered} not covered
-      </Kpi>
-      <Kpi label="Compliance" value={formatPercent(org.complianceRate)}>
-        {org.compliant.toLocaleString("en-PH")} of {org.covered.toLocaleString("en-PH")} covered
-      </Kpi>
-      <Kpi label="At risk" value={org.atRisk.toLocaleString("en-PH")}>
-        {licensed} licensed · {org.atRisk - licensed} unlicensed
-      </Kpi>
-      <Kpi label="Months left" value={org.monthsRemaining}>
-        until {org.deadline}
-      </Kpi>
-      <CostKpi {...props} />
-    </dl>
+    <>
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <Kpi label="Trained" value={fmt(org.compliant)}>
+          {formatPercent(org.complianceRate)} of {fmt(org.covered)} in scope
+        </Kpi>
+        <Kpi label="Untrained (at risk)" value={fmt(org.atRisk)}>
+          {licensed} licensed · {org.atRisk - licensed} unlicensed
+        </Kpi>
+        <TargetKpi analysis={props.analysis} />
+        <Kpi label="Months left" value={org.monthsRemaining}>
+          until {org.deadline}
+        </Kpi>
+        <CostKpi {...props} />
+      </dl>
+      <p className="mt-2 text-xs text-slate-500">
+        In scope = employees the rule applies to as of this date. Left out: {fmt(org.exempt)} exempt ·{" "}
+        {fmt(org.excluded)} excluded · {fmt(org.notCovered)} not covered.
+      </p>
+    </>
   );
 }

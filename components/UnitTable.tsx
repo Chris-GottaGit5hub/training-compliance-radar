@@ -26,13 +26,13 @@ export function UnitTable({
               Unit
             </th>
             <th scope="col" className={`${HEAD} hidden sm:table-cell`}>
-              Covered
+              In scope
             </th>
             <th scope="col" className={`${HEAD} hidden sm:table-cell`}>
-              Compliant
+              Trained
             </th>
             <th scope="col" className={HEAD}>
-              At risk
+              Untrained
             </th>
             <th scope="col" className={`${HEAD} hidden md:table-cell`}>
               Licensed

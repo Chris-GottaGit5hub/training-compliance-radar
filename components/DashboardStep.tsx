@@ -1,6 +1,8 @@
 import { atRiskEmployees, buildAtRiskCsv, exportFileName } from "@/lib/analysis";
 import { BacktestCard } from "./BacktestCard";
+import { BreakdownPanel } from "./BreakdownPanel";
 import { KpiCards } from "./KpiCards";
+import { MilestoneCard } from "./MilestoneCard";
 import { UnitChart } from "./UnitChart";
 import { UnitTable } from "./UnitTable";
 import { downloadTextFile } from "./download";
@@ -53,7 +55,7 @@ export function DashboardStep({ state }: { state: RadarState }) {
           id="step-dashboard-title"
           step={3}
           title="Dashboard"
-          description="Who is untrained as of the chosen date, ranked by risk."
+          description="Trained vs untrained as of the chosen date, against your targets, ranked by risk."
         />
         {!ready && (
           <p className="text-sm text-slate-500">
@@ -67,6 +69,7 @@ export function DashboardStep({ state }: { state: RadarState }) {
         {analysis && config && (
           <div className="mt-4 space-y-6" aria-live="polite">
             <KpiCards analysis={analysis} config={config} hasCatalog={catalog !== null} />
+            <MilestoneCard milestones={analysis.milestones} />
             <UnitChart
               units={analysis.org.unitsRanked}
               selectedUnit={selectedUnit}
@@ -90,6 +93,7 @@ export function DashboardStep({ state }: { state: RadarState }) {
                 onSelect={selectUnit}
               />
             </div>
+            {roster && <BreakdownPanel analysis={analysis} roster={roster} />}
             <BacktestCard backtests={analysis.backtests} />
           </div>
         )}

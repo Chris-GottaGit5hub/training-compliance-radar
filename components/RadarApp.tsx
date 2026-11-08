@@ -49,8 +49,8 @@ export function RadarApp() {
           <DataStep state={state} />
           <RulesStep state={state} />
           <DashboardStep state={state} />
-          {ai.summaryState.status !== "idle" && config && (
-            <SummaryCard ai={ai} asOfDate={config.asOfDate} />
+          {ai.summaryState.status !== "idle" && config && analysis && (
+            <SummaryCard ai={ai} analysis={analysis} config={config} />
           )}
           <UnitPanel state={state} ai={ai} />
         </div>

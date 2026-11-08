@@ -1,11 +1,23 @@
 import { useEffect, useRef } from "react";
+import type { Analysis } from "@/lib/analysis";
+import type { RulesConfig } from "@/lib/schemas";
 import { CopyButton } from "./CopyButton";
+import { SummaryCharts } from "./SummaryCharts";
 import { downloadTextFile } from "./download";
 import type { AiActions } from "./useAiActions";
 import { Banner, Card, buttonClass } from "./ui";
 
 /** Executive summary written by the AI from org-level numbers only. */
-export function SummaryCard({ ai, asOfDate }: { ai: AiActions; asOfDate: string }) {
+export function SummaryCard({
+  ai,
+  analysis,
+  config,
+}: {
+  ai: AiActions;
+  analysis: Analysis;
+  config: RulesConfig;
+}) {
+  const asOfDate = config.asOfDate;
   const { summaryState: state } = ai;
   const heading = useRef<HTMLHeadingElement>(null);
 
@@ -72,6 +84,13 @@ export function SummaryCard({ ai, asOfDate }: { ai: AiActions; asOfDate: string 
             </>
           )}
         </div>
+
+        <h3 className="mb-3 mt-6 text-base font-semibold text-slate-900">Key figures at a glance</h3>
+        <SummaryCharts analysis={analysis} config={config} />
+        <p className="mt-3 text-xs text-slate-500">
+          Charts are drawn by the compliance engine from your data, as of {asOfDate}. They do not
+          depend on the AI.
+        </p>
       </section>
     </Card>
   );

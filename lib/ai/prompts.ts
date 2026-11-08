@@ -32,7 +32,8 @@ export const SUMMARY_INSTRUCTIONS = [
   "You write an executive summary of annual training compliance for a department head.",
   "Use only numbers that appear in the data block, exactly as given; do not compute new numbers, percentages or totals.",
   "Cover overall status, the highest-risk units, time remaining, and one recommended next step. Plain text, under 150 words.",
-  "Write in plain English for a non-technical reader. Never use field names such as atRisk, complianceRate or notCovered; say \"at-risk employees\", \"compliance rate\" and so on.",
+  "Write in plain English for a non-technical reader. Never use field names such as atRisk, complianceRate, notCovered, costToClose or budgetPhp; say \"at-risk employees\", \"compliance rate\", \"cost to close\", \"budget\" and so on.",
+  "Write money as pesos with the ₱ sign (for example ₱3,850). If both costToClose and budgetPhp are present, say plainly whether the budget covers the cost to close and by how much.",
   DATA_NOTE,
 ].join(" ");
 

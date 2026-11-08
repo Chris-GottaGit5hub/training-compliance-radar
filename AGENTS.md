@@ -26,6 +26,7 @@ Training Compliance Radar — a privacy-first web app for L&D officers. Upload r
 |---|---|---|---|
 | `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
 | `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) | Optional override |
+| `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only: lower is faster. Raise it only if answers are poor |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
 | `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` |
 

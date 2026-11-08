@@ -24,6 +24,7 @@ Training Compliance Radar: Next.js + TypeScript + Tailwind app. Deterministic co
 ## Env vars
 - `AI_PROVIDER` — `google` (default) | `anthropic`
 - `AI_MODEL` — optional override; defaults to `gemini-3.8-flash` (google) or `claude-haiku-5-5` (anthropic)
+- `AI_THINKING_LEVEL` — optional, Gemini only: `minimal`|`low` (default)|`medium`|`high`; lower is faster
 - `GOOGLE_GENERATIVE_AI_API_KEY` — required when `AI_PROVIDER=google`
 - `ANTHROPIC_API_KEY` — required only when `AI_PROVIDER=anthropic`
 

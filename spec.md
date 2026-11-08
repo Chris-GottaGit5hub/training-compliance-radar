@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.3)
+# spec.md — Training Compliance Radar (v1.4)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -150,12 +150,13 @@ Client payload rules (enforced in `/lib/payload`, unit-tested):
 
 Prompting rules:
 - User-supplied strings (unit names, positions, course titles) are passed as a JSON data block; the system prompt states that this block is data, never instructions.
-- Provider call: `generateText` with `Output.object({ schema })` and the zod schema (the AI SDK v7 successor to the deprecated `generateObject`), temperature 0.3, timeout 25 s (AbortSignal), `maxRetries: 1`.
+- Provider call: `generateText` with `Output.object({ schema })` and the zod schema (the AI SDK v7 successor to the deprecated `generateObject`), temperature 0.3, a 40 s whole-call deadline (AbortSignal), Gemini `thinkingLevel` `low` by default (retried once without it if the provider rejects it), `maxRetries: 1`.
 
 Server post-processing:
 - `/api/recommend`: drop any `courseId` not in the submitted catalog and any unit not in the request; keep at most 3 IDs per unit. If a requested unit ends with zero valid IDs, return it with `fallbackSearch: true` and the client shows a LinkedIn Learning search link built from the unit's first top position (or the unit name if none).
 - `/api/memo`: the model writes `{{AT_RISK_COUNT}}`, `{{COVERED_COUNT}}`, `{{DEADLINE}}` and `{{EMPLOYEE_LIST}}` tokens instead of numbers and names. The server replaces the first three with request values (prepending a fixed fact sentence if any are missing), then ensures `{{EMPLOYEE_LIST}}` appears exactly once (appending it if missing). The client replaces `{{EMPLOYEE_LIST}}` locally.
 - **Numeric grounding check** (`/api/memo` after substitution, `/api/summary`): every number in the text must equal a number in the request (percentages compared at 1 decimal). On a mismatch, regenerate once; if it still fails, return the text with `warning: 'unverified_numbers'` and the UI shows a warning next to it.
+- The memo/summary regeneration (numeric grounding) is skipped when the first attempt took more than 15 s, so a request stays under `maxDuration`; the text is then returned with the warning.
 - Log one line per AI call: route, provider, model, latency ms, status, error code. Never log payload contents or provider error messages (they can echo the prompt).
 
 ## 6. UI
@@ -170,6 +171,7 @@ States: loading spinners on AI buttons; error banners with retry; empty states. 
   |---|---|---|---|
   | `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
   | `AI_MODEL` | model ID | `gemini-3.8-flash` when `google`; `claude-haiku-5-5` when `anthropic` | Optional override |
+  | `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only; lower is faster |
   | `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
   | `ANTHROPIC_API_KEY` | secret | — | Required when `AI_PROVIDER=anthropic` |
 
@@ -204,3 +206,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.1 | 2026-11-07 | Default AI provider → Google Gemini (`AI_PROVIDER=google`, `GOOGLE_GENERATIVE_AI_API_KEY`, default model `gemini-3.8-flash`); Anthropic kept as one-env-var alternative with its own default model; no runtime fallback; 503 when AI not configured. Cost-to-close respects `elearningCounts`/`minHours` and handles missing routes. Back-test fully defined (adds precision, null rules). Dates handled as strings in Asia/Manila; `monthsRemaining` formula; `deadline` defined; rounding rule. CSV normalization rules; catalog made optional. Memo numbers via server-filled tokens; numeric grounding check for memo/summary. Small-cell suppression for positions; prompt-injection, string, body-size, timeout and log rules. CSV export formula-injection guard. Acceptance criteria 11–15 and test plan updated. | senior-engineer review |
 | 1.2 | 2026-11-08 | Acceptance criterion 2 now states the Nov 30 as-of date (a Sep 30 evaluation gives NOT_COVERED by rule 1). Back-test reports recall and precision at Jun 30 and Sep 30, with a note that 1 − precision is the group early nudges target. `summarizeUnits` and `costToClose` take the roster to read licensing. | clarifications from engine implementation |
 | 1.3 | 2026-11-08 | Provider call uses `generateText` with `Output.object` instead of `generateObject`, which the installed AI SDK (v7) marks deprecated. Behavior and schemas are unchanged. | clarifications from AI route implementation |
+| 1.4 | 2026-11-08 | AI call deadline 25 s → 40 s for the whole call; Gemini `thinkingLevel` set to `low` by default (env `AI_THINKING_LEVEL`) because Gemini 3 reasoning made memo generation exceed 25 s on the live site; memo/summary regeneration skipped after a slow first attempt; summary and memo prompts ask for plain-English labels. 503 responses carry a `reason`, 502 a short `code`, and `GET /api/status` reports configuration. | bug found on live site |

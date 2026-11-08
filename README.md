@@ -23,7 +23,12 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 
 - **Upload and validate** roster, attendance and (optional) course catalog CSVs in the browser, with row-numbered errors; or load built-in sample data.
 - **Churn-aware compliance engine** (deterministic TypeScript): late-hire exemptions, exclusion of separated staff, covered employment types, minimum hours, and an e-learning toggle, as of any date.
-- **Risk dashboard**: covered, compliance %, at-risk, months left, cost to close vs budget, a bar chart and a ranked unit table.
+- **Who is covered:** only regular staff can be at risk. Contractual staff may attend (their costs count as spend) but are never at risk. A footnote says who is left out of scope and why.
+- **Risk dashboard**: trained vs untrained, the next target, months left, cost to close, a bar chart and a ranked table of units that still have untrained staff.
+- **Training targets**: 25/50/85/100% of in-scope staff trained by Mar 31, Jun 30, Sep 30 and Nov 30 (editable), shown as met, missed or upcoming with the people still needed.
+- **Slicers**: trained vs untrained by pay-grade band (Rank and File, Officers, Senior Officers), pay grade, department, group and sector, alone or combined (optional roster columns `pay_grade`, `group`, `sector`).
+- **Budget burn-down**: the annual allocation against money spent by month, people trained, and spend per trained person, with charts and a Print report button.
+- **Recommended-course windows and a plan** (optional catalog flag `recommended` and `calendar.csv`): one staggered monthly window per sector for the annual course (e.g. AMLA), who completed or missed it, and a deterministic plan for the rest: licensed staff on LinkedIn at no extra cost, unlicensed staff in calendar runs above their minimum size or on the paid LinkedIn fee, no in-person runs after Dec 14.
 - **Back-test card**: recall and precision at Jun 30 and Sep 30.
 - **Unit panel**: at-risk employees, CSV export, AI-drafted memo, catalog-grounded course recommendations.
 - **Works without AI, too:** if an AI call fails or the free quota runs out, memos and the executive summary fall back to a clearly labeled template draft built from the same numbers.
@@ -134,7 +139,7 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 | AI agent rules and project conventions | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md), [`.cursorrules`](.cursorrules) |
 | Working app on the recommended stack (Next.js, TypeScript, Tailwind, Vercel AI SDK) | `app/`, `components/`, `lib/` |
 | Deployed and publicly reachable | https://training-compliance-radar.vercel.app |
-| Core logic is deterministic and tested | `lib/engine/`, `tests/` (212 tests) |
+| Core logic is deterministic and tested | `lib/engine/`, `tests/` (302 tests) |
 | AI features with structured output and grounding | `app/api/*`, `lib/ai/`, `lib/payload/` |
 | Data privacy handled (aggregates only, local name merge) | [Privacy](#privacy-and-data-handling), `lib/payload/`, `tests/payload.test.ts` |
 | Security basics (validation, size limits, rate limit, no secrets in git) | `lib/api/`, `.env.example`, gitleaks in CI |

@@ -88,8 +88,9 @@ export function KpiCards(props: Props) {
         <CostKpi {...props} />
       </dl>
       <p className="mt-2 text-xs text-slate-500">
-        In scope = employees the rule applies to as of this date. Left out: {fmt(org.exempt)} exempt ·{" "}
-        {fmt(org.excluded)} excluded · {fmt(org.notCovered)} not covered.
+        In scope = employees the rule applies to as of this date.
+        {props.analysis.leftOut.length > 0 &&
+          ` Left out: ${props.analysis.leftOut.map((i) => `${fmt(i.count)} ${i.label}`).join(" · ")}.`}
       </p>
     </>
   );

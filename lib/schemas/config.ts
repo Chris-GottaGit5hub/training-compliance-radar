@@ -42,7 +42,7 @@ export function defaultRulesConfig(today: string): RulesConfig {
     year,
     asOfDate: today,
     lateHireCutoff: `${year}-10-01`,
-    coveredTypes: [...EMPLOYMENT_TYPES],
+    coveredTypes: ["regular"],
     elearningCounts: true,
     minHours: 1,
     budgetPhp: 0,

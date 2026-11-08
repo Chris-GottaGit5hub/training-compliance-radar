@@ -61,7 +61,7 @@ describe("defaultRulesConfig", () => {
       year: 2026,
       asOfDate: "2026-09-30",
       lateHireCutoff: "2026-10-01",
-      coveredTypes: ["regular", "contractual", "casual"],
+      coveredTypes: ["regular"],
       elearningCounts: true,
       minHours: 1,
       budgetPhp: 0,

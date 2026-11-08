@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { isRealDate } from "./dates";
 
-export const EMPLOYMENT_TYPES = ["regular", "contractual", "casual"] as const;
+export const EMPLOYMENT_TYPES = ["regular", "contractual"] as const;
 export const DELIVERY_TYPES = ["classroom", "elearning", "external"] as const;
 export const PROVIDERS = ["linkedin_learning", "in_house"] as const;
 export const RUN_DELIVERIES = ["in_house", "external"] as const;

@@ -42,7 +42,7 @@ export function buildRoster(rng: Rng, year: number): RosterRow[] {
         name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
         unit,
         position: rng.pick(spec.positions),
-        employment_type: typeRoll < 0.75 ? "regular" : typeRoll < 0.9 ? "contractual" : "casual",
+        employment_type: typeRoll < 0.75 ? "regular" : "contractual",
         hire_date: hire,
         separation_date:
           canSeparate && rng.chance(0.07)

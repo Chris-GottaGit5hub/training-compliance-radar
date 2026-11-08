@@ -51,6 +51,37 @@ export function dimensionValues(roster: readonly RosterRow[], dimension: Dimensi
   return values.sort(natural);
 }
 
+export interface LeftOutItem {
+  label: string;
+  count: number;
+}
+
+/**
+ * Who the rule does not cover as of the as-of date, and why (spec §6). Counts only.
+ * Order: separated, not yet hired, employment types not covered, late hires.
+ */
+export function leftOutSummary(
+  results: readonly EmployeeResult[],
+  roster: readonly RosterRow[],
+): LeftOutItem[] {
+  const byId = new Map(roster.map((r) => [r.employee_id, r]));
+  const counts = new Map<string, number>();
+  const add = (label: string) => counts.set(label, (counts.get(label) ?? 0) + 1);
+  for (const r of results) {
+    if (r.status === "EXCLUDED") add("separated");
+    else if (r.status === "EXEMPT") add("late hires (exempt)");
+    else if (r.status === "NOT_COVERED") {
+      const type = byId.get(r.employeeId)?.employment_type ?? "unknown";
+      add(r.reason === "Not yet hired as of date" ? "not yet hired" : `${type} staff (type not covered)`);
+    }
+  }
+  const rank = (label: string): number =>
+    label === "separated" ? 0 : label === "not yet hired" ? 1 : label.endsWith("(exempt)") ? 3 : 2;
+  return [...counts]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => rank(a.label) - rank(b.label) || natural(a.label, b.label));
+}
+
 export interface BreakdownRow {
   key: string;
   inScope: number;

@@ -166,7 +166,7 @@ export function buildPersonnel(rng: Rng, year: number, total = 10_000): Personne
         canSeparate && rng.chance(0.07) ? randomDate(rng, `${year}-02-01`, separationEnd) : undefined;
       const typeRoll = rng.next();
       const employmentType: EmploymentType =
-        position.pg >= 13 || typeRoll < 0.8 ? "regular" : typeRoll < 0.92 ? "contractual" : "casual";
+        position.pg >= 13 || typeRoll < 0.8 ? "regular" : "contractual";
 
       rows.push({
         employee_id: personnelNumbers[index],

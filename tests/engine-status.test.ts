@@ -41,7 +41,7 @@ describe("rule 2: separated", () => {
 describe("rule 3: employment type", () => {
   it("is NOT_COVERED when the type is not in coveredTypes", () => {
     const c = config({ coveredTypes: ["regular"] });
-    const r = evaluateEmployee(emp("E1", { employment_type: "casual" }), [], c);
+    const r = evaluateEmployee(emp("E1", { employment_type: "contractual" }), [], c);
     expect(r.status).toBe("NOT_COVERED");
     expect(r.reason).toBe("Employment type not covered");
   });
@@ -119,7 +119,7 @@ describe("rule order (first match wins)", () => {
   });
 
   it("applies rule 3 before rule 4 (uncovered late hire is NOT_COVERED)", () => {
-    const e = emp("E1", { hire_date: "2026-10-05", employment_type: "casual" });
+    const e = emp("E1", { hire_date: "2026-10-05", employment_type: "contractual" });
     expect(statusOf(e, [], config({ asOfDate: "2026-11-30", coveredTypes: ["regular"] }))).toBe(
       "NOT_COVERED",
     );

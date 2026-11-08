@@ -44,6 +44,9 @@ function Notices({ state }: { state: RadarState }) {
 export function DashboardStep({ state }: { state: RadarState }) {
   const { analysis, config, ready, issues, catalog, roster, selectedUnit, selectUnit } = state;
   const hasIssues = Object.keys(issues).length > 0;
+  // Only units with untrained staff are listed; fully trained ones are counted in a footnote.
+  const riskUnits = analysis?.org.unitsRanked.filter((u) => u.atRisk > 0) ?? [];
+  const fullyTrained = (analysis?.org.unitsRanked.length ?? 0) - riskUnits.length;
 
   const exportAll = () => {
     if (!analysis || !roster || !config) return;
@@ -92,11 +95,9 @@ export function DashboardStep({ state }: { state: RadarState }) {
             )}
             {analysis.windows && <WindowsTable windows={analysis.windows} />}
             <PlanPanel analysis={analysis} config={config} />
-            <UnitChart
-              units={analysis.org.unitsRanked}
-              selectedUnit={selectedUnit}
-              onSelect={selectUnit}
-            />
+            {riskUnits.length > 0 && (
+              <UnitChart units={riskUnits} selectedUnit={selectedUnit} onSelect={selectUnit} />
+            )}
             <div>
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <h3 className="font-semibold text-slate-900">Units ranked by risk</h3>
@@ -109,11 +110,16 @@ export function DashboardStep({ state }: { state: RadarState }) {
                   Export all at-risk CSV
                 </button>
               </div>
-              <UnitTable
-                units={analysis.org.unitsRanked}
-                selectedUnit={selectedUnit}
-                onSelect={selectUnit}
-              />
+              {riskUnits.length > 0 ? (
+                <UnitTable units={riskUnits} selectedUnit={selectedUnit} onSelect={selectUnit} />
+              ) : (
+                <Banner tone="info">Every unit is fully trained. Nobody is at risk.</Banner>
+              )}
+              {fullyTrained > 0 && (
+                <p className="mt-1 text-xs text-slate-500">
+                  {fullyTrained} {fullyTrained === 1 ? "unit is" : "units are"} fully trained and not listed.
+                </p>
+              )}
             </div>
             {roster && <BreakdownPanel analysis={analysis} roster={roster} />}
             <BacktestCard backtests={analysis.backtests} />

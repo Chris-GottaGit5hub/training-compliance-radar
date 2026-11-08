@@ -35,7 +35,7 @@ describe("sample data files", () => {
 
   it("mix employment types, ~70% licensed, hires, separations and late hires", () => {
     expect(new Set(roster.map((r) => r.employment_type))).toEqual(
-      new Set(["regular", "contractual", "casual"]),
+      new Set(["regular", "contractual"]),
     );
     const licensed = roster.filter((r) => r.licensed === "yes").length / roster.length;
     expect(licensed).toBeGreaterThan(0.6);

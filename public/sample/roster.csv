@@ -3,7 +3,7 @@ EMP-0001,Edgar Villanueva,Human Resources,Recruitment Officer,contractual,2024-0
 EMP-0002,Beatriz Del Rosario,Human Resources,Training Specialist,regular,2022-04-12,,yes,9,People Group,People and Corporate Sector
 EMP-0003,Carmela Dizon,Human Resources,Recruitment Officer,regular,2016-07-05,,yes,8,People Group,People and Corporate Sector
 EMP-0004,Ariel Manalo,Human Resources,HR Officer,regular,2008-10-29,,yes,7,People Group,People and Corporate Sector
-EMP-0005,Ramon Valdez,Human Resources,Training Specialist,casual,2013-02-13,,yes,6,People Group,People and Corporate Sector
+EMP-0005,Ramon Valdez,Human Resources,Training Specialist,contractual,2013-02-13,,yes,6,People Group,People and Corporate Sector
 EMP-0006,Christian Hernandez,Human Resources,Recruitment Officer,regular,2016-12-19,,yes,5,People Group,People and Corporate Sector
 EMP-0007,Grace De Leon,Human Resources,HR Officer,regular,2006-04-13,,no,4,People Group,People and Corporate Sector
 EMP-0008,Cristina Concepcion,Human Resources,Training Specialist,regular,2012-02-19,,yes,9,People Group,People and Corporate Sector
@@ -12,7 +12,7 @@ EMP-0010,Ariel Padilla,Human Resources,Training Specialist,regular,2015-11-02,,y
 EMP-0011,Nathaniel Pascual,Human Resources,Training Specialist,regular,2017-08-02,,yes,6,People Group,People and Corporate Sector
 EMP-0012,Sheila Castillo,Human Resources,Recruitment Officer,regular,2026-10-20,,yes,5,People Group,People and Corporate Sector
 EMP-0013,Liza Villanueva,Human Resources,Payroll Analyst,regular,2017-12-21,,yes,4,People Group,People and Corporate Sector
-EMP-0014,Carmela Santos,Human Resources,Payroll Analyst,casual,2021-03-08,,yes,9,People Group,People and Corporate Sector
+EMP-0014,Carmela Santos,Human Resources,Payroll Analyst,contractual,2021-03-08,,yes,9,People Group,People and Corporate Sector
 EMP-0015,Jerome Mendoza,Human Resources,Recruitment Officer,regular,2024-07-24,,yes,8,People Group,People and Corporate Sector
 EMP-0016,Jerome Panganiban,Human Resources,HR Officer,regular,2018-03-11,,yes,13,People Group,People and Corporate Sector
 EMP-0017,Carlo Del Rosario,Human Resources,Payroll Analyst,regular,2007-11-18,,no,10,People Group,People and Corporate Sector
@@ -23,15 +23,15 @@ EMP-0021,Beatriz De Leon,Finance,Finance Clerk,regular,2015-06-22,,no,12,Finance
 EMP-0022,Edgar Reyes,Finance,Accountant,regular,2026-10-29,,yes,9,Finance Group,Finance and Legal Sector
 EMP-0023,Miguel Manalo,Finance,Finance Clerk,regular,2006-06-12,,yes,8,Finance Group,Finance and Legal Sector
 EMP-0024,Sheila Domingo,Finance,Treasury Officer,contractual,2009-09-24,,no,7,Finance Group,Finance and Legal Sector
-EMP-0025,Paolo Domingo,Finance,Finance Clerk,casual,2017-10-09,,yes,6,Finance Group,Finance and Legal Sector
+EMP-0025,Paolo Domingo,Finance,Finance Clerk,contractual,2017-10-09,,yes,6,Finance Group,Finance and Legal Sector
 EMP-0026,Nathaniel Garcia,Finance,Budget Analyst,regular,2011-11-27,,no,5,Finance Group,Finance and Legal Sector
 EMP-0027,Liza Bautista,Finance,Treasury Officer,regular,2020-10-22,,no,4,Finance Group,Finance and Legal Sector
 EMP-0028,Edgar Del Rosario,Finance,Finance Clerk,regular,2026-03-12,,yes,9,Finance Group,Finance and Legal Sector
 EMP-0029,Kristine Padilla,Finance,Treasury Officer,contractual,2008-02-27,,yes,8,Finance Group,Finance and Legal Sector
-EMP-0030,Victor Villanueva,Finance,Budget Analyst,casual,2021-09-30,,no,7,Finance Group,Finance and Legal Sector
+EMP-0030,Victor Villanueva,Finance,Budget Analyst,contractual,2021-09-30,,no,7,Finance Group,Finance and Legal Sector
 EMP-0031,Cristina Garcia,Finance,Treasury Officer,regular,2026-02-21,,no,6,Finance Group,Finance and Legal Sector
 EMP-0032,Ana Lacson,Finance,Accountant,regular,2011-10-05,,yes,5,Finance Group,Finance and Legal Sector
-EMP-0033,Jerome Panganiban,Finance,Budget Analyst,casual,2025-08-04,,no,4,Finance Group,Finance and Legal Sector
+EMP-0033,Jerome Panganiban,Finance,Budget Analyst,contractual,2025-08-04,,no,4,Finance Group,Finance and Legal Sector
 EMP-0034,Miguel Valdez,Finance,Finance Clerk,regular,2019-03-25,,no,9,Finance Group,Finance and Legal Sector
 EMP-0035,Dennis Mendoza,Finance,Budget Analyst,contractual,2011-10-11,,yes,8,Finance Group,Finance and Legal Sector
 EMP-0036,Joanna Manalo,Finance,Accountant,regular,2021-06-29,,yes,13,Finance Group,Finance and Legal Sector
@@ -39,21 +39,21 @@ EMP-0037,Ramon Rivera,Finance,Accountant,regular,2026-10-25,,yes,10,Finance Grou
 EMP-0038,Arnold Lopez,Finance,Accountant,contractual,2025-08-29,,yes,11,Finance Group,Finance and Legal Sector
 EMP-0039,Sheila Lacson,Finance,Treasury Officer,regular,2020-04-20,,yes,12,Finance Group,Finance and Legal Sector
 EMP-0040,Jennifer Flores,Finance,Accountant,contractual,2026-08-27,,yes,15,Finance Group,Finance and Legal Sector
-EMP-0041,Mark Tolentino,Finance,Accountant,casual,2020-11-27,,yes,8,Finance Group,Finance and Legal Sector
+EMP-0041,Mark Tolentino,Finance,Accountant,contractual,2020-11-27,,yes,8,Finance Group,Finance and Legal Sector
 EMP-0042,Victor Reyes,Finance,Accountant,regular,2020-11-06,,yes,7,Finance Group,Finance and Legal Sector
 EMP-0043,Carlo Villanueva,Finance,Finance Clerk,regular,2010-11-28,,yes,6,Finance Group,Finance and Legal Sector
 EMP-0044,John Paul Aquino,Finance,Treasury Officer,regular,2026-10-23,,yes,5,Finance Group,Finance and Legal Sector
 EMP-0045,Edgar Villanueva,Finance,Treasury Officer,regular,2024-08-02,,yes,4,Finance Group,Finance and Legal Sector
-EMP-0046,Nathaniel Del Rosario,Finance,Accountant,casual,2013-06-09,,no,9,Finance Group,Finance and Legal Sector
+EMP-0046,Nathaniel Del Rosario,Finance,Accountant,contractual,2013-06-09,,no,9,Finance Group,Finance and Legal Sector
 EMP-0047,Jose Reyes,Finance,Accountant,regular,2013-05-21,,no,8,Finance Group,Finance and Legal Sector
-EMP-0048,Camille Rivera,Finance,Finance Clerk,casual,2022-06-14,,yes,7,Finance Group,Finance and Legal Sector
+EMP-0048,Camille Rivera,Finance,Finance Clerk,contractual,2022-06-14,,yes,7,Finance Group,Finance and Legal Sector
 EMP-0049,Victor Navarro,Finance,Budget Analyst,regular,2026-10-17,,yes,6,Finance Group,Finance and Legal Sector
 EMP-0050,Kristine Soriano,Finance,Budget Analyst,contractual,2020-04-24,,yes,5,Finance Group,Finance and Legal Sector
 EMP-0051,Elena Castillo,Information Technology,Network Engineer,regular,2025-05-04,,yes,12,Technology Group,Technology Sector
 EMP-0052,Kristine De Leon,Information Technology,Network Engineer,regular,2006-06-19,,yes,9,Technology Group,Technology Sector
 EMP-0053,Jennifer Bautista,Information Technology,Systems Analyst,regular,2021-11-28,,yes,8,Technology Group,Technology Sector
 EMP-0054,Beatriz Ocampo,Information Technology,Help Desk Associate,regular,2012-12-21,,yes,7,Technology Group,Technology Sector
-EMP-0055,Mark Pascual,Information Technology,Developer,casual,2013-04-20,,yes,6,Technology Group,Technology Sector
+EMP-0055,Mark Pascual,Information Technology,Developer,contractual,2013-04-20,,yes,6,Technology Group,Technology Sector
 EMP-0056,Maria Gonzales,Information Technology,Developer,regular,2024-06-01,,yes,5,Technology Group,Technology Sector
 EMP-0057,Carlo Domingo,Information Technology,Help Desk Associate,contractual,2013-02-22,,yes,4,Technology Group,Technology Sector
 EMP-0058,Lorna Santiago,Information Technology,Developer,regular,2019-01-16,,yes,9,Technology Group,Technology Sector
@@ -75,7 +75,7 @@ EMP-0073,Beatriz Panganiban,Information Technology,Network Engineer,regular,2010
 EMP-0074,Rey Macaraeg,Information Technology,Network Engineer,regular,2021-12-16,,no,5,Technology Group,Technology Sector
 EMP-0075,Kristine Castillo,Information Technology,Systems Analyst,regular,2014-11-17,,no,4,Technology Group,Technology Sector
 EMP-0076,Christian Mendoza,Information Technology,Systems Analyst,contractual,2013-10-20,,no,9,Technology Group,Technology Sector
-EMP-0077,John Paul Flores,Information Technology,Help Desk Associate,casual,2010-05-04,,no,8,Technology Group,Technology Sector
+EMP-0077,John Paul Flores,Information Technology,Help Desk Associate,contractual,2010-05-04,,no,8,Technology Group,Technology Sector
 EMP-0078,Joel Macaraeg,Information Technology,Developer,regular,2006-12-29,2026-08-21,yes,7,Technology Group,Technology Sector
 EMP-0079,Dennis Valdez,Information Technology,Network Engineer,contractual,2025-06-03,,yes,6,Technology Group,Technology Sector
 EMP-0080,Mark Mercado,Information Technology,Systems Analyst,regular,2016-10-06,,no,5,Technology Group,Technology Sector
@@ -84,7 +84,7 @@ EMP-0082,Arnold Manalo,Legal Services,Legal Assistant,regular,2023-04-01,,yes,9,
 EMP-0083,Kristine Evangelista,Legal Services,Legal Assistant,regular,2012-12-26,,yes,8,Legal Group,Finance and Legal Sector
 EMP-0084,Arnold Villanueva,Legal Services,Attorney,regular,2007-10-17,,yes,7,Legal Group,Finance and Legal Sector
 EMP-0085,Jose Pascual,Legal Services,Legal Assistant,regular,2026-10-22,,yes,6,Legal Group,Finance and Legal Sector
-EMP-0086,Carmela Padilla,Legal Services,Paralegal,casual,2021-08-06,2026-05-31,yes,5,Legal Group,Finance and Legal Sector
+EMP-0086,Carmela Padilla,Legal Services,Paralegal,contractual,2021-08-06,2026-05-31,yes,5,Legal Group,Finance and Legal Sector
 EMP-0087,Mark Padilla,Legal Services,Paralegal,contractual,2013-10-12,,yes,4,Legal Group,Finance and Legal Sector
 EMP-0088,Arnold Gonzales,Legal Services,Attorney,regular,2007-12-27,,yes,9,Legal Group,Finance and Legal Sector
 EMP-0089,Grace Ocampo,Legal Services,Legal Assistant,regular,2013-03-13,2026-04-20,yes,8,Legal Group,Finance and Legal Sector
@@ -94,18 +94,18 @@ EMP-0092,Dennis Flores,Legal Services,Attorney,regular,2006-04-21,,yes,5,Legal G
 EMP-0093,Jose Rivera,Branch Operations,Branch Associate,regular,2012-04-12,,yes,12,Branches Group,Branch Banking Sector
 EMP-0094,Jose Cruz,Branch Operations,Teller,contractual,2017-12-23,,no,9,Branches Group,Branch Banking Sector
 EMP-0095,Ramon Lopez,Branch Operations,Branch Associate,regular,2008-08-27,,yes,8,Branches Group,Branch Banking Sector
-EMP-0096,Sheila Dizon,Branch Operations,Customer Service Representative,casual,2010-07-10,,no,7,Branches Group,Branch Banking Sector
+EMP-0096,Sheila Dizon,Branch Operations,Customer Service Representative,contractual,2010-07-10,,no,7,Branches Group,Branch Banking Sector
 EMP-0097,Victor Del Rosario,Branch Operations,Customer Service Representative,regular,2016-08-27,,yes,6,Branches Group,Branch Banking Sector
 EMP-0098,John Paul Dizon,Branch Operations,Branch Associate,regular,2009-03-05,,yes,5,Branches Group,Branch Banking Sector
 EMP-0099,Angelica Ramos,Branch Operations,Branch Associate,regular,2023-03-30,,yes,4,Branches Group,Branch Banking Sector
-EMP-0100,Cristina Aquino,Branch Operations,Branch Associate,casual,2026-06-14,,yes,9,Branches Group,Branch Banking Sector
+EMP-0100,Cristina Aquino,Branch Operations,Branch Associate,contractual,2026-06-14,,yes,9,Branches Group,Branch Banking Sector
 EMP-0101,Michelle Mendoza,Branch Operations,Customer Service Representative,regular,2014-02-03,,no,8,Branches Group,Branch Banking Sector
 EMP-0102,Camille Cruz,Branch Operations,Teller,regular,2007-09-22,,no,7,Branches Group,Branch Banking Sector
 EMP-0103,Juan Cruz,Branch Operations,Customer Service Representative,regular,2018-01-13,,yes,6,Branches Group,Branch Banking Sector
 EMP-0104,Rosario Lacson,Branch Operations,Customer Service Representative,regular,2026-04-08,,yes,5,Branches Group,Branch Banking Sector
 EMP-0105,Maricel Cruz,Branch Operations,Branch Associate,regular,2019-04-17,,yes,4,Branches Group,Branch Banking Sector
 EMP-0106,Mark Ramos,Branch Operations,Branch Associate,regular,2019-01-12,,yes,9,Branches Group,Branch Banking Sector
-EMP-0107,Jennifer Macaraeg,Branch Operations,Customer Service Representative,casual,2007-07-27,,yes,8,Branches Group,Branch Banking Sector
+EMP-0107,Jennifer Macaraeg,Branch Operations,Customer Service Representative,contractual,2007-07-27,,yes,8,Branches Group,Branch Banking Sector
 EMP-0108,Joel Santos,Branch Operations,Operations Officer,regular,2026-10-21,,no,13,Branches Group,Branch Banking Sector
 EMP-0109,Dennis Soriano,Branch Operations,Teller,regular,2021-01-30,,no,10,Branches Group,Branch Banking Sector
 EMP-0110,Rey Castillo,Branch Operations,Teller,regular,2010-02-19,,yes,11,Branches Group,Branch Banking Sector
@@ -124,7 +124,7 @@ EMP-0122,Ariel Salazar,Branch Operations,Customer Service Representative,regular
 EMP-0123,Jennifer Aquino,Branch Operations,Customer Service Representative,regular,2025-10-08,,yes,4,Branches Group,Branch Banking Sector
 EMP-0124,Lorna Santos,Branch Operations,Customer Service Representative,regular,2022-04-07,,yes,9,Branches Group,Branch Banking Sector
 EMP-0125,Ana Dizon,Branch Operations,Operations Officer,regular,2009-05-13,,no,8,Branches Group,Branch Banking Sector
-EMP-0126,Jerome Dizon,Branch Operations,Customer Service Representative,casual,2009-10-18,,yes,7,Branches Group,Branch Banking Sector
+EMP-0126,Jerome Dizon,Branch Operations,Customer Service Representative,contractual,2009-10-18,,yes,7,Branches Group,Branch Banking Sector
 EMP-0127,Leo Bautista,Branch Operations,Teller,regular,2010-12-28,,yes,6,Branches Group,Branch Banking Sector
 EMP-0128,Miguel Cruz,Branch Operations,Branch Associate,regular,2026-04-04,,yes,13,Branches Group,Branch Banking Sector
 EMP-0129,John Paul Aguilar,Branch Operations,Teller,regular,2022-09-13,,no,10,Branches Group,Branch Banking Sector
@@ -136,7 +136,7 @@ EMP-0134,Juan Gonzales,Branch Operations,Operations Officer,regular,2020-06-19,,
 EMP-0135,Katrina Hernandez,Branch Operations,Teller,regular,2008-12-11,,yes,4,Branches Group,Branch Banking Sector
 EMP-0136,Cristina Santos,Branch Operations,Branch Associate,regular,2013-10-13,,yes,9,Branches Group,Branch Banking Sector
 EMP-0137,John Paul Santos,Branch Operations,Branch Associate,contractual,2021-04-03,,yes,8,Branches Group,Branch Banking Sector
-EMP-0138,Beatriz Garcia,Branch Operations,Teller,casual,2023-10-12,2026-04-30,yes,7,Branches Group,Branch Banking Sector
+EMP-0138,Beatriz Garcia,Branch Operations,Teller,contractual,2023-10-12,2026-04-30,yes,7,Branches Group,Branch Banking Sector
 EMP-0139,Jose Valdez,Branch Operations,Teller,regular,2026-06-12,,yes,6,Branches Group,Branch Banking Sector
 EMP-0140,Paolo Torres,Branch Operations,Customer Service Representative,regular,2018-02-07,,yes,5,Branches Group,Branch Banking Sector
 EMP-0141,Maria Manalo,Branch Operations,Operations Officer,regular,2013-08-05,,yes,4,Branches Group,Branch Banking Sector
@@ -150,7 +150,7 @@ EMP-0148,Elena Santiago,Credit Management,Loan Officer,regular,2009-05-13,2026-0
 EMP-0149,Paolo De Leon,Credit Management,Account Officer,regular,2009-02-15,,yes,9,Lending Group,Lending Sector
 EMP-0150,John Paul Padilla,Credit Management,Credit Analyst,regular,2020-09-03,,yes,8,Lending Group,Lending Sector
 EMP-0151,Carmela Dizon,Credit Management,Account Officer,contractual,2015-02-19,,no,7,Lending Group,Lending Sector
-EMP-0152,Kristine Lopez,Credit Management,Credit Analyst,casual,2016-11-07,,yes,6,Lending Group,Lending Sector
+EMP-0152,Kristine Lopez,Credit Management,Credit Analyst,contractual,2016-11-07,,yes,6,Lending Group,Lending Sector
 EMP-0153,Katrina Villanueva,Credit Management,Loan Officer,regular,2019-11-23,,yes,5,Lending Group,Lending Sector
 EMP-0154,Victor Ocampo,Credit Management,Account Officer,regular,2008-05-25,,yes,4,Lending Group,Lending Sector
 EMP-0155,Carlo Padilla,Credit Management,Credit Analyst,regular,2009-08-06,,no,9,Lending Group,Lending Sector
@@ -160,7 +160,7 @@ EMP-0158,Ramon Garcia,Credit Management,Credit Analyst,regular,2011-10-26,,yes,6
 EMP-0159,Lorna Mercado,Credit Management,Credit Analyst,regular,2015-05-24,,yes,5,Lending Group,Lending Sector
 EMP-0160,Edgar Lopez,Credit Management,Loan Officer,regular,2023-02-25,,yes,4,Lending Group,Lending Sector
 EMP-0161,Carlo Magno,Credit Management,Credit Analyst,regular,2021-12-20,,yes,9,Lending Group,Lending Sector
-EMP-0162,Beatriz Panganiban,Credit Management,Account Officer,casual,2026-02-23,,yes,8,Lending Group,Lending Sector
+EMP-0162,Beatriz Panganiban,Credit Management,Account Officer,contractual,2026-02-23,,yes,8,Lending Group,Lending Sector
 EMP-0163,Michelle Villanueva,Credit Management,Credit Analyst,regular,2008-11-17,,no,13,Lending Group,Lending Sector
 EMP-0164,Mark Fernandez,Credit Management,Loan Officer,regular,2023-03-18,,no,10,Lending Group,Lending Sector
 EMP-0165,Lorna Garcia,Credit Management,Credit Analyst,regular,2025-10-12,,no,11,Lending Group,Lending Sector
@@ -199,25 +199,25 @@ EMP-0197,Nathaniel Hernandez,Internal Audit,Audit Analyst,regular,2021-05-28,,ye
 EMP-0198,Michelle Dela Cruz,Internal Audit,Audit Associate,regular,2012-02-07,,yes,5,Governance Group,Governance Sector
 EMP-0199,Victor Lopez,Internal Audit,Audit Analyst,contractual,2017-04-04,,yes,4,Governance Group,Governance Sector
 EMP-0200,Nathaniel Mercado,Internal Audit,Auditor,regular,2018-08-05,2026-06-28,yes,9,Governance Group,Governance Sector
-EMP-0201,John Paul Lopez,Internal Audit,Auditor,casual,2009-03-20,,yes,8,Governance Group,Governance Sector
+EMP-0201,John Paul Lopez,Internal Audit,Auditor,contractual,2009-03-20,,yes,8,Governance Group,Governance Sector
 EMP-0202,Edgar Mercado,Internal Audit,Auditor,regular,2022-03-14,,no,7,Governance Group,Governance Sector
 EMP-0203,Jerome Concepcion,Internal Audit,Auditor,contractual,2016-08-11,,no,6,Governance Group,Governance Sector
 EMP-0204,Victor Santiago,Internal Audit,Audit Associate,regular,2007-06-30,2026-02-13,yes,5,Governance Group,Governance Sector
-EMP-0205,Jerome Padilla,Internal Audit,Audit Associate,casual,2006-01-21,,yes,4,Governance Group,Governance Sector
+EMP-0205,Jerome Padilla,Internal Audit,Audit Associate,contractual,2006-01-21,,yes,4,Governance Group,Governance Sector
 EMP-0206,Michelle Bautista,Internal Audit,Auditor,regular,2023-07-20,,yes,9,Governance Group,Governance Sector
 EMP-0207,Miguel Castillo,Corporate Planning,Research Analyst,regular,2008-05-07,,no,12,Planning Group,People and Corporate Sector
 EMP-0208,Arnold Garcia,Corporate Planning,Planning Officer,regular,2006-09-22,,yes,9,Planning Group,People and Corporate Sector
-EMP-0209,Cristina Villanueva,Corporate Planning,Planning Officer,casual,2023-03-14,,yes,8,Planning Group,People and Corporate Sector
-EMP-0210,Dennis Dizon,Corporate Planning,Planning Associate,casual,2024-04-14,,yes,7,Planning Group,People and Corporate Sector
+EMP-0209,Cristina Villanueva,Corporate Planning,Planning Officer,contractual,2023-03-14,,yes,8,Planning Group,People and Corporate Sector
+EMP-0210,Dennis Dizon,Corporate Planning,Planning Associate,contractual,2024-04-14,,yes,7,Planning Group,People and Corporate Sector
 EMP-0211,Camille Evangelista,Corporate Planning,Research Analyst,regular,2007-03-15,,yes,6,Planning Group,People and Corporate Sector
 EMP-0212,Rosario Aguilar,Corporate Planning,Planning Officer,regular,2018-07-19,,yes,5,Planning Group,People and Corporate Sector
-EMP-0213,Joel Mendoza,Corporate Planning,Research Analyst,casual,2020-04-23,,yes,4,Planning Group,People and Corporate Sector
+EMP-0213,Joel Mendoza,Corporate Planning,Research Analyst,contractual,2020-04-23,,yes,4,Planning Group,People and Corporate Sector
 EMP-0214,Carmela Fernandez,Corporate Planning,Planning Associate,regular,2010-05-04,,no,9,Planning Group,People and Corporate Sector
-EMP-0215,Christian Concepcion,Corporate Planning,Planning Associate,casual,2015-05-18,,yes,8,Planning Group,People and Corporate Sector
+EMP-0215,Christian Concepcion,Corporate Planning,Planning Associate,contractual,2015-05-18,,yes,8,Planning Group,People and Corporate Sector
 EMP-0216,Lorna Gonzales,Corporate Planning,Planning Associate,regular,2018-03-01,,no,7,Planning Group,People and Corporate Sector
 EMP-0217,Ana Gonzales,Corporate Planning,Research Analyst,regular,2010-02-20,2026-05-22,no,6,Planning Group,People and Corporate Sector
 EMP-0218,Nathaniel Reyes,Corporate Planning,Research Analyst,regular,2006-06-23,,no,5,Planning Group,People and Corporate Sector
-EMP-0219,Ana Hernandez,Procurement,Bids and Awards Staff,casual,2026-10-02,,no,12,Operations Group,Operations Sector
+EMP-0219,Ana Hernandez,Procurement,Bids and Awards Staff,contractual,2026-10-02,,no,12,Operations Group,Operations Sector
 EMP-0220,Edgar Fernandez,Procurement,Procurement Officer,regular,2017-03-24,,yes,9,Operations Group,Operations Sector
 EMP-0221,Elena Garcia,Procurement,Supply Clerk,regular,2023-02-20,,yes,8,Operations Group,Operations Sector
 EMP-0222,John Paul Rivera,Procurement,Bids and Awards Staff,regular,2026-01-19,,no,7,Operations Group,Operations Sector
@@ -230,29 +230,29 @@ EMP-0228,Dennis Soriano,Procurement,Bids and Awards Staff,regular,2006-04-09,202
 EMP-0229,Jose Aguilar,Procurement,Procurement Officer,regular,2009-09-22,2026-10-04,yes,6,Operations Group,Operations Sector
 EMP-0230,Carmela Gonzales,Procurement,Bids and Awards Staff,regular,2010-09-29,,yes,5,Operations Group,Operations Sector
 EMP-0231,Ana Padilla,Procurement,Supply Clerk,contractual,2026-07-22,,yes,4,Operations Group,Operations Sector
-EMP-0232,Ariel Santos,Procurement,Supply Clerk,casual,2010-07-02,,no,9,Operations Group,Operations Sector
-EMP-0233,Paolo Concepcion,Procurement,Supply Clerk,casual,2016-08-31,,no,8,Operations Group,Operations Sector
+EMP-0232,Ariel Santos,Procurement,Supply Clerk,contractual,2010-07-02,,no,9,Operations Group,Operations Sector
+EMP-0233,Paolo Concepcion,Procurement,Supply Clerk,contractual,2016-08-31,,no,8,Operations Group,Operations Sector
 EMP-0234,Nathaniel Mercado,Procurement,Supply Clerk,regular,2018-04-08,,no,13,Operations Group,Operations Sector
 EMP-0235,Angelica Padilla,Procurement,Procurement Officer,regular,2024-12-25,,yes,10,Operations Group,Operations Sector
 EMP-0236,Rosario Navarro,Procurement,Procurement Officer,regular,2020-03-03,,yes,11,Operations Group,Operations Sector
 EMP-0237,Ariel Lacson,Administrative Services,Driver,regular,2026-06-14,,yes,12,Operations Group,Operations Sector
 EMP-0238,Miguel Soriano,Administrative Services,Records Officer,contractual,2026-03-10,,yes,9,Operations Group,Operations Sector
-EMP-0239,Maria Domingo,Administrative Services,Utility Worker,casual,2024-04-24,,no,8,Operations Group,Operations Sector
+EMP-0239,Maria Domingo,Administrative Services,Utility Worker,contractual,2024-04-24,,no,8,Operations Group,Operations Sector
 EMP-0240,Angelica Padilla,Administrative Services,Driver,regular,2015-05-02,,yes,7,Operations Group,Operations Sector
 EMP-0241,Jerome Castillo,Administrative Services,Utility Worker,regular,2018-04-19,,yes,6,Operations Group,Operations Sector
 EMP-0242,Camille De Leon,Administrative Services,Records Officer,regular,2013-04-26,,yes,5,Operations Group,Operations Sector
 EMP-0243,Katrina De Leon,Administrative Services,Driver,regular,2026-01-29,,no,4,Operations Group,Operations Sector
 EMP-0244,Arnold Villanueva,Administrative Services,Driver,regular,2023-03-07,,yes,9,Operations Group,Operations Sector
 EMP-0245,Mark Navarro,Administrative Services,Administrative Aide,regular,2025-07-13,2026-03-09,yes,8,Operations Group,Operations Sector
-EMP-0246,Miguel Ocampo,Administrative Services,Records Officer,casual,2015-11-18,,yes,7,Operations Group,Operations Sector
+EMP-0246,Miguel Ocampo,Administrative Services,Records Officer,contractual,2015-11-18,,yes,7,Operations Group,Operations Sector
 EMP-0247,John Paul Garcia,Administrative Services,Driver,regular,2021-07-01,,yes,6,Operations Group,Operations Sector
-EMP-0248,Grace Dela Cruz,Administrative Services,Records Officer,casual,2021-09-03,,no,5,Operations Group,Operations Sector
+EMP-0248,Grace Dela Cruz,Administrative Services,Records Officer,contractual,2021-09-03,,no,5,Operations Group,Operations Sector
 EMP-0249,Noel De Leon,Administrative Services,Utility Worker,regular,2026-10-29,,no,4,Operations Group,Operations Sector
 EMP-0250,Jose Flores,Administrative Services,Administrative Aide,regular,2026-10-23,,yes,9,Operations Group,Operations Sector
 EMP-0251,Miguel De Leon,Administrative Services,Driver,regular,2017-09-07,2026-10-07,yes,8,Operations Group,Operations Sector
-EMP-0252,Michelle Valdez,Administrative Services,Records Officer,casual,2013-10-15,,no,13,Operations Group,Operations Sector
+EMP-0252,Michelle Valdez,Administrative Services,Records Officer,contractual,2013-10-15,,no,13,Operations Group,Operations Sector
 EMP-0253,Rey Navarro,Administrative Services,Driver,regular,2021-03-31,,yes,10,Operations Group,Operations Sector
-EMP-0254,Grace Aguilar,Administrative Services,Records Officer,casual,2008-07-01,2026-11-06,yes,11,Operations Group,Operations Sector
+EMP-0254,Grace Aguilar,Administrative Services,Records Officer,contractual,2008-07-01,2026-11-06,yes,11,Operations Group,Operations Sector
 EMP-0255,Elena Aguilar,Administrative Services,Utility Worker,regular,2019-03-12,,yes,12,Operations Group,Operations Sector
 EMP-0256,Ariel Evangelista,Administrative Services,Administrative Aide,regular,2014-03-30,,yes,15,Operations Group,Operations Sector
 EMP-0257,Kristine Ocampo,Administrative Services,Records Officer,contractual,2011-09-02,,no,8,Operations Group,Operations Sector
@@ -268,29 +268,29 @@ EMP-0266,Angelica Flores,Administrative Services,Records Officer,regular,2015-11
 EMP-0267,Juan Lopez,Administrative Services,Records Officer,regular,2012-08-13,,yes,4,Operations Group,Operations Sector
 EMP-0268,Nathaniel Macaraeg,Administrative Services,Records Officer,regular,2018-12-27,,no,9,Operations Group,Operations Sector
 EMP-0269,Jose Lacson,Administrative Services,Driver,regular,2021-12-10,,yes,8,Operations Group,Operations Sector
-EMP-0270,Kristine Mendoza,Administrative Services,Driver,casual,2023-07-19,,no,7,Operations Group,Operations Sector
+EMP-0270,Kristine Mendoza,Administrative Services,Driver,contractual,2023-07-19,,no,7,Operations Group,Operations Sector
 EMP-0271,Maria Garcia,Administrative Services,Administrative Aide,regular,2013-09-02,,yes,6,Operations Group,Operations Sector
 EMP-0272,Rosario Aguilar,Administrative Services,Utility Worker,regular,2019-06-07,,yes,13,Operations Group,Operations Sector
 EMP-0273,Ana Del Rosario,Administrative Services,Records Officer,regular,2021-04-07,,yes,10,Operations Group,Operations Sector
 EMP-0274,Grace Dizon,Administrative Services,Utility Worker,regular,2016-04-24,2026-10-30,yes,11,Operations Group,Operations Sector
 EMP-0275,Paolo Dela Cruz,Administrative Services,Records Officer,regular,2007-06-09,,yes,12,Operations Group,Operations Sector
-EMP-0276,Maricel Castillo,Administrative Services,Records Officer,casual,2008-04-09,,yes,14,Operations Group,Operations Sector
+EMP-0276,Maricel Castillo,Administrative Services,Records Officer,contractual,2008-04-09,,yes,14,Operations Group,Operations Sector
 EMP-0277,Carlo Domingo,Corporate Communications,Communications Officer,regular,2013-09-17,,yes,12,Communications Group,People and Corporate Sector
 EMP-0278,Juan Aguilar,Corporate Communications,Communications Officer,regular,2011-09-07,,no,9,Communications Group,People and Corporate Sector
 EMP-0279,Jose Mercado,Corporate Communications,Graphic Artist,regular,2026-06-30,,no,8,Communications Group,People and Corporate Sector
-EMP-0280,Paolo Ramos,Corporate Communications,Communications Officer,casual,2025-03-28,,no,7,Communications Group,People and Corporate Sector
+EMP-0280,Paolo Ramos,Corporate Communications,Communications Officer,contractual,2025-03-28,,no,7,Communications Group,People and Corporate Sector
 EMP-0281,Victor Del Rosario,Corporate Communications,Content Writer,contractual,2006-08-13,,no,6,Communications Group,People and Corporate Sector
 EMP-0282,Michelle Lacson,Corporate Communications,Content Writer,regular,2017-01-15,2026-06-20,yes,5,Communications Group,People and Corporate Sector
-EMP-0283,Edgar Castillo,Corporate Communications,Content Writer,casual,2011-08-11,,yes,4,Communications Group,People and Corporate Sector
+EMP-0283,Edgar Castillo,Corporate Communications,Content Writer,contractual,2011-08-11,,yes,4,Communications Group,People and Corporate Sector
 EMP-0284,Rey Hernandez,Corporate Communications,Graphic Artist,regular,2009-03-07,,yes,9,Communications Group,People and Corporate Sector
 EMP-0285,Michelle Mendoza,Corporate Communications,Graphic Artist,contractual,2020-09-26,,yes,8,Communications Group,People and Corporate Sector
-EMP-0286,John Paul Aquino,Corporate Communications,Content Writer,casual,2024-02-27,,yes,7,Communications Group,People and Corporate Sector
+EMP-0286,John Paul Aquino,Corporate Communications,Content Writer,contractual,2024-02-27,,yes,7,Communications Group,People and Corporate Sector
 EMP-0287,Joanna Bautista,Corporate Communications,Communications Officer,regular,2009-06-23,,no,6,Communications Group,People and Corporate Sector
 EMP-0288,Jose Garcia,Corporate Communications,Content Writer,regular,2026-10-27,,yes,5,Communications Group,People and Corporate Sector
 EMP-0289,Maricel Flores,Corporate Communications,Content Writer,regular,2007-12-16,,yes,4,Communications Group,People and Corporate Sector
 EMP-0290,Elena Reyes,Corporate Communications,Graphic Artist,regular,2015-12-08,,yes,9,Communications Group,People and Corporate Sector
 EMP-0291,Ariel Domingo,Corporate Communications,Graphic Artist,regular,2026-03-07,,yes,8,Communications Group,People and Corporate Sector
-EMP-0292,Kristine Evangelista,Corporate Communications,Communications Officer,casual,2024-09-02,,no,13,Communications Group,People and Corporate Sector
+EMP-0292,Kristine Evangelista,Corporate Communications,Communications Officer,contractual,2024-09-02,,no,13,Communications Group,People and Corporate Sector
 EMP-0293,Edgar Dela Cruz,Corporate Communications,Content Writer,contractual,2016-01-24,,yes,10,Communications Group,People and Corporate Sector
 EMP-0294,Paolo Flores,Corporate Communications,Graphic Artist,contractual,2018-01-10,,no,11,Communications Group,People and Corporate Sector
 EMP-0295,Elena De Leon,Corporate Communications,Graphic Artist,regular,2017-06-21,,no,12,Communications Group,People and Corporate Sector

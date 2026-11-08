@@ -10,7 +10,6 @@ type Errors = RadarState["issues"];
 const TYPE_LABELS: Record<EmploymentType, string> = {
   regular: "Regular",
   contractual: "Contractual",
-  casual: "Casual",
 };
 
 function RulesForm({
@@ -109,6 +108,10 @@ function RulesForm({
               </label>
             ))}
           </div>
+          <p className="mt-1 text-xs text-slate-500">
+            Only covered types can be at risk. Contractual staff may still attend trainings; their
+            costs count toward spending.
+          </p>
           {errors.coveredTypes && (
             <p id="rules-types-error" className="mt-1 text-xs font-medium text-red-700">
               {errors.coveredTypes}

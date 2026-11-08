@@ -13,6 +13,7 @@ import {
 } from "@/lib/engine";
 import type { RulesConfig } from "@/lib/schemas/config";
 import type { AttendanceRow, CalendarRow, CatalogRow, RosterRow } from "@/lib/schemas/rows";
+import { leftOutSummary, type LeftOutItem } from "./breakdown";
 import { budgetSeries, type BudgetReport } from "./budget";
 import { buildPlan, type Plan } from "./plan";
 import {
@@ -57,6 +58,8 @@ export interface Analysis {
   milestones: MilestoneResult[];
   /** Annual allocation burn-down (spec §4.7). */
   budget: BudgetReport;
+  /** Who is outside the rule and why (spec §6). */
+  leftOut: LeftOutItem[];
   /** null without a recommended course or sector column. */
   windows: WindowSection | null;
   /** null without a calendar or recommended-course windows. */
@@ -116,6 +119,7 @@ export function runAnalysis({ roster, attendance, catalog, calendar, config }: A
     }),
     milestones: evaluateMilestones(roster, attendance, config, results),
     budget: budgetSeries(roster, attendance, config, results, plan?.plannedByMonth),
+    leftOut: leftOutSummary(results, roster),
     windows,
     plan,
     warnings,

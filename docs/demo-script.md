@@ -5,7 +5,7 @@ Live site: https://training-compliance-radar.vercel.app (open it in an **incogni
 ## Before you record (5 minutes)
 
 - [ ] `GOOGLE_GENERATIVE_AI_API_KEY` is set in Vercel and the project was redeployed (otherwise AI buttons show "not configured").
-- [ ] Do one dry run: Load sample data → open a unit → Generate memo. The first AI call can take a few seconds.
+- [ ] **Go easy on dry runs.** The free Gemini quota is about 20 requests a day per model and each AI click uses 1–2. One dry run (memo, recommend, summary) is enough; more can use up the day's allowance before you record.
 - [ ] Browser zoom 100%, window wide enough to show the chart, notifications off.
 - [ ] Have `docs/validation.md` or a one-line problem statement ready if you want a title card.
 

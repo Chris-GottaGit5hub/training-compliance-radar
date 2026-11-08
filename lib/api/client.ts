@@ -45,6 +45,8 @@ const PROVIDER_CODES: Record<string, string> = {
   http_403: "The AI provider rejected the API key or this model is not allowed for it.",
   http_404: "The AI provider does not know this model name.",
   http_429: "The AI provider's quota or rate limit was reached. Try again later.",
+  http_429_daily:
+    "The free daily AI limit (about 20 requests per day) has been reached. It resets daily, so try again later; the dashboard and exports still work.",
   timeout: "The AI provider did not answer in time.",
   invalid_output: "The AI returned a response in an unexpected format.",
 };

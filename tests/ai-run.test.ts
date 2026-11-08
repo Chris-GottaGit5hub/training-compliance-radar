@@ -1,7 +1,7 @@
 import { APICallError, RetryError } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
-import { createModelCooldown, errorCode, formatAiLog, providerDetail, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
+import { createModelCooldown, errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
 import { REGENERATE_ONLY_BEFORE_MS, runMemo, runRecommend, runSummary } from "@/lib/ai/run";
 import type { MemoRequest, RecommendRequest, SummaryRequest } from "@/lib/schemas";
@@ -359,18 +359,14 @@ describe("AI call logging", () => {
     expect(errorCode(apiError)).not.toContain("SECRET");
   });
 
-  it("exposes the provider's response text only through providerDetail (for the probe)", () => {
-    const quota = new APICallError({
-      message: "x",
-      url: "u",
-      requestBodyValues: {},
-      statusCode: 429,
-      responseBody: '{"error":{"message":"Quota exceeded for metric generate_content_free_tier_requests"}}',
-    });
-    expect(providerDetail(quota)).toContain("Quota exceeded");
-    expect(providerDetail(new RetryError({ message: "m", reason: "maxRetriesExceeded", errors: [quota] }))).toContain("Quota exceeded");
-    expect(providerDetail(new Error("plain"))).toBeUndefined();
-    expect(errorCode(quota)).not.toContain("Quota"); // the log/route code never carries it
+  it("recognizes Google's free-tier daily cap without keeping any provider text", () => {
+    const body = '{"error":{"message":"Quota exceeded for metric free_tier_requests, limit: 20. Generate content requests per day limit exceeded on Free Tier."}}';
+    const daily = new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 429, responseBody: body });
+    const perMinute = new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 429, responseBody: "{}" });
+    expect(errorCode(daily)).toBe("http_429_daily");
+    expect(errorCode(perMinute)).toBe("http_429");
+    expect(errorCode(new RetryError({ message: "m", reason: "maxRetriesExceeded", errors: [daily] }))).toBe("http_429_daily");
+    expect(shouldTryFallback("http_429_daily")).toBe(true); // another model has its own daily allowance
   });
 
   it("looks through the SDK's retry wrapper to the real cause", () => {

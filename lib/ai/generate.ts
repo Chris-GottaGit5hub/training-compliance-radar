@@ -2,13 +2,12 @@ import { APICallError, Output, RetryError, generateText } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { z } from "zod";
-import type { AiConfig, ThinkingLevel } from "./config";
+import type { AiConfig } from "./config";
 
 /** Whole-call deadline (retries included). Must stay well under the routes' 60 s maxDuration. */
 export const AI_TIMEOUT_MS = 40_000;
 
-/** `detail` is only filled for the diagnostic probe (no user data), never for real requests. */
-export type StructuredResult<T> = { ok: true; output: T } | { ok: false; code: string; detail?: string };
+export type StructuredResult<T> = { ok: true; output: T } | { ok: false; code: string };
 
 export interface StructuredCall<S extends z.ZodType> {
   route: string;
@@ -16,10 +15,6 @@ export interface StructuredCall<S extends z.ZodType> {
   schema: S;
   instructions: string;
   prompt: string;
-  /** Diagnostics only: override the thinking level ("off" sends no thinking setting). */
-  thinking?: ThinkingLevel | "off";
-  /** Diagnostics only: override the whole-call deadline. */
-  timeoutMs?: number;
 }
 
 /** Injectable so route logic can be tested without a network call. */
@@ -40,18 +35,16 @@ export function errorCode(error: unknown): string {
     const inner = error.lastError === undefined ? "unknown" : errorCode(error.lastError);
     return error.reason === "abort" && error.errors.length > 0 ? `timeout_after_${inner}` : error.reason === "abort" ? "timeout" : inner;
   }
-  if (error instanceof APICallError) return `http_${error.statusCode ?? "unknown"}`;
+  if (error instanceof APICallError) {
+    // Google's free tier caps requests per day; say so, without keeping any provider text.
+    const daily = error.statusCode === 429 && /per ?day|PerDay/i.test(error.responseBody ?? "");
+    return `http_${error.statusCode ?? "unknown"}${daily ? "_daily" : ""}`;
+  }
   const name = error instanceof Error ? error.name : "";
   if (name === "TimeoutError" || name === "AbortError") return "timeout";
   if (name.includes("NoObjectGenerated") || name.includes("NoOutputGenerated")) return "invalid_output";
   if (name.includes("TypeValidation") || name.includes("JSONParse")) return "invalid_output";
   return "unknown";
-}
-
-/** Provider response text (e.g. which quota was hit), truncated. Only exposed by the probe. */
-export function providerDetail(error: unknown): string | undefined {
-  const cause = RetryError.isInstance(error) ? error.lastError : error;
-  return cause instanceof APICallError ? cause.responseBody?.slice(0, 600) : undefined;
 }
 
 /** One line per AI call: route, provider, model, latency, status. Never the payload. */
@@ -117,10 +110,9 @@ export async function withModelFallback<T>(
     /** Optional: models that recently failed are skipped (the last model is always tried). */
     cooldown?: ModelCooldown;
   },
-): Promise<{ ok: true; value: T } | { ok: false; code: string; detail?: string }> {
+): Promise<{ ok: true; value: T } | { ok: false; code: string }> {
   const overall = AbortSignal.timeout(options.totalMs);
   let lastCode = "unknown";
-  let lastDetail: string | undefined;
 
   for (let i = 0; i < models.length; i++) {
     const isLast = i === models.length - 1;
@@ -133,13 +125,12 @@ export async function withModelFallback<T>(
       return { ok: true, value };
     } catch (error) {
       lastCode = errorCode(error);
-      lastDetail = providerDetail(error);
       options.log(models[i], "error", Date.now() - started, lastCode);
       if (isLast || overall.aborted || !shouldTryFallback(lastCode)) break;
       options.cooldown?.trip(models[i]);
     }
   }
-  return { ok: false, code: lastCode, ...(lastDetail ? { detail: lastDetail } : {}) };
+  return { ok: false, code: lastCode };
 }
 
 /**
@@ -147,7 +138,7 @@ export async function withModelFallback<T>(
  * overall deadline, Gemini thinking kept low, and a same-provider fallback model.
  */
 export const generateStructured: StructuredGenerator = async (call) => {
-  const thinking = call.thinking ?? call.config.thinkingLevel;
+  const thinking = call.config.thinkingLevel;
   const models = [
     call.config.modelId,
     ...(call.config.fallbackModelId ? [call.config.fallbackModelId] : []),
@@ -163,7 +154,7 @@ export const generateStructured: StructuredGenerator = async (call) => {
       maxRetries: 1,
       abortSignal: signal,
       // Gemini 3 reasons by default, which made long outputs (memos) slow.
-      ...(withThinking && call.config.provider === "google" && thinking !== "off"
+      ...(withThinking && call.config.provider === "google"
         ? { providerOptions: { google: { thinkingConfig: { thinkingLevel: thinking } } } }
         : {}),
     });
@@ -181,8 +172,8 @@ export const generateStructured: StructuredGenerator = async (call) => {
     },
     {
       cooldown: sharedCooldown(),
-      totalMs: call.timeoutMs ?? AI_TIMEOUT_MS,
-      firstMs: Math.min(PRIMARY_TIMEOUT_MS, call.timeoutMs ?? AI_TIMEOUT_MS),
+      totalMs: AI_TIMEOUT_MS,
+      firstMs: PRIMARY_TIMEOUT_MS,
       log: (model, status, latencyMs, code) =>
         console.info(
           formatAiLog({ route: call.route, provider: call.config.provider, model, latencyMs, status, code }),
@@ -192,10 +183,5 @@ export const generateStructured: StructuredGenerator = async (call) => {
 
   return result.ok
     ? { ok: true, output: result.value.output as z.infer<typeof call.schema> }
-    : {
-        ok: false,
-        code: result.code,
-        // Provider text could echo a prompt, so only the user-data-free probe may show it.
-        ...(call.route === "probe" && result.detail ? { detail: result.detail } : {}),
-      };
+    : { ok: false, code: result.code };
 };

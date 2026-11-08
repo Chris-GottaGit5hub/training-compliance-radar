@@ -39,6 +39,7 @@ describe("describeApiFailure", () => {
     expect(describeApiFailure(502, { code: "http_403" })).toMatch(/API key/);
     expect(describeApiFailure(502, { code: "http_404" })).toMatch(/model/);
     expect(describeApiFailure(502, { code: "http_429" })).toMatch(/quota/);
+    expect(describeApiFailure(502, { code: "http_429_daily" })).toMatch(/daily/i);
     expect(describeApiFailure(502, { code: "weird" })).toContain("weird");
   });
 

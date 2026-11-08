@@ -4,7 +4,7 @@
 
 Privacy-first AI app that flags employees at risk of missing the one-training-per-year rule, months before year-end.
 
-**Live demo:** https://training-compliance-radar.vercel.app — click **Load sample data** to try it with a synthetic agency. No sign-in, nothing to install.
+**Live demo:** https://training-compliance-radar.vercel.app — click **Load sample data** to try it with a synthetic agency. No sign-in, nothing to install. (AI features use a free Gemini quota of about 20 requests a day; if it is used up they show a "daily limit reached" message and everything else still works.)
 
 ## The problem
 
@@ -107,6 +107,7 @@ On the seeded synthetic data (300 employees, year 2026), rules as of each checkp
 
 ## Limitations
 
+- **Free-tier AI quota is small.** Google's free Gemini tier allows about **20 requests per day per model** (confirmed from Google's own error message). Each AI button click uses 1–2 requests, so the AI buttons stop working for the rest of the day once it is used up and the app shows a clear "daily limit reached" message. The dashboard, charts and CSV export never use AI. Enabling billing on the Google AI project removes this cap.
 - Data must be re-uploaded each session (by design; nothing is stored).
 - The rate limiter is in memory, so on serverless each instance counts separately (best effort).
 - AI output can be imperfect: numbers are checked against the request and flagged with a warning if they do not match, but memos should be read before sending.

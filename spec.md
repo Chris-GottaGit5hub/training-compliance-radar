@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.6)
+# spec.md — Training Compliance Radar (v1.7)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -210,3 +210,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.4 | 2026-11-08 | AI call deadline 25 s → 40 s for the whole call; Gemini `thinkingLevel` set to `low` by default (env `AI_THINKING_LEVEL`) because Gemini 3 reasoning made memo generation exceed 25 s on the live site; memo/summary regeneration skipped after a slow first attempt; summary and memo prompts ask for plain-English labels. 503 responses carry a `reason`, 502 a short `code`, and `GET /api/status` reports configuration. | bug found on live site |
 | 1.5 | 2026-11-08 | Same-provider model fallback (`AI_FALLBACK_MODEL`, default `gemini-3.6-flash` for Gemini): live testing showed `gemini-3.8-flash` returning 503 or hanging while `gemini-3.6-flash` answered in about 1 s. There is still no fallback between providers. 502 bodies carry the underlying provider code (e.g. `timeout_after_http_503`); `GET /api/status?probe=1` tests the provider. | bug found on live site |
 | 1.6 | 2026-11-08 | Executive summary card now includes four engine-drawn charts (status breakdown, highest-risk units, back-test, cost vs budget) that do not depend on the AI. Summary prompt asks for plain-English labels, ₱ amounts, and a plain statement of whether the budget covers the cost to close. | user request |
+| 1.7 | 2026-11-08 | Removed the `GET /api/status?probe=1` model probe: Google's free tier allows only 20 requests per day per model, and a public probe could use that up. `/api/status` now only reports configuration and makes no model call. AI errors distinguish the free-tier daily cap (`http_429_daily`) with a clear message. | found on live site |

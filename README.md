@@ -139,7 +139,7 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 | AI agent rules and project conventions | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md), [`.cursorrules`](.cursorrules) |
 | Working app on the recommended stack (Next.js, TypeScript, Tailwind, Vercel AI SDK) | `app/`, `components/`, `lib/` |
 | Deployed and publicly reachable | https://training-compliance-radar.vercel.app |
-| Core logic is deterministic and tested | `lib/engine/`, `tests/` (302 tests) |
+| Core logic is deterministic and tested | `lib/engine/`, `tests/` (309 tests) |
 | AI features with structured output and grounding | `app/api/*`, `lib/ai/`, `lib/payload/` |
 | Data privacy handled (aggregates only, local name merge) | [Privacy](#privacy-and-data-handling), `lib/payload/`, `tests/payload.test.ts` |
 | Security basics (validation, size limits, rate limit, no secrets in git) | `lib/api/`, `.env.example`, gitleaks in CI |

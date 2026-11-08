@@ -4,16 +4,26 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   MONTH_LABELS,
+  blankDraft,
   buildCalendarCsv,
   buildCalendarView,
   calendarFileName,
+  changedRunCount,
+  describeEdits,
+  draftFromRow,
+  duplicateDraft,
+  editedRunIds,
   formatPeso,
   formatPesoCompact,
+  removedRuns,
   type CalendarRun,
+  type RunDraft,
   type CalendarView,
   type RunState,
 } from "@/lib/analysis";
+import type { CalendarRow } from "@/lib/schemas";
 import { AMBER, ChartPanel, INDIGO } from "./ChartPanel";
+import { CalendarEditor } from "./CalendarEditor";
 import { CalendarGrid, DELIVERY_TEXT, STATE_BADGE, STATE_TEXT } from "./CalendarGrid";
 import { CalendarQuarter } from "./CalendarQuarter";
 import { CalendarTimeline, TimelineLegend } from "./CalendarTimeline";
@@ -73,7 +83,19 @@ function Summary({ view }: { view: CalendarView }) {
   );
 }
 
-function RunDetail({ run, onClose }: { run: CalendarRun; onClose: () => void }) {
+function RunDetail({
+  run,
+  onClose,
+  edited = false,
+  actions,
+}: {
+  run: CalendarRun;
+  onClose: () => void;
+  /** Added or changed in this session (spec §4.11). */
+  edited?: boolean;
+  /** Edit, duplicate and remove buttons, shown in edit mode. */
+  actions?: ReactNode;
+}) {
   const row = (label: string, value: ReactNode) => (
     <div>
       <dt className="text-xs font-medium text-slate-600">{label}</dt>
@@ -91,6 +113,7 @@ function RunDetail({ run, onClose }: { run: CalendarRun; onClose: () => void }) 
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {edited && <span className="rounded bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-800">Edited</span>}
           <span className={`rounded px-2 py-0.5 text-xs font-medium ${STATE_BADGE[run.state]}`}>{STATE_TEXT[run.state]}</span>
           <button type="button" onClick={onClose} className={buttonClass("secondary")}>
             Close
@@ -113,6 +136,7 @@ function RunDetail({ run, onClose }: { run: CalendarRun; onClose: () => void }) 
         {row("People the plan places", run.state === "planned" ? fmt(run.planPeople) : "—")}
         {row("Course", run.courseId)}
       </dl>
+      {actions && <div className="mt-3 flex flex-wrap gap-2 print:hidden">{actions}</div>}
     </section>
   );
 }
@@ -121,10 +145,12 @@ function RunTable({
   runs,
   selectedId,
   onSelect,
+  edited,
 }: {
   runs: readonly CalendarRun[];
   selectedId: string | null;
   onSelect: (runId: string) => void;
+  edited?: ReadonlySet<string>;
 }) {
   const head = "px-3 py-2 font-medium";
   return (
@@ -155,6 +181,9 @@ function RunTable({
                 >
                   {r.title}
                 </button>
+                {edited?.has(r.runId) && (
+                  <span className="ml-2 rounded bg-violet-100 px-1.5 py-0.5 text-xs font-medium text-violet-800">Edited</span>
+                )}
               </th>
               <td className="px-3 py-2">{DELIVERY_TEXT[r.delivery]}</td>
               <td className="px-3 py-2 text-right tabular-nums">{fmt(r.minPax)}–{fmt(r.maxPax)}</td>
@@ -259,7 +288,11 @@ const MODES: readonly (readonly [Mode, string])[] = [
 ];
 
 export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToData: () => void }) {
-  const { analysis, config, calendar, ready, sample, loadSample } = state;
+  const { analysis, config, calendar, calendarBase, edits, ready, sample, loadSample } = state;
+  const { pushEdit, undoLastEdit, restoreEditedRun, resetEdits } = state;
+  const [editMode, setEditMode] = useState(false);
+  const [editor, setEditor] = useState<{ heading: string; draft: RunDraft; lockId: boolean; key: number } | null>(null);
+  const [editorKey, setEditorKey] = useState(0);
   const [mode, setMode] = useState<Mode>("grid");
   const [delivery, setDelivery] = useState<"all" | "in_house" | "external">("all");
   const [runState, setRunState] = useState<"all" | RunState>("all");
@@ -267,9 +300,14 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
 
   const view = useMemo(
     () =>
-      analysis && config && calendar && calendar.length > 0 ? buildCalendarView(calendar, analysis, config) : null,
-    [analysis, config, calendar],
+      analysis && config && calendar && calendarBase && calendarBase.length > 0
+        ? buildCalendarView(calendar, analysis, config)
+        : null,
+    [analysis, config, calendar, calendarBase],
   );
+  const editedIds = useMemo(() => (calendarBase ? editedRunIds(calendarBase, edits) : new Set<string>()), [calendarBase, edits]);
+  const removed = useMemo(() => (calendarBase ? removedRuns(calendarBase, edits) : []), [calendarBase, edits]);
+  const history = useMemo(() => (calendarBase ? describeEdits(calendarBase, edits) : []), [calendarBase, edits]);
   const shown = useMemo(
     () =>
       (view?.runs ?? []).filter(
@@ -338,12 +376,55 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
     setSelectedIds((cur) => (cur.length === ids.length && cur.every((id, i) => id === ids[i]) ? [] : ids));
   const select = (runId: string) => selectMany([runId]);
 
+  // Edit mode (spec §4.11).
+  const allIds = new Set((calendar ?? []).map((r) => r.run_id));
+  const rowOf = (runId: string) => (calendar ?? []).find((r) => r.run_id === runId);
+  const openEditor = (heading: string, draft: RunDraft, lockId: boolean) => {
+    const key = editorKey + 1;
+    setEditorKey(key);
+    setEditor({ heading, draft, lockId, key });
+  };
+  const openEdit = (run: CalendarRun) => {
+    const row = rowOf(run.runId);
+    if (row) openEditor(`Edit ${run.title}`, draftFromRow(row), true);
+  };
+  const openDuplicate = (run: CalendarRun) => {
+    const row = rowOf(run.runId);
+    if (row) openEditor(`Duplicate ${run.title}`, duplicateDraft(row, allIds), false);
+  };
+  const saveRun = (row: CalendarRow) => {
+    pushEdit({ type: "upsert", row });
+    setEditor(null);
+    setSelectedIds([row.run_id]);
+  };
+  const removeRun = (runId: string) => {
+    pushEdit({ type: "remove", runId });
+    setSelectedIds([]);
+  };
+  const toggleEditMode = () => {
+    setEditMode((on) => !on);
+    setEditor(null);
+  };
+  const editorContext = {
+    year: view.year,
+    asOfDate: view.asOfDate,
+    takenIds: new Set([...allIds].filter((id) => !(editor?.lockId && id === editor.draft.run_id))),
+  };
+
   return (
     <Card>
       <section aria-labelledby="calendar-title" className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-2">
           {intro}
-          <div className="flex gap-2 print:hidden">
+          <div className="flex flex-wrap gap-2 print:hidden">
+            <button
+              type="button"
+              aria-pressed={editMode}
+              onClick={toggleEditMode}
+              className={buttonClass(editMode ? "secondary" : "primary")}
+            >
+              {editMode ? "Done editing" : "Edit calendar"}
+            </button>
             <button type="button" onClick={exportCsv} className={buttonClass("secondary")}>
               Export calendar CSV
             </button>
@@ -352,6 +433,74 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
             </button>
           </div>
         </div>
+
+        {editMode && (
+          <div className="space-y-3 rounded-lg border border-violet-200 bg-violet-50/60 p-3 print:hidden">
+            <p className="text-sm text-slate-700">
+              <span className="font-semibold">Edit mode.</span> Changes are a what-if: every number in the app
+              recomputes, nothing is saved, and they are lost when you reload. Export the calendar CSV to keep them.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => openEditor("Add a run", blankDraft(allIds), false)}
+                className={buttonClass("primary")}
+              >
+                Add run
+              </button>
+              <button type="button" onClick={undoLastEdit} disabled={edits.length === 0} className={buttonClass("secondary")}>
+                Undo last change
+              </button>
+              <button type="button" onClick={resetEdits} disabled={edits.length === 0} className={buttonClass("secondary")}>
+                Reset all changes
+              </button>
+            </div>
+            {history.length > 0 && (
+              <details className="text-sm text-slate-700">
+                <summary className="cursor-pointer font-medium">
+                  Changes ({changedRunCount(edits)} {changedRunCount(edits) === 1 ? "run" : "runs"})
+                </summary>
+                <ul className="mt-2 list-disc space-y-0.5 pl-5">
+                  {history.map((line, i) => (
+                    <li key={`${i}-${line}`}>{line}</li>
+                  ))}
+                </ul>
+                {removed.length > 0 && (
+                  <div className="mt-3">
+                    <p className="font-medium">Removed runs</p>
+                    <ul className="mt-1 space-y-1">
+                      {removed.map((r) => (
+                        <li key={r.run_id} className="flex flex-wrap items-center gap-2">
+                          <span>
+                            {r.run_title ?? r.course_id} ({r.date})
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => restoreEditedRun(r.run_id)}
+                            className={`${buttonClass("secondary")} !px-2 !py-1 text-xs`}
+                          >
+                            Restore
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </details>
+            )}
+          </div>
+        )}
+        {editMode && editor && (
+          <CalendarEditor
+            key={editor.key}
+            heading={editor.heading}
+            initial={editor.draft}
+            context={editorContext}
+            lockId={editor.lockId}
+            onSave={saveRun}
+            onCancel={() => setEditor(null)}
+          />
+        )}
 
         <Summary view={view} />
 
@@ -416,13 +565,33 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
         {selectedRuns.length > 0 && (
           <div id="calendar-detail" className="space-y-3">
             {selectedRuns.map((run) => (
-              <RunDetail key={run.runId} run={run} onClose={() => setSelectedIds([])} />
+              <RunDetail
+                key={run.runId}
+                run={run}
+                onClose={() => setSelectedIds([])}
+                edited={editedIds.has(run.runId)}
+                actions={
+                  editMode ? (
+                    <>
+                      <button type="button" onClick={() => openEdit(run)} className={buttonClass("secondary")}>
+                        Edit run
+                      </button>
+                      <button type="button" onClick={() => openDuplicate(run)} className={buttonClass("secondary")}>
+                        Duplicate
+                      </button>
+                      <button type="button" onClick={() => removeRun(run.runId)} className={buttonClass("secondary")}>
+                        Remove run
+                      </button>
+                    </>
+                  ) : undefined
+                }
+              />
             ))}
           </div>
         )}
 
         {mode === "grid" && <CalendarGrid view={view} runs={shown} selectedId={singleId} onSelect={select} />}
-        {mode === "list" && <RunTable runs={shown} selectedId={singleId} onSelect={select} />}
+        {mode === "list" && <RunTable runs={shown} selectedId={singleId} onSelect={select} edited={editedIds} />}
         {mode === "timeline" && (
           <div className="space-y-2">
             <TimelineLegend />

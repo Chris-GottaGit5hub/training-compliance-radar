@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { buildCalendarCsv, buildCalendarView, calendarFileName, changedRunCount } from "@/lib/analysis";
 import { AppTabs, type AppTab } from "./AppTabs";
+import { downloadTextFile } from "./download";
+import { Banner, buttonClass } from "./ui";
 import { CalendarTab } from "./CalendarTab";
 import { DashboardStep } from "./DashboardStep";
 import { DataStep } from "./DataStep";
@@ -24,6 +27,23 @@ export function RadarApp() {
     catalog: state.catalog,
     config,
   });
+
+  const edited = state.edits.length > 0;
+  // The browser asks before leaving while what-if calendar changes would be lost (spec §4.11).
+  useEffect(() => {
+    if (!edited) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [edited]);
+  const exportEdited = () => {
+    if (!analysis || !config || !state.calendar) return;
+    const view = buildCalendarView(state.calendar, analysis, config);
+    downloadTextFile(calendarFileName(view.year), buildCalendarCsv(view));
+  };
 
   const steps: StepInfo[] = [
     { href: "#step-data", label: "Data", state: ready ? "done" : "current" },
@@ -50,6 +70,27 @@ export function RadarApp() {
         />
       </div>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+        {edited && (
+          <div className="mb-4">
+            <Banner tone="warning">
+              <span className="font-semibold">What-if.</span> {changedRunCount(state.edits)}{" "}
+              {changedRunCount(state.edits) === 1 ? "run" : "runs"} of the training calendar{" "}
+              {changedRunCount(state.edits) === 1 ? "is" : "are"} changed. Every number on both tabs includes{" "}
+              {changedRunCount(state.edits) === 1 ? "it" : "them"}, and nothing is saved.
+              <span className="mt-2 flex flex-wrap gap-2 print:hidden">
+                <button type="button" onClick={state.undoLastEdit} className={buttonClass("secondary")}>
+                  Undo last change
+                </button>
+                <button type="button" onClick={state.resetEdits} className={buttonClass("secondary")}>
+                  Reset to uploaded calendar
+                </button>
+                <button type="button" onClick={exportEdited} className={buttonClass("secondary")}>
+                  Export calendar CSV
+                </button>
+              </span>
+            </Banner>
+          </div>
+        )}
         <div className="print:hidden">
           <AppTabs active={tab} onChange={setTab} />
         </div>

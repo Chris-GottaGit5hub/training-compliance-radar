@@ -3,6 +3,10 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   EMPTY_FILE,
+  applyCalendarEdits,
+  restoreRun,
+  undoEdit,
+  type CalendarEdit,
   configErrors,
   initialConfigFor,
   isOversized,
@@ -50,11 +54,17 @@ export function useRadarState() {
   const [pending, setPending] = useState<Partial<Record<CsvKind, boolean>>>({});
   const [sample, setSample] = useState<SampleStatus>({ state: "idle" });
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+  const [edits, setEdits] = useState<CalendarEdit[]>([]);
 
   const roster = files.roster.status === "ok" ? files.roster.rows : null;
   const attendance = files.attendance.status === "ok" ? files.attendance.rows : null;
   const catalog = files.catalog.status === "ok" ? files.catalog.rows : null;
-  const calendar = files.calendar.status === "ok" ? files.calendar.rows : null;
+  const calendarBase = files.calendar.status === "ok" ? files.calendar.rows : null;
+  // What-if changes (spec §4.11), applied on top of the uploaded calendar; browser memory only.
+  const calendar = useMemo(
+    () => (calendarBase ? applyCalendarEdits(calendarBase, edits) : null),
+    [calendarBase, edits],
+  );
   const ready = roster !== null && attendance !== null;
 
   const config = useMemo<RulesConfig | null>(() => {
@@ -85,6 +95,7 @@ export function useRadarState() {
         ? oversizedState(file.name)
         : stateFromResult(validateCsv(kind, await file.text()), file.name);
       setFiles((prev) => ({ ...prev, [kind]: state }));
+      if (kind === "calendar") setEdits([]);
       setSource((prev) => prev ?? "upload");
       setToday((prev) => prev ?? todayManila());
     } finally {
@@ -94,7 +105,13 @@ export function useRadarState() {
 
   const clearFile = useCallback((kind: CsvKind) => {
     setFiles((prev) => ({ ...prev, [kind]: EMPTY_FILE }));
+    if (kind === "calendar") setEdits([]);
   }, []);
+
+  const pushEdit = useCallback((edit: CalendarEdit) => setEdits((prev) => [...prev, edit]), []);
+  const undoLastEdit = useCallback(() => setEdits((prev) => undoEdit(prev)), []);
+  const restoreEditedRun = useCallback((runId: string) => setEdits((prev) => restoreRun(prev, runId)), []);
+  const resetEdits = useCallback(() => setEdits([]), []);
 
   const loadSample = useCallback(async () => {
     setSample({ state: "loading" });
@@ -115,6 +132,7 @@ export function useRadarState() {
       });
       setSource("sample");
       setToday(todayManila());
+      setEdits([]);
       setEdited(null);
       setSelectedUnit(null);
       setSample({ state: "idle" });
@@ -137,7 +155,15 @@ export function useRadarState() {
     analysisError: run.error,
     roster,
     catalog,
+    /** The calendar the app analyzes: uploaded rows plus what-if changes. */
     calendar,
+    /** The calendar as uploaded. */
+    calendarBase,
+    edits,
+    pushEdit,
+    undoLastEdit,
+    restoreEditedRun,
+    resetEdits,
     selectedUnit,
     loadFile,
     clearFile,

@@ -1,7 +1,8 @@
 import { formatDeadline } from "@/lib/ai/finalize";
 import { deadlineOf, monthsRemaining, type UnitSummary } from "@/lib/engine";
-import type { CatalogRow, MemoRequest, RulesConfig } from "@/lib/schemas";
-import type { Analysis } from "./analysis";
+import { recommendableCourses, topPositions, unitKey } from "@/lib/payload";
+import type { CatalogRow, MemoRequest, RecommendResponse, RulesConfig } from "@/lib/schemas";
+import type { Analysis, AtRiskRow } from "./analysis";
 import { formatPercent, formatPeso } from "./format";
 
 /*
@@ -104,4 +105,56 @@ export function buildTemplateSummary(analysis: Analysis, config: RulesConfig): s
       : "Recommended next step: send early-warning memos to the highest-risk units first.",
   );
   return parts.join(" ");
+}
+
+const STOP_WORDS = new Set(["and", "the", "for", "with", "from", "into", "your", "of", "in", "to", "on"]);
+
+/** Lower-case words of 3+ letters, without filler words. */
+function words(text: string): string[] {
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 3 && !STOP_WORDS.has(w));
+}
+
+/** Same word, or the same 5-letter stem (accountant / accounting, operation / operations). */
+const sameStem = (a: string, b: string): boolean =>
+  a === b || (a.length >= 5 && b.length >= 5 && a.slice(0, 5) === b.slice(0, 5));
+
+/**
+ * Course picks for one unit without AI (spec §6): up to 3 qualifying courses ranked by how
+ * many of the unit's words (its name and top positions) appear in the course title or skill
+ * area, then lowest cost per head, then shortest, then course ID. Same shape as the AI route.
+ */
+export function buildTemplateRecommendation(
+  unit: UnitSummary,
+  atRisk: readonly AtRiskRow[],
+  catalog: readonly CatalogRow[],
+  config: RulesConfig,
+): RecommendResponse["recommendations"][number] {
+  const unitWords = [...new Set(words([unit.unit, ...topPositions(atRisk, unit.unit)].join(" ")))];
+  const ranked = recommendableCourses(catalog, config)
+    .map((course) => {
+      const courseWords = words(`${course.title} ${course.skill_area}`);
+      const score = unitWords.filter((w) => courseWords.some((c) => sameStem(w, c))).length;
+      return { course, score };
+    })
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        a.course.cost_per_head - b.course.cost_per_head ||
+        a.course.duration_minutes - b.course.duration_minutes ||
+        (a.course.course_id < b.course.course_id ? -1 : a.course.course_id > b.course.course_id ? 1 : 0),
+    )
+    .slice(0, 3);
+
+  return {
+    unit: unitKey(unit.unit),
+    courseIds: ranked.map((r) => r.course.course_id),
+    rationale:
+      ranked.length === 0
+        ? "Template (no AI): no catalog course meets the minimum hours for this unit."
+        : "Template picks (no AI): courses whose titles best match this unit and its most common at-risk roles, then the lowest cost and shortest duration.",
+    fallbackSearch: ranked.length === 0,
+  };
 }

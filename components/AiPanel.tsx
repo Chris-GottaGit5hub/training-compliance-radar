@@ -2,7 +2,7 @@ import { useId, useState, type ReactNode } from "react";
 import type { AtRiskRow } from "@/lib/analysis";
 import type { UnitSummary } from "@/lib/engine";
 import { topPositions, unitKey } from "@/lib/payload";
-import { buildTemplateMemo } from "@/lib/analysis";
+import { buildTemplateMemo, buildTemplateRecommendation } from "@/lib/analysis";
 import type { CatalogRow, MemoRequest, RulesConfig } from "@/lib/schemas";
 import { MemoView } from "./MemoView";
 import { RecommendationList } from "./RecommendationList";
@@ -49,7 +49,13 @@ export function AiPanel({
   const [tone, setTone] = useState<MemoRequest["tone"]>("formal");
   const memo = ai.memos[unit.unit] ?? { status: "idle" as const };
   const recs = ai.recommendations;
-  const rec = recs.status === "done" ? recs.data[unitKey(unit.unit)] : undefined;
+  // When the AI call failed, show labeled template picks instead (spec §6).
+  const usingTemplate = recs.status === "error" && catalog !== null && unit.atRisk > 0;
+  const rec = usingTemplate
+    ? buildTemplateRecommendation(unit, rows, catalog, config)
+    : recs.status === "done"
+      ? recs.data[unitKey(unit.unit)]
+      : undefined;
   const asOfDate = config.asOfDate;
   const recCourses =
     rec && catalog
@@ -106,6 +112,7 @@ export function AiPanel({
       {recs.status === "error" && <RetryBanner message={recs.message} onRetry={ai.recommend} />}
       {rec && catalog && (
         <RecommendationList
+          template={usingTemplate}
           rec={rec}
           catalog={catalog}
           searchQuery={topPositions(rows, unit.unit)[0] ?? unit.unit}

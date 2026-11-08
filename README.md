@@ -73,7 +73,7 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 ## Tests
 
-`npm test` runs **212 tests in 17 files** (Vitest). They cover:
+`npm test` runs **234 tests in 18 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);
@@ -109,7 +109,7 @@ On the seeded synthetic data (300 employees, year 2026), rules as of each checkp
 
 ## Limitations
 
-- **Free-tier AI quota is small.** Google's free Gemini tier allows about **20 requests per day per model** (confirmed from Google's own error message). Each AI button click uses 1–2 requests. Once it is used up, the app shows a clear "daily limit reached" message with a Retry button and falls back to a **template memo or summary** built from the engine's numbers (labeled as such). The dashboard, charts and CSV export never use AI. Enabling billing on the Google AI project removes this cap.
+- **Free-tier AI quota is small.** Google's free Gemini tier allows about **20 requests per day per model** (confirmed from Google's own error message). Each AI button click uses 1–2 requests. Once it is used up, the app shows a clear "daily limit reached" message with a Retry button and falls back to a **template memo or summary** built from the engine's numbers, and **template course picks** from the catalog (all labeled as such). The dashboard, charts and CSV export never use AI. Setting Groq as the primary provider (free plan: 30 requests per minute, 1,000 per day for `openai/gpt-oss-120b`) with Gemini behind it raises the daily capacity a lot without billing.
 - Data must be re-uploaded each session (by design; nothing is stored).
 - The rate limiter is in memory, so on serverless each instance counts separately (best effort).
 - AI output can be imperfect: numbers are checked against the request and flagged with a warning if they do not match, but memos should be read before sending.

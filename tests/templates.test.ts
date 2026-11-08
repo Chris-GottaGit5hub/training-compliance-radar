@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTemplateMemo, buildTemplateSummary, runAnalysis } from "@/lib/analysis";
+import { buildTemplateMemo, buildTemplateRecommendation, buildTemplateSummary, runAnalysis } from "@/lib/analysis";
 import { mergeEmployeeList } from "@/lib/payload";
 import { att, config, course, emp, unitSummary } from "./helpers/fixtures";
 
@@ -92,5 +92,59 @@ describe("buildTemplateSummary", () => {
     const text = buildTemplateSummary(allDone, config());
     expect(text).toContain("No unit has at-risk employees.");
     expect(text).toContain("keep monitoring");
+  });
+});
+
+describe("buildTemplateRecommendation (spec §6 template picks)", () => {
+  const cfg = config();
+  const named = (id: string, title: string, skill: string, cost: number, minutes = 120, provider: "linkedin_learning" | "in_house" = "in_house") =>
+    ({ ...course(id, provider, minutes, cost), title, skill_area: skill });
+  const atRisk = (unitName: string, position: string, n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      employeeId: `${position}-${i}`, name: `N${i}`, unit: unitName, position,
+      employmentType: "regular", licensed: true, hireDate: "2020-01-01",
+    }));
+
+  it("picks up to 3 qualifying courses that best match the unit and its top positions, then cheapest", () => {
+    const catalog = [
+      named("C1", "Leadership Foundations", "Leadership", 0),
+      named("C2", "Customer Service Foundations", "Customer Service", 900),
+      named("C3", "Customer Handling in Banking Operations", "Customer Service", 600),
+      named("C4", "Excel Essential Training", "Productivity", 0),
+      named("C5", "Financial Literacy", "Finance", 0),
+    ];
+    const rec = buildTemplateRecommendation(unit("Branch Operations", 10, 6), atRisk("Branch Operations", "Customer Associate", 4), catalog, cfg);
+    expect(rec.courseIds).toEqual(["C3", "C2", "C1"]); // C3 matches "customer" + "operations"; C2 "customer"; then cheapest/shortest
+    expect(rec.fallbackSearch).toBe(false);
+    expect(rec.rationale).toMatch(/template/i);
+    expect(rec.rationale.length).toBeLessThanOrEqual(300);
+  });
+
+  it("matches word stems such as accountant and accounting", () => {
+    const catalog = [named("A", "Accounting Basics", "Finance", 500), named("B", "Leadership Foundations", "Leadership", 0)];
+    const rec = buildTemplateRecommendation(unit("Finance", 5, 3), atRisk("Finance", "Accountant", 3), catalog, cfg);
+    expect(rec.courseIds[0]).toBe("A");
+  });
+
+  it("only uses courses that qualify: long enough, and no e-learning when it does not count", () => {
+    const catalog = [
+      named("SHORT", "Customer Service Tips", "Customer Service", 0, 30),
+      named("ELEARN", "Customer Service Foundations", "Customer Service", 0, 120, "linkedin_learning"),
+      named("OK", "Records Management", "Productivity", 600, 180),
+    ];
+    const rec = buildTemplateRecommendation(unit("Customer Care", 4, 2), [], catalog, config({ elearningCounts: false }));
+    expect(rec.courseIds).toEqual(["OK"]);
+  });
+
+  it("falls back to the LinkedIn Learning search when no course qualifies", () => {
+    const rec = buildTemplateRecommendation(unit("Legal", 4, 1), [], [named("S", "Short", "General", 0, 20)], cfg);
+    expect(rec).toMatchObject({ unit: "Legal", courseIds: [], fallbackSearch: true });
+  });
+
+  it("is deterministic and ties break on course ID", () => {
+    const catalog = [named("Z", "Alpha", "General", 0), named("Y", "Beta", "General", 0), named("X", "Gamma", "General", 0), named("W", "Delta", "General", 0)];
+    const a = buildTemplateRecommendation(unit("Legal", 4, 1), [], catalog, cfg);
+    expect(a.courseIds).toEqual(["W", "X", "Y"]);
+    expect(buildTemplateRecommendation(unit("Legal", 4, 1), [], catalog, cfg)).toEqual(a);
   });
 });

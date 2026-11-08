@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.9)
+# spec.md — Training Compliance Radar (v2.0)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -18,6 +18,11 @@ L&D officers in Philippine government agencies must ensure every covered employe
 | hire_date | `YYYY-MM-DD` | required, valid date |
 | separation_date | `YYYY-MM-DD` or empty | optional; if present must be ≥ hire_date |
 | licensed | `yes` \| `no` | required (has e-learning license) |
+| pay_grade | integer 1–30; `8`, `PG8` and `PG 8` are all accepted | optional |
+| group | string | optional |
+| sector | string | optional |
+
+Derived **band** from `pay_grade`: PG 4–9 = Rank and File, PG 10–13 = Officers, PG 14–18 = Senior Officers; any other or missing grade = Unbanded. A missing `group` or `sector` is shown as "Unassigned". `unit` is the department.
 
 ### 2.2 attendance.csv (required)
 | Column | Type | Rules |
@@ -38,7 +43,9 @@ L&D officers in Philippine government agencies must ensure every covered employe
 | duration_minutes | integer > 0 | required |
 | provider | `linkedin_learning` \| `in_house` | required |
 | url | https URL or empty | optional |
-| cost_per_head | number ≥ 0 (PHP) | required (0 for licensed e-learning) |
+| cost_per_head | number ≥ 0 (PHP) | required (0 for licensed e-learning); what one **licensed** person costs the budget |
+| unlicensed_fee | number ≥ 0 (PHP) | optional, `linkedin_learning` only: what one **unlicensed** person costs the budget when they take the course (e.g. ₱800). Blank = unlicensed staff cannot use the course |
+| recommended | `yes` \| `no` | optional, default `no`: a company-recommended annual course (e.g. AMLA), scheduled by sector window (§4.8) |
 
 Without a catalog, the dashboard and memos still work; the Recommendations panel and cost-to-close KPI show an empty state ("Upload a catalog to enable").
 
@@ -51,10 +58,11 @@ interface RulesConfig {
   coveredTypes: EmploymentType[]; // default: ['regular','contractual','casual']; at least one
   elearningCounts: boolean;     // default: true
   minHours: number;             // default: 1 — a training counts only if hours ≥ minHours
-  budgetPhp: number;            // default: 0 (budget comparison hidden if 0)
+  budgetPhp: number;            // default: 0 — the ANNUAL training allocation; every cost in this spec is charged against it (hidden if 0)
+  milestoneTargets: number[];   // default [25, 50, 85, 100] — % of in-scope staff trained by Mar 31, Jun 30, Sep 30, Nov 30; four values, each 0–100, not decreasing
 }
 ```
-Derived (not user-editable): `deadline = ${year}-12-31`.
+Derived (not user-editable): `deadline = ${year}-12-31` (official, online courses only after the in-person cutoff); `inPersonCutoff = ${year}-12-14` (no in-house or external runs after it); milestone dates `${year}-03-31`, `-06-30`, `-09-30`, `-11-30` (Nov 30 is the internal target).
 
 ### 2.5 Parsing & normalization (applies to all CSVs)
 - UTF-8; a leading BOM is stripped. Header names are trimmed and lower-cased; unknown extra columns are ignored.
@@ -119,8 +127,9 @@ Other rules:
 ### 4.2 Cost-to-close
 `costToClose(results, roster, catalog, config)` likewise takes the roster to read each employee's licensing.
 - A catalog course **qualifies** if `duration_minutes ≥ minHours × 60`.
-- Licensed AT_RISK employee → cheapest qualifying `linkedin_learning` course, **only if `elearningCounts` is true**; otherwise use the unlicensed route.
-- Unlicensed AT_RISK employee → cheapest qualifying `in_house` course `cost_per_head`.
+- **Every route is charged to the training budget** (`budgetPhp`, the annual allocation): licensed LinkedIn use, an unlicensed person's LinkedIn fee, in-house runs and external courses alike.
+- Licensed AT_RISK employee → cheapest qualifying `linkedin_learning` course `cost_per_head` (normally 0), **only if `elearningCounts` is true**; otherwise use the unlicensed route.
+- Unlicensed AT_RISK employee → the cheaper of (a) the cheapest qualifying `in_house` `cost_per_head` and (b) the cheapest qualifying `linkedin_learning` `unlicensed_fee` (only courses that have one, and only if `elearningCounts` is true).
 - If a route has no qualifying course, those employees are counted in `unpricedCount` and `costToClose` is shown as a lower bound with a warning.
 - Output: `{ costToClose, unpricedCount, remaining: budgetPhp − costToClose, covered: remaining ≥ 0 && unpricedCount = 0 }`.
 - The cost-to-close KPI shows whenever a catalog is loaded; the budget line (`remaining`, covered/short) shows only when `budgetPhp > 0`.
@@ -132,6 +141,50 @@ Other rules:
 ### 4.4 Export
 - Exports: at-risk list CSV (per unit and all units) and memo text.
 - CSV cells starting with `=`, `+`, `-`, `@`, tab, or carriage return are prefixed with `'` (formula-injection guard). Files are UTF-8 with BOM so Excel shows names correctly.
+
+### 4.5 Trained vs untrained and milestones
+"Trained" = COMPLIANT and "untrained" = AT_RISK among the covered; the dashboard leads with these two counts. The covered total appears only as the denominator ("of 200 in scope").
+`evaluateMilestones(roster, attendance, config)` returns one row per milestone date with the target from `milestoneTargets`: `{ date, label, targetPct, state: 'met' | 'missed' | 'upcoming', inScope, trained, untrained, targetTrained, gap, needed }`.
+- `date ≤ asOfDate`: run the engine with `asOfDate = date`; `inScope = compliant + atRisk`, `trained = compliant`, `untrained = atRisk`.
+- `date > asOfDate`: use the run at the real `asOfDate` and `state = 'upcoming'` (`needed` = people still to train to reach the target).
+- `targetTrained = ceil(targetPct × inScope / 100)`; `gap = trained − targetTrained` (negative = short); `needed = max(0, −gap)`; past dates are `met` when `gap ≥ 0`, else `missed`.
+- Counts only, no IDs.
+
+### 4.6 Breakdown (slicers)
+`breakdown(results, roster, dimension, filter)` with `dimension ∈ band | payGrade | unit | group | sector` and `filter` any combination of those fields (exact match; `band` is derived). Only COMPLIANT and AT_RISK employees count. Rows: `{ key, inScope, trained, untrained, rate }`, sorted by untrained desc, then rate asc, then key. This is on-screen only: AI payloads stay unit-level with the ≥ 3 small-cell rule and never carry band, grade or sector cells (the president is a cell of one).
+
+### 4.7 Budget burn-down
+Allocation = `budgetPhp`. `budgetSeries(roster, attendance, config)` returns, for each month Jan–Dec, `{ month, spent, remaining, trained, planned }`:
+- `spent` (cumulative) = sum of `cost` over de-duplicated attendance rows of roster employees dated within `year` and ≤ `asOfDate`; every row counts whatever its hours. Months after the as-of month have `spent = null`; `planned` (cumulative projected spend from §4.9) is `null` without a calendar.
+- `remaining = budgetPhp − spent`; `trained` = COMPLIANT count with the engine run as of that month end (months after the as-of month: `null`).
+- The report also shows percent spent and cost per trained person (`spent ÷ trained`). Hidden when `budgetPhp = 0`.
+
+### 4.8 Recommended-course windows (sector schedule)
+A catalog course with `recommended = yes` (e.g. AMLA) runs **once a year** in one window per sector, spread across the year so LinkedIn is never loaded by everyone at once. Someone who misses their window cannot take it again that year; one completion is also one qualifying training (§4 rule 5), so it can close compliance.
+`planSectorWindows(inScopeBySector, targets, year)`:
+- Scheduling units are sectors (missing = "Unassigned"). A sector holding more than 30% of in-scope staff is split into its groups (unit label `Sector · Group`).
+- Units sorted by size desc then name; one window per unit, a whole calendar month, spread over Feb–Oct: unit `i` of `n` gets month `2 + floor(i × 9 / n)`. If a milestone target would then not be reachable (cumulative in-scope headcount of windows ending on or before the milestone date < target), the units are instead packed into consecutive months from January. With more than nine units, months repeat in order.
+- Output per window: `{ unit, start, end, size }` plus `peakShare` (largest month load ÷ in-scope staff).
+`windowStatus(window, course, roster, attendance, asOfDate)`: `completed` = in-scope employees of the unit with an attendance row whose title equals the course title (trimmed, case-insensitive) dated in the window; `pending` = the rest while the window has not closed; `missed` = the rest after `end`. State: `upcoming | open | closed`. Counts only.
+
+### 4.9 Calendar and plan (optional 4th CSV)
+`calendar.csv` (optional) lists planned in-house and external runs:
+| Column | Type | Rules |
+|---|---|---|
+| run_id | string | required, unique |
+| course_id | string | required (informational) |
+| date | `YYYY-MM-DD` | required, within `year` |
+| delivery | `in_house` \| `external` | required |
+| cost_per_run | number ≥ 0 | required for `in_house` (fixed cost of one run; 0 allowed) |
+| cost_per_head | number ≥ 0 | required (per participant) |
+| min_pax | integer ≥ 1 | required |
+| max_pax | integer ≥ min_pax | required |
+`buildPlan(results, roster, catalog, calendar, config)` (deterministic, counts only):
+1. Candidates = AT_RISK employees at `asOfDate`. **Licensed** candidates are closed through LinkedIn at ₱0 by the Nov 30 target.
+2. **Unlicensed** candidates: runs with `asOfDate < date ≤ inPersonCutoff` in date order (then `run_id`). A run takes up to `max_pax` unplaced unlicensed candidates; if fewer than `min_pax` are available the run is **cancelled** (cost 0) and they stay unplaced. A run's cost = `cost_per_run + cost_per_head × participants`.
+3. Unplaced unlicensed candidates take the cheapest qualifying LinkedIn `unlicensed_fee` (charged on Nov 30) when `elearningCounts` and one exists; otherwise they are **unplaced** ("cannot close by the deadline without a license or another run").
+4. Output: `{ runs: { runId, date, participants, cost, state: 'held' | 'cancelled' }[], licensedLinkedIn, paidLinkedIn, unplaced, totalPlannedCost, plannedByMonth, projectedTrainedByMilestone }`. Planned spend feeds `planned` in §4.7; `remaining after plan = budgetPhp − spent − totalPlannedCost`.
+Everything in §4.5–§4.9 is computed in `/lib` from the uploaded files; the AI never computes these numbers.
 
 ## 5. API Contracts (Next.js Route Handlers)
 All routes: POST, JSON, zod-validated, `maxDuration = 60`, request body ≤ 200 KB (else 413), in-memory rate limit **10 requests/min per IP** (first IP in `x-forwarded-for`; best-effort per serverless instance).
@@ -161,7 +214,7 @@ Server post-processing:
 - Log one line per AI call: route, provider, model, latency ms, status, error code. Never log payload contents or provider error messages (they can echo the prompt).
 
 ## 6. UI
-Single page, 4 steps: **(1) Data** — upload 3 CSVs (catalog optional) or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (covered, compliance %, at-risk, months left, cost to close), units bar chart, ranked unit table; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**, which opens a card with the AI-written summary plus four charts drawn by the app from the engine's numbers (status breakdown, highest-risk units, back-test recall and precision at Jun 30 and Sep 30, and cost to close vs budget). The charts never depend on AI output and still show if the AI call fails. Footer: privacy note.
+Single page, 4 steps: **(1) Data** — upload 3 CSVs (catalog optional) or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (trained, untrained, next target, months left, cost to close; the covered total only as "of N in scope"), milestone table and chart (target vs actual), breakdown slicers (band, department, group, sector, pay grade; shown when the roster has those columns), budget burn-down report with charts (shown when `budgetPhp > 0`), sector-window schedule and plan (shown when a recommended course or a calendar is loaded), units bar chart, ranked unit table (columns In scope, Trained, Untrained, Licensed, Unlicensed, Compliance), a Print report button; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**, which opens a card with the AI-written summary plus four charts drawn by the app from the engine's numbers (status breakdown, highest-risk units, back-test recall and precision at Jun 30 and Sep 30, and cost to close vs budget). The charts never depend on AI output and still show if the AI call fails. Footer: privacy note.
 States: loading spinners on AI buttons; error banners with retry; empty states. If an AI route fails (503, 502, 429, timeout), the UI shows the reason with a Retry button, and the memo and executive summary views also show a clearly labeled **template draft** built locally from the engine's numbers (no AI), so the user always gets usable text. Recommend courses likewise shows clearly labeled **template picks**: for each unit, up to 3 courses from the qualifying catalog (§5 client payload rules) ranked by how many words of the unit's name and top positions (3+ letters; the same word or the same 5-letter stem) appear in the course title or skill area, then lowest cost per head, then shortest duration, then course ID; the LinkedIn Learning search link when no course qualifies. A memo drafted after a failed Recommend uses the template picks. AI buttons are never disabled permanently after a failure; the engine and dashboard keep working. Mobile-friendly layout.
 
 ## 7. Constraints
@@ -200,9 +253,16 @@ States: loading spinners on AI buttons; error banners with retry; empty states. 
 15. Given a memo, then the displayed at-risk count and deadline equal the engine values (token substitution, not model text).
 16. Given `AI_PROVIDER=groq` with Groq and Google keys set and `AI_FALLBACK_MODEL` unset, when Groq returns 429 or 404, then `gemini-3.6-flash` answers, and `gemini-3.8-flash` if that also fails (unit test with fake models).
 17. Given Recommend courses fails, then each unit shows labeled template picks drawn only from qualifying catalog courses.
+18. Given 200 in scope of whom 165 are compliant, then the KPIs show Trained 165 and Untrained 35, with 200 only as "of 200 in scope".
+19. Given as of Sep 30 with an 85% target, 200 in scope and 165 trained, then the Sep 30 milestone is `missed` with `gap = −5` and `needed = 5`; a future Nov 30 milestone is `upcoming`.
+20. Given a roster with `pay_grade` `PG 8`, `PG10` and `14`, then their bands are Rank and File, Officers and Senior Officers; filtering by band and sector returns only matching employees.
+21. Given an unlicensed at-risk employee, an in-house course at ₱1,200 and a LinkedIn course with `unlicensed_fee` 800, then their cost is ₱800; a licensed at-risk employee costs ₱0; both are charged against `budgetPhp`.
+22. Given attendance costs dated in the year up to the as-of date, then `spent` is their sum, `remaining = budgetPhp − spent`, and months after the as-of month have no actual spend.
+23. Given seven sectors of which one holds more than 30% of staff, then that sector is split by group, every window is a whole month inside Feb–Oct, and each milestone target is reached by the windows ending before it.
+24. Given a run with fewer available people than `min_pax`, then it is cancelled at cost 0; no in-house or external run after Dec 14 is used; people left over are paid-LinkedIn or unplaced.
 
 ## 9. Test Plan (Vitest, ≥ 10 tests)
-Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order, back-test (recall, precision, null denominators, hires after checkpoint), cost-to-close (both routes, elearningCounts = false, minHours filter, unpriced). Validation: missing columns, duplicates, bad and impossible dates, normalization (BOM, case, whitespace). API helpers: catalog ID filtering, memo token substitution and `{{EMPLOYEE_LIST}}` enforcement, numeric grounding check, payload builders exclude PII and suppress small cells, rate limiter, provider/model resolution from env (backup list, cross-provider keys), model-chain hand-over rules (404, cross-provider 400, cooldown), template recommendations, CSV export escaping.
+Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order, back-test (recall, precision, null denominators, hires after checkpoint), cost-to-close (both routes, elearningCounts = false, minHours filter, unpriced). Validation: missing columns, duplicates, bad and impossible dates, normalization (BOM, case, whitespace). API helpers: catalog ID filtering, memo token substitution and `{{EMPLOYEE_LIST}}` enforcement, numeric grounding check, payload builders exclude PII and suppress small cells, rate limiter, provider/model resolution from env (backup list, cross-provider keys), model-chain hand-over rules (404, cross-provider 400, cooldown), template recommendations, CSV export escaping. v2.0: pay-grade parsing and bands, optional roster/catalog columns, milestones (met, missed, upcoming, rounding), breakdown filters, three-route cost model, budget series, sector-window planner, window status, calendar plan (cancel below minimum, Dec 14 cutoff, unplaced).
 
 ## 10. Revision Log
 | Version | Date | Change | Reason |
@@ -216,4 +276,5 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.6 | 2026-11-08 | Executive summary card now includes four engine-drawn charts (status breakdown, highest-risk units, back-test, cost vs budget) that do not depend on the AI. Summary prompt asks for plain-English labels, ₱ amounts, and a plain statement of whether the budget covers the cost to close. | user request |
 | 1.7 | 2026-11-08 | Removed the `GET /api/status?probe=1` model probe: Google's free tier allows only 20 requests per day per model, and a public probe could use that up. `/api/status` now only reports configuration and makes no model call. AI errors distinguish the free-tier daily cap (`http_429_daily`) with a clear message. | found on live site |
 | 1.8 | 2026-11-08 | No-AI fallback: when a memo or summary AI call fails, the UI shows a labeled template draft built from the engine's numbers (memo keeps the `{{EMPLOYEE_LIST}}` token, names merged locally). Replaces "AI buttons disabled when not configured" with "error + Retry + template", since the free Gemini tier allows only about 20 requests per day. | user request |
+| 2.0 | 2026-11-08 | Progress and budget reporting. Dashboard leads with trained vs untrained and four milestone targets (25/50/85/100% by Mar 31, Jun 30, Sep 30, Nov 30), replacing the confusing "Covered employees" headline. Optional roster columns `pay_grade`, `group`, `sector` with derived bands and slicers. `budgetPhp` becomes the annual allocation with a month-by-month burn-down; every cost route (licensed LinkedIn ₱0, unlicensed LinkedIn `unlicensed_fee`, in-house, external) is charged to it. Catalog gets `unlicensed_fee` and `recommended`. Recommended annual courses (e.g. AMLA) run once a year in staggered sector windows. Optional `calendar.csv` plan with minimum and maximum participants and the Dec 14 in-person cutoff. Acceptance 18–24. | user request after the deadline moved to 2026-11-23 |
 | 1.9 | 2026-11-08 | Groq added as a third provider (`AI_PROVIDER=groq`, `GROQ_API_KEY`, default `openai/gpt-oss-120b`, `reasoningEffort` low). `AI_FALLBACK_MODEL` becomes an ordered list of up to 3 backups that may be on another provider (`provider:model`), replacing the single same-provider backup and the "no fallback between providers" rule. A 404 (retired model) and invalid output now hand over to the next model; a 400/401/403 hands over when the next model is on a different provider. Recommend courses gets labeled template picks when the AI fails. Acceptance 16-17. | Gemini free tier is 5 requests/min and 20/day per model and `gemini-3.6-flash` may retire; Groq's free plan allows 30/min and 1,000/day |

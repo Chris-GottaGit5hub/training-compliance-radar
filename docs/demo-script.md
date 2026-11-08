@@ -24,6 +24,8 @@ Live site: https://training-compliance-radar.vercel.app (open it in an **incogni
 
 ## If something goes wrong
 
+- **"Template" memo or summary instead of an AI one:** the AI failed or the free daily quota is used up. The template is built from the same numbers and is labeled. Say so, then click Retry later or show your recording.
+
 - **"AI is not configured"** banner: the Vercel key is missing. Skip the AI steps, say "AI features need an API key; here is the output," and show a pre-recorded memo.
 - **429 "Too many AI requests":** wait a minute. Limit is 10 per minute per IP.
 - **A slow AI call:** keep talking over the spinner; calls time out at 25 seconds and offer Retry.

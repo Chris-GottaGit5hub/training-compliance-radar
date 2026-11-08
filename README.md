@@ -26,6 +26,7 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 - **Risk dashboard**: covered, compliance %, at-risk, months left, cost to close vs budget, a bar chart and a ranked unit table.
 - **Back-test card**: recall and precision at Jun 30 and Sep 30.
 - **Unit panel**: at-risk employees, CSV export, AI-drafted memo, catalog-grounded course recommendations.
+- **Works without AI, too:** if an AI call fails or the free quota runs out, memos and the executive summary fall back to a clearly labeled template draft built from the same numbers.
 - **Executive summary** for a department head: an AI-written narrative plus four charts (status breakdown, highest-risk units, back-test, cost vs budget) drawn from the engine, so they stay accurate and still appear if the AI is unavailable.
 - **Privacy by design**: employee names and IDs never leave the browser.
 
@@ -71,7 +72,7 @@ Switching to Claude is one variable (`AI_PROVIDER=anthropic`) plus its key. Ther
 
 ## Tests
 
-`npm test` runs **203 tests in 16 files** (Vitest). They cover:
+`npm test` runs **212 tests in 17 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);
@@ -107,7 +108,7 @@ On the seeded synthetic data (300 employees, year 2026), rules as of each checkp
 
 ## Limitations
 
-- **Free-tier AI quota is small.** Google's free Gemini tier allows about **20 requests per day per model** (confirmed from Google's own error message). Each AI button click uses 1–2 requests, so the AI buttons stop working for the rest of the day once it is used up and the app shows a clear "daily limit reached" message. The dashboard, charts and CSV export never use AI. Enabling billing on the Google AI project removes this cap.
+- **Free-tier AI quota is small.** Google's free Gemini tier allows about **20 requests per day per model** (confirmed from Google's own error message). Each AI button click uses 1–2 requests. Once it is used up, the app shows a clear "daily limit reached" message with a Retry button and falls back to a **template memo or summary** built from the engine's numbers (labeled as such). The dashboard, charts and CSV export never use AI. Enabling billing on the Google AI project removes this cap.
 - Data must be re-uploaded each session (by design; nothing is stored).
 - The rate limiter is in memory, so on serverless each instance counts separately (best effort).
 - AI output can be imperfect: numbers are checked against the request and flagged with a warning if they do not match, but memos should be read before sending.
@@ -132,7 +133,7 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 | AI agent rules and project conventions | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md), [`.cursorrules`](.cursorrules) |
 | Working app on the recommended stack (Next.js, TypeScript, Tailwind, Vercel AI SDK) | `app/`, `components/`, `lib/` |
 | Deployed and publicly reachable | https://training-compliance-radar.vercel.app |
-| Core logic is deterministic and tested | `lib/engine/`, `tests/` (203 tests) |
+| Core logic is deterministic and tested | `lib/engine/`, `tests/` (212 tests) |
 | AI features with structured output and grounding | `app/api/*`, `lib/ai/`, `lib/payload/` |
 | Data privacy handled (aggregates only, local name merge) | [Privacy](#privacy-and-data-handling), `lib/payload/`, `tests/payload.test.ts` |
 | Security basics (validation, size limits, rate limit, no secrets in git) | `lib/api/`, `.env.example`, gitleaks in CI |

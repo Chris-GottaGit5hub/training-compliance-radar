@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   MONTH_LABELS,
@@ -15,6 +15,8 @@ import {
 } from "@/lib/analysis";
 import { AMBER, ChartPanel, INDIGO } from "./ChartPanel";
 import { CalendarGrid, DELIVERY_TEXT, STATE_BADGE, STATE_TEXT } from "./CalendarGrid";
+import { CalendarQuarter } from "./CalendarQuarter";
+import { CalendarTimeline, TimelineLegend } from "./CalendarTimeline";
 import { downloadTextFile } from "./download";
 import type { useRadarState } from "./useRadarState";
 import { Banner, Card, buttonClass, inputClass } from "./ui";
@@ -248,12 +250,20 @@ function WindowLane({ view, course }: { view: CalendarView; course: string }) {
 
 const STATES: RunState[] = ["completed", "planned", "standby", "blocked"];
 
+type Mode = "grid" | "list" | "timeline" | "quarter";
+const MODES: readonly (readonly [Mode, string])[] = [
+  ["grid", "Year grid"],
+  ["list", "List"],
+  ["timeline", "Course timeline"],
+  ["quarter", "By quarter"],
+];
+
 export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToData: () => void }) {
   const { analysis, config, calendar, ready, sample, loadSample } = state;
-  const [mode, setMode] = useState<"grid" | "list">("grid");
+  const [mode, setMode] = useState<Mode>("grid");
   const [delivery, setDelivery] = useState<"all" | "in_house" | "external">("all");
   const [runState, setRunState] = useState<"all" | RunState>("all");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const view = useMemo(
     () =>
@@ -267,7 +277,16 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
       ),
     [view, delivery, runState],
   );
-  const selected = view?.runs.find((r) => r.runId === selectedId) ?? null;
+  const selectedRuns = useMemo(
+    () => (view?.runs ?? []).filter((r) => selectedIds.includes(r.runId)),
+    [view, selectedIds],
+  );
+  const singleId = selectedIds.length === 1 ? selectedIds[0] : null;
+
+  // Bring the detail panel into view when something is picked far down a long view.
+  useEffect(() => {
+    if (selectedIds.length > 0) document.getElementById("calendar-detail")?.scrollIntoView({ block: "nearest" });
+  }, [selectedIds]);
 
   const intro = (
     <div>
@@ -315,7 +334,9 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
   }
 
   const exportCsv = () => downloadTextFile(calendarFileName(view.year), buildCalendarCsv(view));
-  const select = (runId: string) => setSelectedId((cur) => (cur === runId ? null : runId));
+  const selectMany = (ids: string[]) =>
+    setSelectedIds((cur) => (cur.length === ids.length && cur.every((id, i) => id === ids[i]) ? [] : ids));
+  const select = (runId: string) => selectMany([runId]);
 
   return (
     <Card>
@@ -346,7 +367,7 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
 
         <div className="flex flex-wrap items-end gap-3 print:hidden">
           <div role="group" aria-label="View" className="inline-flex overflow-hidden rounded-md border border-slate-300">
-            {(["grid", "list"] as const).map((m) => (
+            {MODES.map(([m, label]) => (
               <button
                 key={m}
                 type="button"
@@ -356,7 +377,7 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
                   mode === m ? "bg-indigo-600 text-white" : "bg-white text-slate-800 hover:bg-slate-50"
                 }`}
               >
-                {m === "grid" ? "Year grid" : "List"}
+                {label}
               </button>
             ))}
           </div>
@@ -392,16 +413,30 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
           </p>
         </div>
 
-        {selected && <RunDetail run={selected} onClose={() => setSelectedId(null)} />}
-
-        {mode === "grid" ? (
-          <CalendarGrid view={view} runs={shown} selectedId={selectedId} onSelect={select} />
-        ) : (
-          <RunTable runs={shown} selectedId={selectedId} onSelect={select} />
+        {selectedRuns.length > 0 && (
+          <div id="calendar-detail" className="space-y-3">
+            {selectedRuns.map((run) => (
+              <RunDetail key={run.runId} run={run} onClose={() => setSelectedIds([])} />
+            ))}
+          </div>
         )}
+
+        {mode === "grid" && <CalendarGrid view={view} runs={shown} selectedId={singleId} onSelect={select} />}
+        {mode === "list" && <RunTable runs={shown} selectedId={singleId} onSelect={select} />}
+        {mode === "timeline" && (
+          <div className="space-y-2">
+            <TimelineLegend />
+            <CalendarTimeline view={view} runs={shown} selectedIds={selectedIds} onSelect={selectMany} />
+          </div>
+        )}
+        {mode === "quarter" && <CalendarQuarter view={view} runs={shown} selectedId={singleId} onSelect={select} />}
         <p className="text-xs text-slate-500">
-          Left bar: indigo is in-house, amber is external. Runs after Dec 14 cannot run in person; online
-          courses run to Dec 31.
+          {mode === "timeline"
+            ? "A shaded month holds a run of that course; the day is shown inside. "
+            : mode === "quarter"
+              ? "Seats open is an estimate: maximum seats minus expected enrolment. "
+              : "Left bar: indigo is in-house, amber is external. "}
+          Runs after Dec 14 cannot run in person; online courses run to Dec 31.
         </p>
 
         <CostChart view={view} />

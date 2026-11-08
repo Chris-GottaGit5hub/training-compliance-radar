@@ -1,5 +1,6 @@
 export * from "./analysis";
 export * from "./breakdown";
+export * from "./calendar-timeline";
 export * from "./calendar-view";
 export * from "./budget";
 export * from "./commitments";

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { AppTabs, type AppTab } from "./AppTabs";
+import { CalendarTab } from "./CalendarTab";
 import { DashboardStep } from "./DashboardStep";
 import { DataStep } from "./DataStep";
 import { Footer } from "./Footer";
@@ -13,6 +16,7 @@ import { useRadarState } from "./useRadarState";
 
 export function RadarApp() {
   const state = useRadarState();
+  const [tab, setTab] = useState<AppTab>("radar");
   const { ready, config, analysis, selectedUnit } = state;
   const ai = useAiActions({
     analysis,
@@ -47,23 +51,34 @@ export function RadarApp() {
       </div>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <div className="print:hidden">
-          <Stepper steps={steps} />
+          <AppTabs active={tab} onChange={setTab} />
         </div>
-        <div className="space-y-6">
-          <div className="print:hidden">
-            <DataStep state={state} />
+        {tab === "calendar" ? (
+          <div role="tabpanel" id="panel-calendar" aria-labelledby="tab-calendar">
+            <CalendarTab state={state} onGoToData={() => setTab("radar")} />
           </div>
-          <div className="print:hidden">
-            <RulesStep state={state} />
+        ) : (
+          <div role="tabpanel" id="panel-radar" aria-labelledby="tab-radar">
+            <div className="print:hidden">
+              <Stepper steps={steps} />
+            </div>
+            <div className="space-y-6">
+              <div className="print:hidden">
+                <DataStep state={state} />
+              </div>
+              <div className="print:hidden">
+                <RulesStep state={state} />
+              </div>
+              <DashboardStep state={state} />
+              {ai.summaryState.status !== "idle" && config && analysis && (
+                <SummaryCard ai={ai} analysis={analysis} config={config} />
+              )}
+              <div className="print:hidden">
+                <UnitPanel state={state} ai={ai} />
+              </div>
+            </div>
           </div>
-          <DashboardStep state={state} />
-          {ai.summaryState.status !== "idle" && config && analysis && (
-            <SummaryCard ai={ai} analysis={analysis} config={config} />
-          )}
-          <div className="print:hidden">
-            <UnitPanel state={state} ai={ai} />
-          </div>
-        </div>
+        )}
       </main>
       <div className="print:hidden">
         <Footer />

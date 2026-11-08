@@ -110,7 +110,7 @@ export function buildPlan(
       decided.set(run.run_id, { ...base, state: "cancelled", reason: `fewer than ${run.min_pax} people available` });
     } else if (paidFee !== null && cost >= paidFee * take) {
       const perHead = Math.round(cost / take);
-      decided.set(run.run_id, { ...base, state: "cancelled", reason: `costlier than paid LinkedIn (₱${perHead} vs ₱${paidFee} per head)` });
+      decided.set(run.run_id, { ...base, state: "cancelled", reason: `costlier than paid LinkedIn (₱${perHead.toLocaleString("en-PH")} vs ₱${paidFee.toLocaleString("en-PH")} per head)` });
     } else {
       pool.splice(0, take);
       plannedByMonth[monthIndex(run.date)] += cost;

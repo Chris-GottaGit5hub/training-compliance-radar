@@ -1,6 +1,6 @@
 import { APICallError } from "ai";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_MODELS, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
+import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
 import { errorCode, formatAiLog, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
 import { runMemo, runRecommend, runSummary } from "@/lib/ai/run";
@@ -53,10 +53,51 @@ describe("resolveAiConfig", () => {
   });
 
   it("is not configured without the selected provider's key or with an unknown provider (acceptance 12)", () => {
-    expect(resolveAiConfig({})).toEqual({ ok: false });
-    expect(resolveAiConfig({ GOOGLE_GENERATIVE_AI_API_KEY: "  " })).toEqual({ ok: false });
-    expect(resolveAiConfig({ ANTHROPIC_API_KEY: "k" })).toEqual({ ok: false }); // provider defaults to google
-    expect(resolveAiConfig({ AI_PROVIDER: "openai", GOOGLE_GENERATIVE_AI_API_KEY: "k" })).toEqual({ ok: false });
+    const missing = { ok: false, reason: "missing_key", keyVar: "GOOGLE_GENERATIVE_AI_API_KEY" };
+    expect(resolveAiConfig({})).toEqual(missing);
+    expect(resolveAiConfig({ GOOGLE_GENERATIVE_AI_API_KEY: "  " })).toEqual(missing);
+    expect(resolveAiConfig({ ANTHROPIC_API_KEY: "k" })).toEqual(missing); // provider defaults to google
+    expect(resolveAiConfig({ AI_PROVIDER: "openai", GOOGLE_GENERATIVE_AI_API_KEY: "k" })).toEqual({
+      ok: false,
+      reason: "unknown_provider",
+    });
+    expect(resolveAiConfig({ AI_PROVIDER: "anthropic" })).toEqual({
+      ok: false,
+      reason: "missing_key",
+      keyVar: "ANTHROPIC_API_KEY",
+    });
+  });
+
+  it("tolerates quotes and spaces pasted into env values", () => {
+    const result = resolveAiConfig({
+      AI_PROVIDER: ' "google" ',
+      AI_MODEL: "'gemini-3.8-flash'",
+      GOOGLE_GENERATIVE_AI_API_KEY: '"abc123"',
+    });
+    expect(result).toEqual({
+      ok: true,
+      config: { provider: "google", modelId: "gemini-3.8-flash", apiKey: "abc123" },
+    });
+  });
+});
+
+describe("describeAiStatus", () => {
+  it("reports provider and model when configured, and never the key", () => {
+    const status = describeAiStatus({ GOOGLE_GENERATIVE_AI_API_KEY: "super-secret" });
+    expect(status).toEqual({ configured: true, provider: "google", model: "gemini-3.8-flash" });
+    expect(JSON.stringify(status)).not.toContain("super-secret");
+  });
+
+  it("reports why AI is off", () => {
+    expect(describeAiStatus({})).toEqual({
+      configured: false,
+      reason: "missing_key",
+      keyVar: "GOOGLE_GENERATIVE_AI_API_KEY",
+    });
+    expect(describeAiStatus({ AI_PROVIDER: "nope" })).toEqual({
+      configured: false,
+      reason: "unknown_provider",
+    });
   });
 });
 
@@ -108,7 +149,7 @@ describe("runMemo", () => {
 
   it("fails (for a 502) when the model call fails", async () => {
     const { generate, calls } = fakeGenerator(["FAIL"]);
-    expect(await runMemo(memoRequest, aiConfig, generate)).toEqual({ ok: false });
+    expect(await runMemo(memoRequest, aiConfig, generate)).toEqual({ ok: false, code: "unknown" });
     expect(calls()).toBe(1);
   });
 });

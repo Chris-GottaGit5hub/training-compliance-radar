@@ -23,7 +23,8 @@ import {
   summaryPrompt,
 } from "./prompts";
 
-export type RunResult<T> = { ok: true; body: T } | { ok: false };
+/** `code` is a short non-sensitive error code (timeout, http_400, invalid_output...). */
+export type RunResult<T> = { ok: true; body: T } | { ok: false; code?: string };
 
 const MAX_ATTEMPTS = 2; // spec §5: regenerate once if numbers do not match the request
 
@@ -39,18 +40,20 @@ export async function runRecommend(
     instructions: RECOMMEND_INSTRUCTIONS,
     prompt: recommendPrompt(request),
   });
-  return result.ok ? { ok: true, body: finalizeRecommendations(result.output, request) } : { ok: false };
+  return result.ok
+    ? { ok: true, body: finalizeRecommendations(result.output, request) }
+    : { ok: false, code: result.code };
 }
 
 /** Generates text, then checks every number against the request; one regeneration, then a warning. */
 async function generateGrounded<T extends { warning?: "unverified_numbers" }>(
-  attempt: () => Promise<{ ok: true; value: T; text: string } | { ok: false }>,
+  attempt: () => Promise<{ ok: true; value: T; text: string } | { ok: false; code?: string }>,
   request: unknown,
 ): Promise<RunResult<T>> {
   let last: { value: T; text: string } | null = null;
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     const result = await attempt();
-    if (!result.ok) return { ok: false };
+    if (!result.ok) return { ok: false, code: result.code };
     last = result;
     if (ungroundedNumbers(result.text, request).length === 0) return { ok: true, body: result.value };
   }
@@ -70,7 +73,7 @@ export function runMemo(
       instructions: MEMO_INSTRUCTIONS,
       prompt: memoPrompt(request),
     });
-    if (!result.ok) return { ok: false };
+    if (!result.ok) return { ok: false, code: result.code };
     const memo = finalizeMemo(result.output, request);
     return { ok: true, value: memo, text: `${memo.subject}\n${memo.body}` };
   }, request);
@@ -89,7 +92,7 @@ export function runSummary(
       instructions: SUMMARY_INSTRUCTIONS,
       prompt: summaryPrompt(request),
     });
-    if (!result.ok) return { ok: false };
+    if (!result.ok) return { ok: false, code: result.code };
     const summary = limitWords(result.output.summary, API_LIMITS.maxSummaryWords);
     return { ok: true, value: { summary }, text: summary };
   }, request);

@@ -112,13 +112,19 @@ describe("handleAiRequest guards", () => {
   it("returns 503 ai_not_configured when the provider key is missing (acceptance 12)", async () => {
     const res = await handleAiRequest(post(validMemo), spec, { ...deps(), env: {} });
     expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: "ai_not_configured" });
+    expect(await res.json()).toEqual({
+      error: "ai_not_configured",
+      reason: "missing_key",
+      keyVar: "GOOGLE_GENERATIVE_AI_API_KEY",
+    });
   });
 
   it("returns 502 when the AI run fails or throws", async () => {
-    const failing = { schema: memoRequestSchema, run: async () => ({ ok: false as const }) };
+    const failing = { schema: memoRequestSchema, run: async () => ({ ok: false as const, code: "http_403" }) };
     const throwing = { schema: memoRequestSchema, run: async () => { throw new Error("boom SECRET"); } };
-    expect((await handleAiRequest(post(validMemo), failing, deps())).status).toBe(502);
+    const failed = await handleAiRequest(post(validMemo), failing, deps());
+    expect(failed.status).toBe(502);
+    expect(await failed.json()).toEqual({ error: "ai_failed", code: "http_403" }); // code only, no message
     const res = await handleAiRequest(post(validMemo), throwing, deps());
     expect(res.status).toBe(502);
     expect(JSON.stringify(await res.json())).not.toContain("SECRET");

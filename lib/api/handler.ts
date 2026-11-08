@@ -53,11 +53,18 @@ export async function handleAiRequest<S extends z.ZodType, TRes>(
   }
 
   const ai = resolveAiConfig(deps.env ?? process.env);
-  if (!ai.ok) return json({ error: "ai_not_configured" }, 503);
+  if (!ai.ok) {
+    return json(
+      { error: "ai_not_configured", reason: ai.reason, ...(ai.keyVar ? { keyVar: ai.keyVar } : {}) },
+      503,
+    );
+  }
 
   try {
     const result = await spec.run(parsed.data, ai.config);
-    return result.ok ? json(result.body, 200) : json({ error: "ai_failed" }, 502);
+    return result.ok
+      ? json(result.body, 200)
+      : json({ error: "ai_failed", ...(result.code ? { code: result.code } : {}) }, 502);
   } catch {
     return json({ error: "ai_failed" }, 502);
   }

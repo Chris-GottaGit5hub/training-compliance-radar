@@ -12,15 +12,33 @@ import {
   type OrgSummary,
 } from "@/lib/engine";
 import type { RulesConfig } from "@/lib/schemas/config";
+import type { AttendanceRow, CalendarRow, CatalogRow, RosterRow } from "@/lib/schemas/rows";
 import { budgetSeries, type BudgetReport } from "./budget";
-import type { AttendanceRow, CatalogRow, RosterRow } from "@/lib/schemas/rows";
+import { buildPlan, type Plan } from "./plan";
+import {
+  planSectorWindows,
+  recommendedCourse,
+  scheduleUnits,
+  windowStatus,
+  type WindowPlan,
+  type WindowRow,
+} from "./windows";
 
 export interface AnalysisInput {
   roster: readonly RosterRow[];
   attendance: readonly AttendanceRow[];
   /** null when no catalog was uploaded: cost-to-close is then unavailable. */
   catalog: readonly CatalogRow[] | null;
+  /** Optional planned runs (spec §4.9). */
+  calendar?: readonly CalendarRow[] | null;
   config: RulesConfig;
+}
+
+/** Sector windows for the recommended course (spec §4.8). */
+export interface WindowSection {
+  course: CatalogRow;
+  plan: WindowPlan;
+  rows: WindowRow[];
 }
 
 export interface BacktestCheckpoint {
@@ -39,6 +57,10 @@ export interface Analysis {
   milestones: MilestoneResult[];
   /** Annual allocation burn-down (spec §4.7). */
   budget: BudgetReport;
+  /** null without a recommended course or sector column. */
+  windows: WindowSection | null;
+  /** null without a calendar or recommended-course windows. */
+  plan: Plan | null;
   warnings: EngineWarnings;
 }
 
@@ -58,8 +80,32 @@ const CHECKPOINTS = [
 ] as const;
 
 /** Runs the whole engine once for the dashboard. Pure; throws only on duplicate employee_id. */
-export function runAnalysis({ roster, attendance, catalog, config }: AnalysisInput): Analysis {
+export function runAnalysis({ roster, attendance, catalog, calendar, config }: AnalysisInput): Analysis {
   const { results, warnings } = evaluateRoster(roster, attendance, config);
+
+  const scheme = scheduleUnits(results, roster);
+  const course = recommendedCourse(catalog);
+  const windowPlan = course && scheme.units.length > 0 ? planSectorWindows(scheme.units, config) : null;
+  const windows: WindowSection | null =
+    course && windowPlan
+      ? {
+          course,
+          plan: windowPlan,
+          rows: windowStatus(windowPlan.windows, scheme, course, results, roster, attendance, config.asOfDate),
+        }
+      : null;
+  const plan =
+    windows || (calendar && calendar.length > 0)
+      ? buildPlan(
+          results,
+          roster,
+          catalog ?? [],
+          calendar ?? [],
+          config,
+          windowPlan ? { windows: windowPlan.windows, label: scheme.label } : null,
+        )
+      : null;
+
   return {
     results,
     org: summarizeOrg(results, roster, config),
@@ -69,7 +115,9 @@ export function runAnalysis({ roster, attendance, catalog, config }: AnalysisInp
       return { label, checkpoint, result: backtest(roster, attendance, config, checkpoint) };
     }),
     milestones: evaluateMilestones(roster, attendance, config, results),
-    budget: budgetSeries(roster, attendance, config, results),
+    budget: budgetSeries(roster, attendance, config, results, plan?.plannedByMonth),
+    windows,
+    plan,
     warnings,
   };
 }

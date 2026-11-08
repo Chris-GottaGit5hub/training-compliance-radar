@@ -4,7 +4,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { backtest, evaluateRoster, summarizeOrg } from "../lib/engine";
-import { CSV_LIMITS, defaultRulesConfig, validateCsv, type CsvKind } from "../lib/schemas";
+import { CSV_LIMITS, defaultRulesConfig, validateCsv } from "../lib/schemas";
 import { build10kDataset } from "./sample-data-10k";
 
 const year = Number(process.env.SAMPLE_YEAR) || 2026;
@@ -12,7 +12,7 @@ const outDir = path.resolve(process.cwd(), "data", "synthetic-10k");
 const { files } = build10kDataset(year);
 
 // The written files must pass the app's own validator, exactly as an upload would.
-function check<K extends CsvKind>(kind: K) {
+function check<K extends keyof typeof files>(kind: K) {
   const text = files[kind];
   const result = validateCsv(kind, text);
   if (!result.ok) throw new Error(`${kind}.csv failed validation: ${JSON.stringify(result.errors)}`);

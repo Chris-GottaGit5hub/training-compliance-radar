@@ -5,6 +5,7 @@ import path from "node:path";
 import { backtest, evaluateRoster, summarizeOrg, todayManila } from "../lib/engine";
 import {
   ATTENDANCE_COLUMNS,
+  CALENDAR_COLUMNS,
   CATALOG_COLUMNS,
   ROSTER_COLUMNS,
   defaultRulesConfig,
@@ -12,6 +13,7 @@ import {
   type CsvKind,
 } from "../lib/schemas";
 import { buildAttendance } from "./sample-data/attendance";
+import { buildCalendar } from "./sample-data/calendar";
 import { buildCatalog } from "./sample-data/catalog";
 import { buildRoster } from "./sample-data/roster";
 import { createRng } from "./sample-data/rng";
@@ -40,6 +42,7 @@ const files: [CsvKind, string][] = [
   ["roster", toCsv(ROSTER_COLUMNS, roster)],
   ["attendance", toCsv(ATTENDANCE_COLUMNS, attendance)],
   ["catalog", toCsv(CATALOG_COLUMNS, catalog)],
+  ["calendar", toCsv(CALENDAR_COLUMNS, buildCalendar(year))],
 ];
 
 // The written files must pass the app's own validator.

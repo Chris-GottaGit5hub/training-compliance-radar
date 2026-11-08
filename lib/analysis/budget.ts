@@ -31,7 +31,7 @@ export interface BudgetReport {
 }
 
 const isLeap = (y: number): boolean => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
-const lastDay = (year: number, month: number): number =>
+export const lastDayOfMonth = (year: number, month: number): number =>
   [31, isLeap(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
@@ -85,7 +85,7 @@ export function budgetSeries(
           ? now
           : evaluateRoster(roster, attendance, {
               ...config,
-              asOfDate: `${config.year}-${String(month).padStart(2, "0")}-${lastDay(config.year, month)}`,
+              asOfDate: `${config.year}-${String(month).padStart(2, "0")}-${lastDayOfMonth(config.year, month)}`,
             }).results;
       return {
         label,

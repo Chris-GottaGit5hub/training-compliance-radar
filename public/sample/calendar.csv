@@ -1,0 +1,6 @@
+run_id,course_id,date,delivery,cost_per_run,cost_per_head,min_pax,max_pax
+R-01,IH-001,2026-10-15,in_house,3000,0,4,6
+R-02,IH-008,2026-10-29,in_house,2400,0,4,6
+R-03,EXT-01,2026-11-05,external,,6500,1,4
+R-04,IH-005,2026-12-09,in_house,4000,0,5,10
+R-05,IH-004,2026-12-16,in_house,3000,0,5,10

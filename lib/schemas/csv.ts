@@ -2,13 +2,16 @@ import Papa from "papaparse";
 import type { ZodType } from "zod";
 import {
   ATTENDANCE_COLUMNS,
+  CALENDAR_COLUMNS,
   CATALOG_COLUMNS,
   OPTIONAL_COLUMNS,
   ROSTER_COLUMNS,
   attendanceRowSchema,
+  calendarRowSchema,
   catalogRowSchema,
   rosterRowSchema,
   type AttendanceRow,
+  type CalendarRow,
   type CatalogRow,
   type RosterRow,
 } from "./rows";
@@ -19,12 +22,13 @@ export const CSV_LIMITS = {
   maxShownErrors: 20,
 } as const;
 
-export type CsvKind = "roster" | "attendance" | "catalog";
+export type CsvKind = "roster" | "attendance" | "catalog" | "calendar";
 
 interface RowByKind {
   roster: RosterRow;
   attendance: AttendanceRow;
   catalog: CatalogRow;
+  calendar: CalendarRow;
 }
 
 /** `row` is the spreadsheet row number (header = row 1); null = whole-file issue. */
@@ -45,6 +49,7 @@ const SPECS: Record<
   roster: { schema: rosterRowSchema, columns: ROSTER_COLUMNS, uniqueKey: "employee_id" },
   attendance: { schema: attendanceRowSchema, columns: ATTENDANCE_COLUMNS },
   catalog: { schema: catalogRowSchema, columns: CATALOG_COLUMNS, uniqueKey: "course_id" },
+  calendar: { schema: calendarRowSchema, columns: CALENDAR_COLUMNS, uniqueKey: "run_id" },
 };
 
 function fail(errors: CsvIssue[]): CsvResult<never> {

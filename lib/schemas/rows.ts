@@ -4,6 +4,7 @@ import { isRealDate } from "./dates";
 export const EMPLOYMENT_TYPES = ["regular", "contractual", "casual"] as const;
 export const DELIVERY_TYPES = ["classroom", "elearning", "external"] as const;
 export const PROVIDERS = ["linkedin_learning", "in_house"] as const;
+export const RUN_DELIVERIES = ["in_house", "external"] as const;
 
 export const ROSTER_COLUMNS = [
   "employee_id",
@@ -38,10 +39,22 @@ export const CATALOG_COLUMNS = [
   "recommended",
 ] as const;
 
+export const CALENDAR_COLUMNS = [
+  "run_id",
+  "course_id",
+  "date",
+  "delivery",
+  "cost_per_run",
+  "cost_per_head",
+  "min_pax",
+  "max_pax",
+] as const;
+
 /** Columns that may be absent from the header (their cells are optional). */
 export const OPTIONAL_COLUMNS: readonly string[] = [
   "separation_date",
   "url",
+  "cost_per_run",
   "pay_grade",
   "group",
   "sector",
@@ -149,7 +162,28 @@ export const catalogRowSchema = z.object({
   recommended: lowerEnum(["yes", "no"] as const).optional(),
 });
 
+export const calendarRowSchema = z
+  .object({
+    run_id: text,
+    course_id: text,
+    date: dateString,
+    delivery: lowerEnum(RUN_DELIVERIES),
+    cost_per_run: nonNegative.optional(),
+    cost_per_head: nonNegative,
+    min_pax: positiveInt,
+    max_pax: positiveInt,
+  })
+  .superRefine((run, ctx) => {
+    if (run.max_pax < run.min_pax) {
+      ctx.addIssue({ code: "custom", path: ["max_pax"], message: "must be at least min_pax" });
+    }
+    if (run.delivery === "in_house" && run.cost_per_run === undefined) {
+      ctx.addIssue({ code: "custom", path: ["cost_per_run"], message: "is required for in_house runs" });
+    }
+  });
+
 export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number];
+export type CalendarRow = z.infer<typeof calendarRowSchema>;
 export type RosterRow = z.infer<typeof rosterRowSchema>;
 export type AttendanceRow = z.infer<typeof attendanceRowSchema>;
 export type CatalogRow = z.infer<typeof catalogRowSchema>;

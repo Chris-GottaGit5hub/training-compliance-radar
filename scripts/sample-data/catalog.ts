@@ -16,7 +16,7 @@ const LINKEDIN: Course[] = [
   ["Business Writing Principles", "Communication", 72],
   ["Managing Stress for Positive Change", "Wellness", 52],
   ["Strategic Thinking", "Leadership", 110],
-  ["Anti-Money Laundering Foundations", "Compliance", 90],
+  ["Anti-Money Laundering Briefing", "Compliance", 90],
   ["Power BI Essential Training", "Data & Analytics", 160],
   ["Giving and Receiving Feedback", "Communication", 42],
 ];

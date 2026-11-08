@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.5)
+# spec.md — Training Compliance Radar (v1.6)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -160,7 +160,7 @@ Server post-processing:
 - Log one line per AI call: route, provider, model, latency ms, status, error code. Never log payload contents or provider error messages (they can echo the prompt).
 
 ## 6. UI
-Single page, 4 steps: **(1) Data** — upload 3 CSVs (catalog optional) or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (covered, compliance %, at-risk, months left, cost to close), units bar chart, ranked unit table; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**. Footer: privacy note.
+Single page, 4 steps: **(1) Data** — upload 3 CSVs (catalog optional) or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (covered, compliance %, at-risk, months left, cost to close), units bar chart, ranked unit table; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**, which opens a card with the AI-written summary plus four charts drawn by the app from the engine's numbers (status breakdown, highest-risk units, back-test recall and precision at Jun 30 and Sep 30, and cost to close vs budget). The charts never depend on AI output and still show if the AI call fails. Footer: privacy note.
 States: loading spinners on AI buttons; error banners with retry; empty states. If an AI route returns 503, AI buttons are disabled with a banner "AI not configured" while the engine and dashboard keep working. Mobile-friendly layout.
 
 ## 7. Constraints
@@ -209,3 +209,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.3 | 2026-11-08 | Provider call uses `generateText` with `Output.object` instead of `generateObject`, which the installed AI SDK (v7) marks deprecated. Behavior and schemas are unchanged. | clarifications from AI route implementation |
 | 1.4 | 2026-11-08 | AI call deadline 25 s → 40 s for the whole call; Gemini `thinkingLevel` set to `low` by default (env `AI_THINKING_LEVEL`) because Gemini 3 reasoning made memo generation exceed 25 s on the live site; memo/summary regeneration skipped after a slow first attempt; summary and memo prompts ask for plain-English labels. 503 responses carry a `reason`, 502 a short `code`, and `GET /api/status` reports configuration. | bug found on live site |
 | 1.5 | 2026-11-08 | Same-provider model fallback (`AI_FALLBACK_MODEL`, default `gemini-3.6-flash` for Gemini): live testing showed `gemini-3.8-flash` returning 503 or hanging while `gemini-3.6-flash` answered in about 1 s. There is still no fallback between providers. 502 bodies carry the underlying provider code (e.g. `timeout_after_http_503`); `GET /api/status?probe=1` tests the provider. | bug found on live site |
+| 1.6 | 2026-11-08 | Executive summary card now includes four engine-drawn charts (status breakdown, highest-risk units, back-test, cost vs budget) that do not depend on the AI. Summary prompt asks for plain-English labels, ₱ amounts, and a plain statement of whether the budget covers the cost to close. | user request |

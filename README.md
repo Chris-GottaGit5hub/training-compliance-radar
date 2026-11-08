@@ -26,7 +26,7 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 - **Risk dashboard**: covered, compliance %, at-risk, months left, cost to close vs budget, a bar chart and a ranked unit table.
 - **Back-test card**: recall and precision at Jun 30 and Sep 30.
 - **Unit panel**: at-risk employees, CSV export, AI-drafted memo, catalog-grounded course recommendations.
-- **Executive summary** for a department head.
+- **Executive summary** for a department head: an AI-written narrative plus four charts (status breakdown, highest-risk units, back-test, cost vs budget) drawn from the engine, so they stay accurate and still appear if the AI is unavailable.
 - **Privacy by design**: employee names and IDs never leave the browser.
 
 ## How it works
@@ -71,7 +71,7 @@ Switching to Claude is one variable (`AI_PROVIDER=anthropic`) plus its key. Ther
 
 ## Tests
 
-`npm test` runs **171 tests in 15 files** (Vitest). They cover:
+`npm test` runs **201 tests in 16 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);
@@ -131,7 +131,7 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 | AI agent rules and project conventions | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md), [`.cursorrules`](.cursorrules) |
 | Working app on the recommended stack (Next.js, TypeScript, Tailwind, Vercel AI SDK) | `app/`, `components/`, `lib/` |
 | Deployed and publicly reachable | https://training-compliance-radar.vercel.app |
-| Core logic is deterministic and tested | `lib/engine/`, `tests/` (171 tests) |
+| Core logic is deterministic and tested | `lib/engine/`, `tests/` (201 tests) |
 | AI features with structured output and grounding | `app/api/*`, `lib/ai/`, `lib/payload/` |
 | Data privacy handled (aggregates only, local name merge) | [Privacy](#privacy-and-data-handling), `lib/payload/`, `tests/payload.test.ts` |
 | Security basics (validation, size limits, rate limit, no secrets in git) | `lib/api/`, `.env.example`, gitleaks in CI |

@@ -69,6 +69,32 @@ export const shouldTryFallback = (code: string): boolean =>
 /** How long the primary model gets before the fallback is tried. */
 export const PRIMARY_TIMEOUT_MS = 15_000;
 
+/** After a model fails with an overload-type error, skip it for this long. */
+export const MODEL_COOLDOWN_MS = 5 * 60_000;
+
+export interface ModelCooldown {
+  isCooling(modelId: string): boolean;
+  trip(modelId: string): void;
+}
+
+/** In-memory (per server instance): avoids paying the primary's timeout on every request. */
+export function createModelCooldown(
+  now: () => number = Date.now,
+  durationMs: number = MODEL_COOLDOWN_MS,
+): ModelCooldown {
+  const until = new Map<string, number>();
+  return {
+    isCooling: (modelId) => (until.get(modelId) ?? 0) > now(),
+    trip: (modelId) => void until.set(modelId, now() + durationMs),
+  };
+}
+
+const COOLDOWN_KEY = Symbol.for("training-compliance-radar.model-cooldown");
+const sharedCooldown = (): ModelCooldown => {
+  const store = globalThis as unknown as Record<symbol, ModelCooldown | undefined>;
+  return (store[COOLDOWN_KEY] ??= createModelCooldown());
+};
+
 /**
  * Runs `run` on each model in turn. A model that fails with an overload-type error or a
  * timeout hands over to the next one; other errors (bad request, bad key) stop right away
@@ -81,6 +107,8 @@ export async function withModelFallback<T>(
     totalMs: number;
     firstMs: number;
     log: (modelId: string, status: "ok" | "error", latencyMs: number, code?: string) => void;
+    /** Optional: models that recently failed are skipped (the last model is always tried). */
+    cooldown?: ModelCooldown;
   },
 ): Promise<{ ok: true; value: T } | { ok: false; code: string }> {
   const overall = AbortSignal.timeout(options.totalMs);
@@ -88,6 +116,7 @@ export async function withModelFallback<T>(
 
   for (let i = 0; i < models.length; i++) {
     const isLast = i === models.length - 1;
+    if (!isLast && options.cooldown?.isCooling(models[i])) continue;
     const signal = isLast ? overall : AbortSignal.any([overall, AbortSignal.timeout(options.firstMs)]);
     const started = Date.now();
     try {
@@ -98,6 +127,7 @@ export async function withModelFallback<T>(
       lastCode = errorCode(error);
       options.log(models[i], "error", Date.now() - started, lastCode);
       if (isLast || overall.aborted || !shouldTryFallback(lastCode)) break;
+      options.cooldown?.trip(models[i]);
     }
   }
   return { ok: false, code: lastCode };
@@ -141,6 +171,7 @@ export const generateStructured: StructuredGenerator = async (call) => {
       }
     },
     {
+      cooldown: sharedCooldown(),
       totalMs: call.timeoutMs ?? AI_TIMEOUT_MS,
       firstMs: Math.min(PRIMARY_TIMEOUT_MS, call.timeoutMs ?? AI_TIMEOUT_MS),
       log: (model, status, latencyMs, code) =>

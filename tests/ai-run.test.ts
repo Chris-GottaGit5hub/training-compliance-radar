@@ -1,7 +1,7 @@
 import { APICallError, RetryError } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
-import { errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
+import { createModelCooldown, errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
 import { REGENERATE_ONLY_BEFORE_MS, runMemo, runRecommend, runSummary } from "@/lib/ai/run";
 import type { MemoRequest, RecommendRequest, SummaryRequest } from "@/lib/schemas";
@@ -297,6 +297,30 @@ describe("withModelFallback", () => {
     });
     expect(result).toEqual({ ok: false, code: "http_503" });
     expect(lines).toEqual(["a:error:http_503", "b:error:http_503"]);
+  });
+
+  it("skips a recently failed primary on later calls, then retries it after the cooldown", async () => {
+    let now = 0;
+    const cooldown = createModelCooldown(() => now, 1_000);
+    const tried: string[] = [];
+    const run = async (model: string) => {
+      tried.push(model);
+      if (model === "primary") throw overloaded();
+      return "answer";
+    };
+    await withModelFallback(["primary", "backup"], run, { ...options, cooldown });
+    await withModelFallback(["primary", "backup"], run, { ...options, cooldown });
+    expect(tried).toEqual(["primary", "backup", "backup"]); // second call went straight to backup
+    now = 1_001;
+    await withModelFallback(["primary", "backup"], run, { ...options, cooldown });
+    expect(tried).toEqual(["primary", "backup", "backup", "primary", "backup"]);
+  });
+
+  it("never cools down the only or last model", async () => {
+    const cooldown = createModelCooldown(() => 0, 1_000);
+    cooldown.trip("only");
+    const result = await withModelFallback(["only"], async () => "ok", { ...options, cooldown });
+    expect(result).toEqual({ ok: true, value: "ok" });
   });
 
   it("works with a single model", async () => {

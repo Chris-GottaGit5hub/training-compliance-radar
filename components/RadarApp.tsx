@@ -10,7 +10,6 @@ import { UnitPanel } from "./UnitPanel";
 import { SummaryCard } from "./SummaryCard";
 import { useAiActions } from "./useAiActions";
 import { useRadarState } from "./useRadarState";
-import { Banner } from "./ui";
 
 export function RadarApp() {
   const state = useRadarState();
@@ -40,23 +39,12 @@ export function RadarApp() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header
-        canSummarize={analysis !== null && !ai.notConfigured}
-        disabledReason={
-          ai.notConfigured ? "AI is not configured on this server" : "Load data and rules first"
-        }
+        canSummarize={analysis !== null}
         loading={ai.summaryState.status === "loading"}
         onSummary={ai.summary}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <Stepper steps={steps} />
-        {ai.notConfigured && (
-          <div className="mb-4">
-            <Banner tone="warning">
-              AI is not configured on this server. Memos, recommendations and the executive summary are
-              off; everything else works.
-            </Banner>
-          </div>
-        )}
         <div className="space-y-6">
           <DataStep state={state} />
           <RulesStep state={state} />

@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { atRiskEmployees, type Analysis } from "@/lib/analysis";
-import { postAi } from "@/lib/api/client";
+import { postAi, type ApiResult } from "@/lib/api/client";
 import {
   buildMemoPayload,
   buildRecommendPayload,
@@ -16,10 +16,10 @@ import {
   type CatalogRow,
   type MemoRequest,
   type MemoResponse,
-  type RecommendResponse,
   type RosterRow,
   type RulesConfig,
   type SummaryResponse,
+  type RecommendResponse,
 } from "@/lib/schemas";
 
 export type Async<T> =
@@ -45,6 +45,26 @@ const emptyStore = (analysis: Analysis | null): Store => ({
   summary: { status: "idle" },
 });
 
+const UNEXPECTED = "Something unexpected went wrong. Try again.";
+
+/**
+ * Runs one AI call and always ends in "done" or "error", never "loading": building the
+ * payload, the request and the response handling are all inside the try.
+ */
+async function settle<T, R>(
+  call: () => Promise<ApiResult<T> | { ok: false; message: string }>,
+  map: (data: T) => R,
+): Promise<Async<R>> {
+  try {
+    const result = await call();
+    return result.ok
+      ? { status: "done", data: map(result.data) }
+      : { status: "error", message: result.message };
+  } catch {
+    return { status: "error", message: UNEXPECTED };
+  }
+}
+
 interface Inputs {
   analysis: Analysis | null;
   roster: RosterRow[] | null;
@@ -52,10 +72,13 @@ interface Inputs {
   config: RulesConfig | null;
 }
 
-/** AI actions. Only aggregates are sent; names are merged into memos by the UI, locally. */
+/**
+ * AI actions. Only aggregates are sent; names are merged into memos by the UI, locally.
+ * Every action leaves a visible result or error, and nothing disables the buttons for good:
+ * after a failure the user can always retry.
+ */
 export function useAiActions({ analysis, roster, catalog, config }: Inputs) {
   const [store, setStore] = useState<Store>(() => emptyStore(null));
-  const [notConfigured, setNotConfigured] = useState(false);
   const live = store.analysis === analysis ? store : emptyStore(analysis);
 
   const patch = useCallback(
@@ -69,31 +92,27 @@ export function useAiActions({ analysis, roster, catalog, config }: Inputs) {
 
   const recommend = useCallback(async () => {
     if (!analysis || !roster || !catalog || !config) return;
-    const payload = buildRecommendPayload(
-      analysis.org.unitsRanked,
-      atRiskEmployees(analysis.results, roster),
-      catalog,
-      config,
-    );
-    if (!payload) {
-      patch(analysis, () => ({
-        recommend: {
-          status: "error",
-          message:
-            "Nothing to recommend: no unit has at-risk employees, or no catalog course meets the minimum hours.",
-        },
-      }));
-      return;
-    }
     patch(analysis, () => ({ recommend: { status: "loading" } }));
-    const result = await postAi("/api/recommend", payload, recommendResponseSchema);
-    if (!result.ok) {
-      if (result.notConfigured) setNotConfigured(true);
-      patch(analysis, () => ({ recommend: { status: "error", message: result.message } }));
-      return;
-    }
-    const byUnit = Object.fromEntries(result.data.recommendations.map((r) => [r.unit, r]));
-    patch(analysis, () => ({ recommend: { status: "done", data: byUnit } }));
+    const state = await settle(
+      async () => {
+        const payload = buildRecommendPayload(
+          analysis.org.unitsRanked,
+          atRiskEmployees(analysis.results, roster),
+          catalog,
+          config,
+        );
+        if (!payload) {
+          return {
+            ok: false as const,
+            message:
+              "Nothing to recommend: no unit has at-risk employees, or no catalog course meets the minimum hours.",
+          };
+        }
+        return postAi("/api/recommend", payload, recommendResponseSchema);
+      },
+      (data) => Object.fromEntries(data.recommendations.map((r) => [r.unit, r])),
+    );
+    patch(analysis, () => ({ recommend: state }));
   }, [analysis, roster, catalog, config, patch]);
 
   const memo = useCallback(
@@ -101,24 +120,25 @@ export function useAiActions({ analysis, roster, catalog, config }: Inputs) {
       const unit = analysis?.org.unitsRanked.find((u) => u.unit === unitName);
       if (!analysis || !unit || !config) return;
       const recs = live.recommend.status === "done" ? live.recommend.data[unitKey(unitName)] : undefined;
-      const courses = (recs?.courseIds ?? [])
-        .map((id) => catalog?.find((c) => c.course_id === id))
-        .filter((c): c is CatalogRow => c !== undefined);
       const setMemo = (value: Async<MemoResponse>) =>
         patch(analysis, (s) => ({ memos: { ...s.memos, [unitName]: value } }));
 
       setMemo({ status: "loading" });
-      const result = await postAi(
-        "/api/memo",
-        buildMemoPayload(unit, courses, config, tone),
-        memoResponseSchema,
+      setMemo(
+        await settle(
+          async () => {
+            const courses = (recs?.courseIds ?? [])
+              .map((id) => catalog?.find((c) => c.course_id === id))
+              .filter((c): c is CatalogRow => c !== undefined);
+            return postAi(
+              "/api/memo",
+              buildMemoPayload(unit, courses, config, tone),
+              memoResponseSchema,
+            );
+          },
+          (data) => data,
+        ),
       );
-      if (!result.ok) {
-        if (result.notConfigured) setNotConfigured(true);
-        setMemo({ status: "error", message: result.message });
-        return;
-      }
-      setMemo({ status: "done", data: result.data });
     },
     [analysis, catalog, config, live.recommend, patch],
   );
@@ -126,21 +146,19 @@ export function useAiActions({ analysis, roster, catalog, config }: Inputs) {
   const summary = useCallback(async () => {
     if (!analysis || !config) return;
     patch(analysis, () => ({ summary: { status: "loading" } }));
-    const result = await postAi(
-      "/api/summary",
-      buildSummaryPayload(analysis.org, analysis.cost, config),
-      summaryResponseSchema,
+    const state = await settle(
+      async () =>
+        postAi(
+          "/api/summary",
+          buildSummaryPayload(analysis.org, analysis.cost, config),
+          summaryResponseSchema,
+        ),
+      (data) => data,
     );
-    if (!result.ok) {
-      if (result.notConfigured) setNotConfigured(true);
-      patch(analysis, () => ({ summary: { status: "error", message: result.message } }));
-      return;
-    }
-    patch(analysis, () => ({ summary: { status: "done", data: result.data } }));
+    patch(analysis, () => ({ summary: state }));
   }, [analysis, config, patch]);
 
   return {
-    notConfigured,
     recommendations: live.recommend,
     memos: live.memos,
     summaryState: live.summary,

@@ -58,7 +58,7 @@ export function AiPanel({
         <button
           type="button"
           onClick={ai.recommend}
-          disabled={!ai.hasCatalog || recLoading || ai.notConfigured}
+          disabled={!ai.hasCatalog || recLoading}
           className={buttonClass("secondary")}
         >
           {recLoading && <Spinner />}
@@ -81,7 +81,7 @@ export function AiPanel({
         <button
           type="button"
           onClick={() => ai.memo(unit.unit, tone)}
-          disabled={memoLoading || ai.notConfigured || unit.atRisk === 0}
+          disabled={memoLoading || unit.atRisk === 0}
           className={buttonClass("primary")}
         >
           {memoLoading && <Spinner />}
@@ -95,7 +95,7 @@ export function AiPanel({
         </p>
       )}
 
-      {recs.status === "error" && !ai.notConfigured && <RetryBanner message={recs.message} onRetry={ai.recommend} />}
+      {recs.status === "error" && <RetryBanner message={recs.message} onRetry={ai.recommend} />}
       {rec && catalog && (
         <RecommendationList
           rec={rec}
@@ -104,7 +104,7 @@ export function AiPanel({
         />
       )}
 
-      {memo.status === "error" && !ai.notConfigured && (
+      {memo.status === "error" && (
         <RetryBanner message={memo.message} onRetry={() => ai.memo(unit.unit, tone)} />
       )}
       {memo.status === "done" && (

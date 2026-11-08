@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { describeApiError, postAi } from "@/lib/api/client";
+import { describeApiError, describeApiFailure, postAi } from "@/lib/api/client";
 import { summaryResponseSchema } from "@/lib/schemas";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -16,6 +16,34 @@ describe("describeApiError", () => {
     expect(new Set(messages).size).toBe(messages.length);
     expect(describeApiError(503)).toMatch(/not configured/i);
     expect(describeApiError(429)).toMatch(/wait/i);
+  });
+});
+
+describe("describeApiFailure", () => {
+  it("names the missing key and what to do about it", () => {
+    const message = describeApiFailure(503, {
+      error: "ai_not_configured",
+      reason: "missing_key",
+      keyVar: "GOOGLE_GENERATIVE_AI_API_KEY",
+    });
+    expect(message).toContain("GOOGLE_GENERATIVE_AI_API_KEY");
+    expect(message).toMatch(/Vercel/);
+    expect(message).toMatch(/redeploy/i);
+  });
+
+  it("explains an unknown provider", () => {
+    expect(describeApiFailure(503, { reason: "unknown_provider" })).toContain("AI_PROVIDER");
+  });
+
+  it("turns provider error codes into hints", () => {
+    expect(describeApiFailure(502, { code: "http_403" })).toMatch(/API key/);
+    expect(describeApiFailure(502, { code: "http_404" })).toMatch(/model/);
+    expect(describeApiFailure(502, { code: "http_429" })).toMatch(/quota/);
+    expect(describeApiFailure(502, { code: "weird" })).toContain("weird");
+  });
+
+  it("falls back to the generic message without a body", () => {
+    expect(describeApiFailure(502)).toBe(describeApiError(502));
   });
 });
 
@@ -50,6 +78,40 @@ describe("postAi", () => {
     expect(await postAi("/api/summary", {}, summaryResponseSchema)).toMatchObject({
       ok: false,
       status: 0,
+    });
+  });
+
+  it("includes the server's reason in the message for a 503", async () => {
+    stubFetch(
+      Response.json(
+        { error: "ai_not_configured", reason: "missing_key", keyVar: "GOOGLE_GENERATIVE_AI_API_KEY" },
+        { status: 503 },
+      ),
+    );
+    const result = await postAi("/api/summary", {}, summaryResponseSchema);
+    expect(!result.ok && result.message).toContain("GOOGLE_GENERATIVE_AI_API_KEY");
+  });
+
+  it("gives up with a timeout error instead of loading forever", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        (_path: string, init: RequestInit) =>
+          new Promise((_resolve, reject) =>
+            init.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))),
+          ),
+      ),
+    );
+    const result = await postAi("/api/summary", {}, summaryResponseSchema, { timeoutMs: 20 });
+    expect(result).toMatchObject({ ok: false, status: 408 });
+    expect(!result.ok && result.message).toMatch(/too long/i);
+  });
+
+  it("never throws, even if the response body is not JSON", async () => {
+    stubFetch(new Response("<html>oops</html>", { status: 500 }));
+    await expect(postAi("/api/summary", {}, summaryResponseSchema)).resolves.toMatchObject({
+      ok: false,
+      status: 500,
     });
   });
 

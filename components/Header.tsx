@@ -2,12 +2,10 @@ import { buttonClass } from "./ui";
 
 export function Header({
   canSummarize,
-  disabledReason,
   loading,
   onSummary,
 }: {
   canSummarize: boolean;
-  disabledReason: string;
   loading: boolean;
   onSummary: () => void;
 }) {
@@ -40,7 +38,7 @@ export function Header({
           type="button"
           onClick={onSummary}
           disabled={!canSummarize || loading}
-          title={canSummarize ? undefined : disabledReason}
+          title={canSummarize ? undefined : "Load data and rules first"}
           className={buttonClass("secondary")}
         >
           {loading ? "Writing summary…" : "Executive summary"}

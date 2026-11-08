@@ -2,7 +2,18 @@
 
 Checkpoints 2–4 from [`build-plan.md`](build-plan.md) are done and pushed to `main` (HEAD at the time of writing: the commit that adds this file). The deadline is **Nov 9, 2026**.
 
-## Do this first: the live AI features are OFF
+## Update (Nov 8, later): AI is now working on the live site
+
+The key was added to Vercel and the AI routes now return real output. Two further problems were found and fixed:
+
+1. **Buttons went grey with no message.** A 503 latched a "not configured" flag that disabled every AI button and hid the per-action error. Fixed: errors always show inline with a Retry button, buttons stay usable, requests time out after 55 s, and failures always end in a result or an error (commits `cc3bf3c`).
+2. **`gemini-3.8-flash` was overloaded.** A probe showed Google returning `503` (or hanging) for it while `gemini-3.6-flash` answered in about 1 s. The app now falls back automatically to `gemini-3.6-flash` (`AI_FALLBACK_MODEL`), skips a failed primary for 5 minutes, and reports the real cause in 502 bodies. Live calls now take about 2–5 s. Spec is at v1.5.
+
+Optional: in Vercel, set `AI_MODEL=gemini-3.6-flash` (or remove `AI_MODEL`) to skip the broken primary entirely. `GET /api/status` shows the current configuration, and `GET /api/status?probe=1` makes one tiny test call to Google (rate limited, no user data).
+
+The section below is the original note from before the key was set.
+
+## (Resolved) The live AI features were OFF
 
 I probed the live site. It is deployed with the latest code, but **every AI route returns `503 ai_not_configured`** because `GOOGLE_GENERATIVE_AI_API_KEY` is not set in the Vercel project. I cannot set it for you (it is your key and your Vercel account).
 

@@ -1,5 +1,5 @@
 /*
- * Fictional organization for the 10k synthetic personnel file: 7 sectors, 50 departments,
+ * Fictional organization for the 12k synthetic personnel file: 7 sectors, 50 departments,
  * pay grades PG 4-18. Sector codes come from the user; everything else is invented.
  */
 
@@ -9,7 +9,7 @@ export type Sector = (typeof SECTORS)[number];
 /** A position and its pay grade; `weight` is its relative headcount within the family. */
 export type PositionSpec = { title: string; pg: number; weight: number };
 
-/** Staff positions by department type. Managers (PG 15-18) are added separately. */
+/** Staff positions by department type (PG 4-13). Department, group and sector heads and the President are added separately. */
 export const FAMILIES: Record<string, PositionSpec[]> = {
   branch: [
     { title: "Customer Associate", pg: 4, weight: 30 },
@@ -20,7 +20,7 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Credit Investigator", pg: 9, weight: 5 },
     { title: "Account Officer", pg: 10, weight: 8 },
     { title: "Branch Operations Supervisor", pg: 13, weight: 4 },
-    { title: "Branch Manager", pg: 14, weight: 3 },
+    { title: "Branch Manager", pg: 12, weight: 3 },
   ],
   lending: [
     { title: "Customer Associate", pg: 4, weight: 8 },
@@ -30,7 +30,7 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Credit Analyst", pg: 11, weight: 18 },
     { title: "Senior Credit Analyst", pg: 12, weight: 10 },
     { title: "Lending Specialist", pg: 13, weight: 6 },
-    { title: "Lending Unit Head", pg: 14, weight: 3 },
+    { title: "Lending Unit Head", pg: 12, weight: 3 },
   ],
   finance: [
     { title: "Administrative Assistant", pg: 5, weight: 8 },
@@ -39,7 +39,7 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Budget Analyst", pg: 11, weight: 15 },
     { title: "Accountant", pg: 12, weight: 20 },
     { title: "Senior Accountant", pg: 13, weight: 8 },
-    { title: "Finance Unit Head", pg: 14, weight: 3 },
+    { title: "Finance Unit Head", pg: 12, weight: 3 },
   ],
   tech: [
     { title: "IT Support Associate", pg: 8, weight: 20 },
@@ -47,7 +47,7 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Network Engineer", pg: 11, weight: 10 },
     { title: "Senior Systems Developer", pg: 12, weight: 15 },
     { title: "IT Security Specialist", pg: 13, weight: 8 },
-    { title: "Systems Architect", pg: 14, weight: 4 },
+    { title: "Systems Architect", pg: 12, weight: 4 },
   ],
   treasury: [
     { title: "Treasury Assistant", pg: 7, weight: 15 },
@@ -55,7 +55,7 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Investment Analyst", pg: 11, weight: 18 },
     { title: "Dealer", pg: 11, weight: 12 },
     { title: "Senior Dealer", pg: 13, weight: 6 },
-    { title: "Portfolio Manager", pg: 14, weight: 4 },
+    { title: "Portfolio Manager", pg: 12, weight: 4 },
   ],
   corporate: [
     { title: "Administrative Assistant", pg: 5, weight: 18 },
@@ -65,8 +65,8 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "HR Officer", pg: 11, weight: 12 },
     { title: "Training Specialist", pg: 11, weight: 8 },
     { title: "Communications Officer", pg: 11, weight: 6 },
-    { title: "Attorney", pg: 14, weight: 4 },
-    { title: "Services Unit Head", pg: 14, weight: 3 },
+    { title: "Attorney", pg: 12, weight: 4 },
+    { title: "Services Unit Head", pg: 12, weight: 3 },
   ],
   control: [
     { title: "Administrative Assistant", pg: 5, weight: 10 },
@@ -76,7 +76,7 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Auditor", pg: 12, weight: 15 },
     { title: "Compliance Officer", pg: 12, weight: 12 },
     { title: "Senior Auditor", pg: 13, weight: 8 },
-    { title: "Control Unit Head", pg: 14, weight: 3 },
+    { title: "Control Unit Head", pg: 12, weight: 3 },
   ],
   operations: [
     { title: "Customer Associate", pg: 4, weight: 15 },
@@ -85,15 +85,20 @@ export const FAMILIES: Record<string, PositionSpec[]> = {
     { title: "Payments Processor", pg: 7, weight: 12 },
     { title: "Operations Analyst", pg: 11, weight: 10 },
     { title: "Operations Specialist", pg: 13, weight: 5 },
-    { title: "Operations Unit Head", pg: 14, weight: 3 },
+    { title: "Operations Unit Head", pg: 12, weight: 3 },
   ],
 };
 
+/**
+ * Leadership grades follow the company ladder: a department head starts at PG 12, a group head
+ * at PG 14, a sector head at PG 16, and the President is the only person at PG 18.
+ */
 export const MANAGER_TITLES = {
-  assistantManager: { title: "Assistant Department Manager", pg: 15 },
-  departmentManager: { title: "Department Manager", pg: 16 },
-  groupHead: { title: "Group Head", pg: 17 },
-  sectorHead: { title: "Sector Head", pg: 18 },
+  assistantManager: { title: "Assistant Department Manager", pg: 12 },
+  departmentManager: { title: "Department Manager", pg: 13 },
+  groupHead: { title: "Group Head", pg: 14 },
+  sectorHead: { title: "Sector Head", pg: 16 },
+  president: { title: "President", pg: 18 },
 } as const;
 
 export interface DepartmentSpec {
@@ -120,7 +125,7 @@ const d = (
   region: string = HO,
 ): DepartmentSpec => ({ name, sector, group, family, weight, risk, region });
 
-/** 50 departments. Weights add up to about 10,000; the builder scales them to exactly the target. */
+/** 50 departments. Weights add up to about 10,000; the builder scales them to exactly the target (12,000). */
 export const DEPARTMENTS: DepartmentSpec[] = [
   // BBS: 12 departments
   d("NCR North Branches", "BBS", "Luzon Branches Group", "branch", 420, 1.3, "NCR"),

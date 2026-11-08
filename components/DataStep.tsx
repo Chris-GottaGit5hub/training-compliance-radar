@@ -11,7 +11,7 @@ const BOXES: { kind: CsvKind; label: string; required: boolean; columns: string 
     label: "Roster",
     required: true,
     columns:
-      "employee_id, name, unit, position, employment_type, hire_date, separation_date, licensed. Optional: pay_grade, group, sector",
+      "employee_id, name, unit, position, employment_type, hire_date, separation_date, licensed. Optional: personnel_number (5 digits, unique), pay_grade, group, sector",
   },
   {
     kind: "attendance",
@@ -31,7 +31,7 @@ const BOXES: { kind: CsvKind; label: string; required: boolean; columns: string 
     label: "Training calendar",
     required: false,
     columns:
-      "run_id, course_id, date, delivery, cost_per_run, cost_per_head, min_pax, max_pax. Add nominated external trainings as external rows with min_pax 1",
+      "run_id, course_id, date, delivery, cost_per_head, min_pax, max_pax. Optional: run_title, hours, speakers, cost_per_run, expected_pax. Add nominated external trainings as external rows with min_pax 1",
   },
 ];
 
@@ -42,7 +42,8 @@ function SamplePanel({ status, onLoad }: { status: SampleStatus; onLoad: () => v
       <div>
         <p className="font-medium text-indigo-950">No files handy?</p>
         <p className="text-sm text-indigo-900">
-          Load a synthetic agency: about 300 employees, 12 units and a 26-course catalog.
+          Load a synthetic agency: 12,000 employees in 50 departments and 7 sectors, a 26-course
+          catalog and a 48-run training calendar.
         </p>
       </div>
       <button

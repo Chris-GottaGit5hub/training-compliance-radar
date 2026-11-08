@@ -21,7 +21,7 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 
 ## Features
 
-- **Upload and validate** roster, attendance and (optional) course catalog CSVs in the browser, with row-numbered errors; or load built-in sample data.
+- **Upload and validate** roster, attendance and (optional) course catalog and training calendar CSVs in the browser, with row-numbered errors; or load the built-in sample: 12,000 synthetic employees in 50 departments under 7 sectors, with Employee IDs A100 to N399 and unique 5-digit Personnel Numbers. Field list: [`docs/data-dictionary.md`](docs/data-dictionary.md).
 - **Churn-aware compliance engine** (deterministic TypeScript): late-hire exemptions, exclusion of separated staff, covered employment types, minimum hours, and an e-learning toggle, as of any date.
 - **Who is covered:** only regular staff can be at risk. Contractual staff may attend (their costs count as spend) but are never at risk. A footnote says who is left out of scope and why.
 - **Risk dashboard**: trained vs untrained, the next target, months left, cost to close, a bar chart and a ranked table of units that still have untrained staff.
@@ -92,15 +92,15 @@ CI runs lint, typecheck, tests, build, a report-only `npm audit`, and gitleaks o
 
 ## Back-test results
 
-On the seeded synthetic data (300 employees, year 2026), rules as of each checkpoint compared with who was actually untrained at Dec 31:
+On the seeded synthetic data (12,000 employees, year 2026), rules as of each checkpoint compared with who was actually untrained at Dec 31:
 
 | Checkpoint | Flagged at-risk | Untrained at year end | Caught early | Recall | Precision |
 |---|---|---|---|---|---|
-| Jun 30 | 113 | 28 | 28 | 100% | 25% |
-| Sep 30 | 49 | 28 | 28 | 100% | 57% |
+| Jun 30 | 3,631 | 891 | 872 | 98% | 24% |
+| Sep 30 | 1,691 | 891 | 891 | 100% | 53% |
 
 - **Recall** (share of year-end gaps already flagged) meets the PRD target of at least 80%. It is structurally high: an untrained employee stays at risk until trained, so recall mainly drops for people hired after the checkpoint.
-- **Precision** is the informative number. `1 − precision` is the share of flagged staff who were trained before year-end: the group early nudges target (75% at Jun 30, 43% at Sep 30).
+- **Precision** is the informative number. `1 − precision` is the share of flagged staff who were trained before year-end: the group early nudges target (76% at Jun 30, 47% at Sep 30).
 - These results come from synthetic data, so they show the method works, not how an agency would perform. See [`spec.md` §4.1](spec.md).
 
 ## Privacy and data handling

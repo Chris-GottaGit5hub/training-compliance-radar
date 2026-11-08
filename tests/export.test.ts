@@ -41,19 +41,22 @@ describe("csvCell", () => {
 
 describe("buildAtRiskCsv", () => {
   it("starts with a BOM and the header, then one CRLF line per row", () => {
-    const csv = buildAtRiskCsv([row(), row({ employeeId: "E2", licensed: false })]);
-    expect(csv.startsWith("﻿employee_id,name,unit,position,employment_type,licensed,hire_date\r\n")).toBe(true);
+    const csv = buildAtRiskCsv([
+      row({ personnelNumber: "48213" }),
+      row({ employeeId: "E2", licensed: false }),
+    ]);
+    expect(csv.startsWith("﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date\r\n")).toBe(true);
     expect(csv.split("\r\n")).toEqual([
-      "﻿employee_id,name,unit,position,employment_type,licensed,hire_date",
-      "E1,Ana Cruz,Finance,Accountant,regular,yes,2020-01-05",
-      "E2,Ana Cruz,Finance,Accountant,regular,no,2020-01-05",
+      "﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date",
+      "E1,48213,Ana Cruz,Finance,Accountant,regular,yes,2020-01-05",
+      "E2,,Ana Cruz,Finance,Accountant,regular,no,2020-01-05", // no Personnel Number on this row
       "",
     ]);
   });
 
   it("writes only the header for an empty list", () => {
     expect(buildAtRiskCsv([])).toBe(
-      "﻿employee_id,name,unit,position,employment_type,licensed,hire_date\r\n",
+      "﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date\r\n",
     );
   });
 

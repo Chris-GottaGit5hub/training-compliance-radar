@@ -32,6 +32,9 @@ function EmployeeTable({ rows }: { rows: AtRiskRow[] }) {
             <th scope="col" className="hidden px-3 py-2 font-medium sm:table-cell">
               Employee ID
             </th>
+            <th scope="col" className="hidden px-3 py-2 font-medium md:table-cell">
+              Personnel No.
+            </th>
             <th scope="col" className="px-3 py-2 font-medium">
               Licensed
             </th>
@@ -45,6 +48,7 @@ function EmployeeTable({ rows }: { rows: AtRiskRow[] }) {
               </th>
               <td className="px-3 py-2">{r.position}</td>
               <td className="hidden px-3 py-2 text-slate-500 sm:table-cell">{r.employeeId}</td>
+              <td className="hidden px-3 py-2 text-slate-500 md:table-cell">{r.personnelNumber ?? "—"}</td>
               <td className="px-3 py-2">{r.licensed ? "Yes" : "No"}</td>
             </tr>
           ))}

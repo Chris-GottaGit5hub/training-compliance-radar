@@ -2,6 +2,7 @@ import type { AtRiskRow } from "./analysis";
 
 const HEADER = [
   "employee_id",
+  "personnel_number",
   "name",
   "unit",
   "position",
@@ -23,6 +24,7 @@ export function buildAtRiskCsv(rows: readonly AtRiskRow[]): string {
   const lines = rows.map((r) =>
     [
       r.employeeId,
+      r.personnelNumber ?? "",
       r.name,
       r.unit,
       r.position,

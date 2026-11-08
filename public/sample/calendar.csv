@@ -1,17 +1,49 @@
 run_id,course_id,run_title,date,delivery,hours,speakers,cost_per_run,cost_per_head,min_pax,max_pax,expected_pax
-EX-R01,EXTERNAL,ITIL 4 Foundation,2026-01-27,external,,,,18000,1,6,4
-IH-R1,IH-001,Code of Conduct and Ethics Workshop,2026-02-12,in_house,4,1,,,10,40,30
-EX-R02,EXTERNAL,Data Privacy Officer Certification,2026-02-24,external,,,,15000,1,5,3
-EX-R03,EXTERNAL,Certified Ethical Hacker,2026-03-17,external,,,,45000,1,3,2
-EX-R04,EXTERNAL,PMP Exam Preparation,2026-04-21,external,,,,35000,1,4,3
-IH-R2,IH-002,Records Management and Documentation,2026-05-14,in_house,8,2,,,10,40,30
-EX-R05,EXTERNAL,COBIT 2019 Foundation,2026-05-19,external,,,,22000,1,4,3
-EX-R06,EXTERNAL,Lean Six Sigma Green Belt,2026-06-23,external,,,,28000,1,4,2
-EX-R07,EXTERNAL,AML/CFT Specialist Course,2026-08-11,external,,,,12000,1,6,4
-EX-R08,EXTERNAL,ITIL 4 Foundation,2026-10-06,external,,,,18000,1,6,4
-IH-R3,IH-005,Risk and Control Self-Assessment,2026-10-15,in_house,8,2,,,10,40,30
-EX-R09,EXTERNAL,ISO 27001 Lead Implementer,2026-10-27,external,,,,38000,1,3,2
-EX-R10,EXTERNAL,Government Procurement Updates,2026-11-10,external,,,,8500,1,8,5
-EX-R11,EXTERNAL,Business Continuity (ISO 22301),2026-11-24,external,,,,24000,1,4,2
-IH-R4,IH-007,Effective Report Writing,2026-11-26,in_house,4,1,,,10,40,25
-EX-R12,EXTERNAL,Advanced Excel and Power BI,2026-12-08,external,,,,9500,1,8,4
+EX-R01,EXTERNAL,ITIL 4 Foundation,2026-01-20,external,,,,18000,1,30,20
+IH-R01,IH-001,Code of Conduct and Ethics Workshop,2026-01-22,in_house,4,1,,,10,40,30
+EX-R02,EXTERNAL,Data Privacy Officer Certification,2026-01-27,external,,,,15000,1,30,20
+EX-R03,EXTERNAL,AML/CFT Specialist Course,2026-02-10,external,,,,12000,1,40,30
+IH-R02,IH-002,Records Management and Documentation,2026-02-19,in_house,8,2,,,10,40,35
+EX-R04,EXTERNAL,Government Procurement Updates,2026-02-24,external,,,,8500,1,50,40
+EX-R05,EXTERNAL,PMP Exam Preparation,2026-03-10,external,,,,35000,1,20,12
+IH-R03,IH-004,Customer Handling in Banking Operations,2026-03-12,in_house,4,1,,,10,40,40
+EX-R06,EXTERNAL,Advanced Excel and Power BI,2026-03-24,external,,,,9500,1,60,40
+EX-R07,EXTERNAL,COBIT 2019 Foundation,2026-04-14,external,,,,22000,1,20,12
+IH-R04,IH-005,Risk and Control Self-Assessment,2026-04-16,in_house,8,2,,,10,40,30
+EX-R08,EXTERNAL,Credit Risk Management,2026-04-28,external,,,,16000,1,30,20
+EX-R09,EXTERNAL,Certified Ethical Hacker,2026-05-12,external,,,,45000,1,15,8
+IH-R05,IH-008,Occupational Safety and Health Orientation,2026-05-14,in_house,4,1,,,10,40,40
+EX-R10,EXTERNAL,ISO 27001 Lead Implementer,2026-05-26,external,,,,38000,1,15,8
+EX-R11,EXTERNAL,Lean Six Sigma Green Belt,2026-06-09,external,,,,28000,1,20,12
+IH-R06,IH-007,Effective Report Writing,2026-06-11,in_house,4,1,,,10,40,35
+EX-R12,EXTERNAL,Business Continuity (ISO 22301),2026-06-23,external,,,,24000,1,20,12
+EX-R13,EXTERNAL,ITIL 4 Foundation,2026-07-14,external,,,,18000,1,30,20
+IH-R07,IH-003,Supervisory Skills Seminar,2026-07-16,in_house,8,3,,,10,40,30
+EX-R14,EXTERNAL,Data Privacy Officer Certification,2026-07-28,external,,,,15000,1,30,20
+EX-R15,EXTERNAL,AML/CFT Specialist Course,2026-08-04,external,,,,12000,1,40,30
+EX-R16,EXTERNAL,Government Procurement Updates,2026-08-11,external,,,,8500,1,50,40
+IH-R08,IH-009,Introduction to Government Accounting,2026-08-13,in_house,8,2,,,10,40,30
+EX-R17,EXTERNAL,PMP Exam Preparation,2026-08-18,external,,,,35000,1,20,12
+EX-R18,EXTERNAL,Advanced Excel and Power BI,2026-08-25,external,,,,9500,1,60,40
+EX-R19,EXTERNAL,COBIT 2019 Foundation,2026-09-01,external,,,,22000,1,20,12
+EX-R20,EXTERNAL,Credit Risk Management,2026-09-08,external,,,,16000,1,30,20
+EX-R21,EXTERNAL,Certified Ethical Hacker,2026-09-15,external,,,,45000,1,15,8
+IH-R09,IH-010,Information Security Hands-on Lab,2026-09-17,in_house,8,2,,,10,40,25
+EX-R22,EXTERNAL,ISO 27001 Lead Implementer,2026-09-22,external,,,,38000,1,15,8
+EX-R23,EXTERNAL,Lean Six Sigma Green Belt,2026-10-06,external,,,,28000,1,20,12
+EX-R24,EXTERNAL,Business Continuity (ISO 22301),2026-10-08,external,,,,24000,1,20,12
+EX-R25,EXTERNAL,ITIL 4 Foundation,2026-10-13,external,,,,18000,1,30,20
+EX-R26,EXTERNAL,Data Privacy Officer Certification,2026-10-15,external,,,,15000,1,30,20
+IH-R10,IH-005,Risk and Control Self-Assessment,2026-10-15,in_house,8,2,,,10,40,40
+EX-R27,EXTERNAL,AML/CFT Specialist Course,2026-10-20,external,,,,12000,1,40,30
+EX-R28,EXTERNAL,Government Procurement Updates,2026-10-22,external,,,,8500,1,50,40
+EX-R29,EXTERNAL,PMP Exam Preparation,2026-10-27,external,,,,35000,1,20,12
+EX-R30,EXTERNAL,Advanced Excel and Power BI,2026-10-29,external,,,,9500,1,60,40
+EX-R31,EXTERNAL,COBIT 2019 Foundation,2026-11-03,external,,,,22000,1,20,12
+EX-R32,EXTERNAL,Credit Risk Management,2026-11-10,external,,,,16000,1,30,20
+IH-R11,IH-006,Procurement Law Refresher,2026-11-12,in_house,8,2,,,10,40,40
+EX-R33,EXTERNAL,Certified Ethical Hacker,2026-11-17,external,,,,45000,1,15,8
+EX-R34,EXTERNAL,ISO 27001 Lead Implementer,2026-11-24,external,,,,38000,1,15,8
+IH-R12,IH-007,Effective Report Writing,2026-11-26,in_house,4,1,,,10,40,40
+EX-R35,EXTERNAL,Lean Six Sigma Green Belt,2026-12-01,external,,,,28000,1,20,12
+EX-R36,EXTERNAL,ITIL 4 Foundation,2026-12-08,external,,,,18000,1,30,20

@@ -73,3 +73,34 @@ describe("milestoneTargets", () => {
     }
   });
 });
+
+describe("personnel_number", () => {
+  const header = `${ROSTER_HEADER},personnel_number`;
+  const line = (id: string, pn: string) => `${id},Name ${id},Ops,Officer,regular,2020-01-01,,yes,${pn}`;
+
+  it("accepts a unique 5-digit number next to a letter-and-3-digits Employee ID", () => {
+    const res = validateCsv("roster", [header, line("A100", "48213"), line("A101", "90112")].join("\n"));
+    expect(res.ok).toBe(true);
+    if (res.ok) expect(res.rows.map((r) => r.personnel_number)).toEqual(["48213", "90112"]);
+  });
+
+  it("is optional", () => {
+    expect(validateCsv("roster", `${ROSTER_HEADER}\nA100,N,Ops,O,regular,2020-01-01,,yes`).ok).toBe(true);
+    expect(validateCsv("roster", [header, line("A100", "")].join("\n")).ok).toBe(true);
+  });
+
+  it("rejects anything that is not exactly 5 digits", () => {
+    for (const bad of ["4821", "482130", "4821A", "48 213"]) {
+      const res = validateCsv("roster", [header, line("A100", bad)].join("\n"));
+      expect(res.ok, bad).toBe(false);
+      if (!res.ok) expect(res.errors[0]).toMatchObject({ row: 2, field: "personnel_number" });
+    }
+  });
+
+  it("rejects a Personnel Number used twice", () => {
+    const res = validateCsv("roster", [header, line("A100", "48213"), line("A101", "48213")].join("\n"));
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.errors[0]).toMatchObject({ field: "personnel_number" });
+    if (!res.ok) expect(res.errors[0].message).toContain("48213");
+  });
+});

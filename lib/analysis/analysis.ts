@@ -75,6 +75,8 @@ export interface Analysis {
 
 export interface AtRiskRow {
   employeeId: string;
+  /** The unique 5-digit Personnel Number, when the roster has one. */
+  personnelNumber?: string;
   name: string;
   unit: string;
   position: string;
@@ -169,6 +171,7 @@ export function atRiskEmployees(
     if (!emp) continue;
     rows.push({
       employeeId: emp.employee_id,
+      personnelNumber: emp.personnel_number,
       name: emp.name,
       unit: emp.unit,
       position: emp.position,

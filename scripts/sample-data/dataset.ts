@@ -1,10 +1,16 @@
-import { ATTENDANCE_COLUMNS, CATALOG_COLUMNS } from "../../lib/schemas/rows";
-import { buildCatalog } from "../sample-data/catalog";
-import { createRng } from "../sample-data/rng";
-import { buildAttendance10k } from "./attendance";
+import {
+  ATTENDANCE_COLUMNS,
+  CALENDAR_COLUMNS,
+  CATALOG_COLUMNS,
+} from "../../lib/schemas/rows";
+import { buildAttendance } from "./attendance";
+import { buildCalendar } from "./calendar";
+import { buildCatalog } from "./catalog";
+import { createRng } from "./rng";
 import { PERSONNEL_COLUMNS, buildPersonnel, departmentRisk } from "./roster";
 
-export const SEED_10K = 20261123;
+export const SEED = 20261123;
+export const SAMPLE_SIZE = 12_000;
 
 export function toCsv(columns: readonly string[], rows: readonly object[]): string {
   const cell = (value: unknown): string => {
@@ -15,20 +21,23 @@ export function toCsv(columns: readonly string[], rows: readonly object[]): stri
   return [columns.join(","), ...lines].join("\n") + "\n";
 }
 
-/** The three CSV files (roster, attendance, catalog) for the 10k synthetic set. */
-export function build10kDataset(year: number, seed = SEED_10K, total = 10_000) {
+/** The four sample CSV files (roster, attendance, catalog, calendar). Deterministic for a seed. */
+export function buildSampleDataset(year: number, seed = SEED, total = SAMPLE_SIZE) {
   const rng = createRng(seed);
   const personnel = buildPersonnel(rng, year, total);
-  const attendance = buildAttendance10k(rng, personnel, year, departmentRisk);
+  const attendance = buildAttendance(rng, personnel, year, departmentRisk);
   const catalog = buildCatalog();
+  const calendar = buildCalendar(year);
   return {
     personnel,
     attendance,
     catalog,
+    calendar,
     files: {
       roster: toCsv(PERSONNEL_COLUMNS, personnel),
       attendance: toCsv(ATTENDANCE_COLUMNS, attendance),
       catalog: toCsv(CATALOG_COLUMNS, catalog),
+      calendar: toCsv(CALENDAR_COLUMNS, calendar),
     },
   };
 }

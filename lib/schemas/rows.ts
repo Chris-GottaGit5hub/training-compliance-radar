@@ -8,6 +8,7 @@ export const RUN_DELIVERIES = ["in_house", "external"] as const;
 
 export const ROSTER_COLUMNS = [
   "employee_id",
+  "personnel_number",
   "name",
   "unit",
   "position",
@@ -59,7 +60,7 @@ export const OPTIONAL_COLUMNS: Record<
   "roster" | "attendance" | "catalog" | "calendar",
   readonly string[]
 > = {
-  roster: ["separation_date", "pay_grade", "group", "sector"],
+  roster: ["personnel_number", "separation_date", "pay_grade", "group", "sector"],
   attendance: [],
   catalog: ["url", "unlicensed_fee", "recommended"],
   calendar: ["run_title", "hours", "speakers", "cost_per_run", "expected_pax"],
@@ -126,6 +127,10 @@ const isHttpsUrl = (value: string): boolean => {
 export const rosterRowSchema = z
   .object({
     employee_id: text,
+    personnel_number: z
+      .string()
+      .regex(/^\d{5}$/, "must be exactly 5 digits")
+      .optional(),
     name: text,
     unit: text,
     position: text,

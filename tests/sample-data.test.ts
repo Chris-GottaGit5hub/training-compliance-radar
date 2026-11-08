@@ -3,6 +3,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { backtest, evaluateRoster, summarizeOrg } from "@/lib/engine";
 import { defaultRulesConfig, validateCsv } from "@/lib/schemas";
+import { buildSampleDataset } from "@/scripts/sample-data/dataset";
+import { allocate, employeeIdFor } from "@/scripts/sample-data/roster";
 
 function load<K extends "roster" | "attendance" | "catalog">(kind: K) {
   const text = readFileSync(path.resolve(process.cwd(), "public/sample", `${kind}.csv`), "utf8");
@@ -26,11 +28,43 @@ describe("sample data files", () => {
     });
   });
 
-  it("have ~300 employees across ~12 units and ~25 courses", () => {
-    expect(roster).toHaveLength(300);
-    expect(new Set(roster.map((r) => r.unit)).size).toBe(12);
-    expect(catalog.length).toBeGreaterThanOrEqual(24);
-    expect(catalog.length).toBeLessThanOrEqual(27);
+  it("have 12,000 employees in 50 departments under 7 sectors, with a 26-course catalog", () => {
+    expect(roster).toHaveLength(12_000);
+    expect(new Set(roster.map((r) => r.unit)).size).toBe(50);
+    expect(new Set(roster.map((r) => r.sector))).toEqual(
+      new Set(["BBS", "CSS", "DBS", "EXEC", "OS", "NDLS", "TIBS"]),
+    );
+    expect(catalog).toHaveLength(26);
+    expect(attendance.length).toBeLessThanOrEqual(20_000);
+  });
+
+  it("number Employee IDs A100 to A999, then B100 onwards, and Personnel Numbers uniquely in 5 digits", () => {
+    expect(roster[0].employee_id).toBe("A100");
+    expect(roster[899].employee_id).toBe("A999");
+    expect(roster[900].employee_id).toBe("B100");
+    expect(roster[11_999].employee_id).toBe("N399");
+    expect(roster.every((r) => /^[A-Z]\d{3}$/.test(r.employee_id))).toBe(true);
+    expect(new Set(roster.map((r) => r.employee_id)).size).toBe(12_000);
+    expect(roster.every((r) => /^[1-9]\d{4}$/.test(r.personnel_number ?? ""))).toBe(true);
+    expect(new Set(roster.map((r) => r.personnel_number)).size).toBe(12_000);
+  });
+
+  it("follows the pay-grade ladder: PG 4-13 staff, group heads PG 14, sector heads PG 16, one President at PG 18", () => {
+    const grades = roster.map((r) => r.pay_grade ?? 0);
+    expect(Math.min(...grades)).toBe(4);
+    expect(Math.max(...grades)).toBe(18);
+    const at = (pg: number) => roster.filter((r) => r.pay_grade === pg);
+    expect(at(18).map((r) => r.position)).toEqual(["President"]);
+    expect(at(16).map((r) => r.position)).toEqual(Array(7).fill("Sector Head"));
+    expect(at(14).map((r) => r.position)).toEqual(Array(14).fill("Group Head"));
+    expect(at(15)).toHaveLength(0);
+    expect(at(17)).toHaveLength(0);
+    // Every department has a head at PG 12 or above.
+    for (const unit of new Set(roster.map((r) => r.unit))) {
+      const head = roster.filter((r) => r.unit === unit && r.position === "Department Manager");
+      expect(head, unit).toHaveLength(1);
+      expect(head[0].pay_grade).toBeGreaterThanOrEqual(12);
+    }
   });
 
   it("mix employment types, ~70% licensed, hires, separations and late hires", () => {
@@ -55,6 +89,40 @@ describe("sample data files", () => {
       expect(c.url).toMatch(/^https:\/\/www\.linkedin\.com\/learning\/search\?keywords=/);
     }
     for (const c of inHouse) expect(c.cost_per_head).toBeGreaterThan(0);
+  });
+});
+
+describe("generator", () => {
+  it("is reproducible and keeps the attendance linked to the roster by Employee ID", () => {
+    const a = buildSampleDataset(year);
+    expect(a.files.roster).toBe(buildSampleDataset(year).files.roster);
+    const ids = new Set(a.personnel.map((p) => p.employee_id));
+    expect(a.attendance.every((r) => ids.has(r.employee_id))).toBe(true);
+    expect(employeeIdFor(899)).toBe("A999");
+    expect(employeeIdFor(900)).toBe("B100");
+    expect(() => employeeIdFor(23_400)).toThrow(RangeError);
+  });
+
+  it("names each department's head from its own Department Manager and uses only the .example domain", () => {
+    const { personnel } = buildSampleDataset(year);
+    for (const unit of new Set(personnel.map((p) => p.unit))) {
+      const members = personnel.filter((p) => p.unit === unit);
+      const manager = members.find((p) => p.position === "Department Manager");
+      expect(members.every((p) => p.department_head === manager?.name)).toBe(true);
+    }
+    expect(personnel.every((p) => p.employee_email.endsWith("@agency.example"))).toBe(true);
+    expect(new Set(personnel.map((p) => p.employee_email)).size).toBe(12_000);
+  });
+
+  it("marks exactly the people with a separation date as separated", () => {
+    for (const p of buildSampleDataset(year).personnel) {
+      expect(p.employment_status).toBe(p.separation_date ? "separated" : "active");
+    }
+  });
+
+  it("splits the allocation of people across weights exactly", () => {
+    expect(allocate([1, 1, 1], 10).reduce((a, b) => a + b, 0)).toBe(10);
+    expect(allocate([420, 410, 90, 100], 12_000).reduce((a, b) => a + b, 0)).toBe(12_000);
   });
 });
 

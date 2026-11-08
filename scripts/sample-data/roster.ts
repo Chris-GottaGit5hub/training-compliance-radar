@@ -1,59 +1,205 @@
-import type { RosterRow } from "../../lib/schemas/rows";
-import { FIRST_NAMES, LAST_NAMES, UNITS, UNIT_ORG } from "./people";
+import type { EmploymentType } from "../../lib/schemas/rows";
 import { randomDate, type Rng } from "./rng";
-
-function hireDateFor(rng: Rng, year: number): { hire: string; canSeparate: boolean } {
-  const r = rng.next();
-  if (r < 0.04) {
-    // Late hire: on/after the Oct 1 cutoff.
-    return { hire: randomDate(rng, `${year}-10-01`, `${year}-10-31`), canSeparate: false };
-  }
-  if (r < 0.14) {
-    // Mid-year hire.
-    return { hire: randomDate(rng, `${year}-01-15`, `${year}-08-31`), canSeparate: false };
-  }
-  const hire = randomDate(rng, `${year - 20}-01-01`, `${year - 1}-12-31`);
-  return { hire, canSeparate: true };
-}
+import {
+  DEPARTMENTS,
+  EMAIL_DOMAIN,
+  FAMILIES,
+  FEMALE_FIRST,
+  LAST_NAMES,
+  MALE_FIRST,
+  MANAGER_TITLES,
+  type DepartmentSpec,
+  type PositionSpec,
+} from "./org";
 
 /**
- * Pay grade by position in the unit (no random numbers, so every other column of the
- * seeded roster stays the same): the first person is the department head at PG 12,
- * then about 70% Rank and File, 20% Officers and 5% Senior Officers.
+ * One row of the 12k personnel file (spec §2.1). `employee_id` is one letter and three digits
+ * (A100 to A999, then B100 to B999, and so on) and is what the attendance file links to;
+ * `personnel_number` is a unique 5-digit number. The app reads `pay_grade`, `group`, `sector`
+ * and `personnel_number` as well as the required columns; the rest (sex, region, status and
+ * the emails) are extra and the app ignores them.
  */
-function payGradeFor(index: number): number {
-  if (index === 0) return 12;
-  const slot = index % 20;
-  if (slot < 15) return 4 + ((index * 5) % 6);
-  if (slot < 19) return 10 + (index % 4);
-  return 14 + (index % 3);
+export interface PersonnelRow {
+  employee_id: string;
+  personnel_number: string;
+  name: string;
+  sex: "F" | "M";
+  position: string;
+  pay_grade: string;
+  unit: string;
+  group: string;
+  sector: string;
+  region: string;
+  employment_type: EmploymentType;
+  employment_status: "active" | "separated";
+  hire_date: string;
+  separation_date?: string;
+  licensed: "yes" | "no";
+  employee_email: string;
+  department_email: string;
+  department_head: string;
 }
 
-/** ~300 synthetic employees across 12 units (headcounts come from UNITS weights). */
-export function buildRoster(rng: Rng, year: number): RosterRow[] {
-  const roster: RosterRow[] = [];
+export const PERSONNEL_COLUMNS = [
+  "employee_id",
+  "personnel_number",
+  "name",
+  "sex",
+  "position",
+  "pay_grade",
+  "unit",
+  "group",
+  "sector",
+  "region",
+  "employment_type",
+  "employment_status",
+  "hire_date",
+  "separation_date",
+  "licensed",
+  "employee_email",
+  "department_email",
+  "department_head",
+] as const;
 
-  for (const [unit, spec] of Object.entries(UNITS)) {
-    for (let i = 0; i < spec.weight; i++) {
-      const { hire, canSeparate } = hireDateFor(rng, year);
+/** Splits `total` across weights so the parts add up exactly (largest remainder). */
+export function allocate(weights: readonly number[], total: number): number[] {
+  const sum = weights.reduce((a, b) => a + b, 0);
+  const raw = weights.map((w) => (w / sum) * total);
+  const parts = raw.map(Math.floor);
+  const order = raw.map((r, i) => [r - Math.floor(r), i] as const).sort((a, b) => b[0] - a[0]);
+  const shortfall = total - parts.reduce((a, b) => a + b, 0);
+  for (let k = 0; k < shortfall; k++) parts[order[k][1]]++;
+  return parts;
+}
+
+/** `count` distinct values from `pool`, in random order (partial Fisher-Yates). */
+function drawDistinct<T>(rng: Rng, pool: T[], count: number): T[] {
+  const items = [...pool];
+  for (let i = 0; i < count; i++) {
+    const j = i + Math.floor(rng.next() * (items.length - i));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items.slice(0, count);
+}
+
+const range = (from: number, to: number): number[] =>
+  Array.from({ length: to - from + 1 }, (_, i) => from + i);
+
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+/** Employee ID for the nth person (0-based): A100..A999, then B100..B999, and so on (23,400 in all). */
+export function employeeIdFor(index: number): string {
+  const letter = LETTERS[Math.floor(index / 900)];
+  if (letter === undefined) throw new RangeError(`Employee ID capacity is 23,400; got index ${index}.`);
+  return `${letter}${100 + (index % 900)}`;
+}
+const slug = (text: string, sep: string): string =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, sep).replace(new RegExp(`^\\${sep}|\\${sep}$`, "g"), "");
+
+function pickWeighted(rng: Rng, specs: readonly PositionSpec[]): PositionSpec {
+  const total = specs.reduce((s, p) => s + p.weight, 0);
+  let roll = rng.next() * total;
+  for (const spec of specs) {
+    roll -= spec.weight;
+    if (roll < 0) return spec;
+  }
+  return specs[specs.length - 1];
+}
+
+/** Date of entry: seniors joined long ago; some staff are mid-year or late (exempt) hires. */
+function hireDate(rng: Rng, pg: number, year: number): { hire: string; canSeparate: boolean } {
+  if (pg >= 14) return { hire: randomDate(rng, `${year - 30}-01-01`, `${year - 8}-12-31`), canSeparate: false };
+  if (pg >= 12) return { hire: randomDate(rng, `${year - 22}-01-01`, `${year - 3}-12-31`), canSeparate: true };
+  const r = rng.next();
+  if (r < 0.04) return { hire: randomDate(rng, `${year}-10-01`, `${year}-10-31`), canSeparate: false };
+  if (r < 0.14) return { hire: randomDate(rng, `${year}-01-15`, `${year}-08-31`), canSeparate: false };
+  return { hire: randomDate(rng, `${year - 20}-01-01`, `${year - 1}-12-31`), canSeparate: true };
+}
+
+/** Positions for one department: managers first, then staff drawn from the family's weights. */
+function positionsFor(
+  rng: Rng,
+  dept: DepartmentSpec,
+  headcount: number,
+  extraHeads: PositionSpec[],
+): PositionSpec[] {
+  const m = MANAGER_TITLES;
+  const managers: PositionSpec[] = [
+    { ...m.departmentManager, weight: 0 },
+    ...extraHeads,
+    ...Array.from({ length: Math.max(1, Math.round(headcount / 150)) }, () => ({
+      ...m.assistantManager,
+      weight: 0,
+    })),
+  ];
+  const staff = Array.from({ length: headcount - managers.length }, () =>
+    pickWeighted(rng, FAMILIES[dept.family]),
+  );
+  return [...managers, ...staff];
+}
+
+/** 12,000 fictional employees in 50 departments under 7 sectors. Deterministic for a seed. */
+export function buildPersonnel(rng: Rng, year: number, total = 12_000): PersonnelRow[] {
+  const counts = allocate(DEPARTMENTS.map((d) => d.weight), total);
+  const personnelNumbers = drawDistinct(rng, range(10_000, 99_999), total).map(String);
+  const seenGroups = new Set<string>();
+  const seenSectors = new Set<string>();
+  const rows: PersonnelRow[] = [];
+  const separationEnd = `${year}-11-06`;
+
+  DEPARTMENTS.forEach((dept, deptIndex) => {
+    const extraHeads: PositionSpec[] = [];
+    if (dept.name === "Office of the President") extraHeads.push({ ...MANAGER_TITLES.president, weight: 0 });
+    if (!seenSectors.has(dept.sector)) extraHeads.push({ ...MANAGER_TITLES.sectorHead, weight: 0 });
+    if (!seenGroups.has(dept.group)) extraHeads.push({ ...MANAGER_TITLES.groupHead, weight: 0 });
+    seenSectors.add(dept.sector);
+    seenGroups.add(dept.group);
+
+    const departmentEmail = `${slug(dept.name, "-")}@${EMAIL_DOMAIN}`;
+    let head = "";
+
+    for (const position of positionsFor(rng, dept, counts[deptIndex], extraHeads)) {
+      const index = rows.length;
+      const sex = rng.chance(0.57) ? "F" : "M";
+      const first = rng.pick(sex === "F" ? FEMALE_FIRST : MALE_FIRST);
+      const last = rng.pick(LAST_NAMES);
+      const name = `${first} ${rng.pick(LETTERS)}. ${last}`;
+      if (position.title === MANAGER_TITLES.departmentManager.title) head = name;
+
+      const { hire, canSeparate } = hireDate(rng, position.pg, year);
+      const separation =
+        canSeparate && rng.chance(0.07) ? randomDate(rng, `${year}-02-01`, separationEnd) : undefined;
       const typeRoll = rng.next();
-      roster.push({
-        employee_id: `EMP-${String(roster.length + 1).padStart(4, "0")}`,
-        name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
-        unit,
-        position: rng.pick(spec.positions),
-        employment_type: typeRoll < 0.75 ? "regular" : "contractual",
+      const employmentType: EmploymentType =
+        position.pg >= 13 || typeRoll < 0.8 ? "regular" : "contractual";
+
+      rows.push({
+        employee_id: employeeIdFor(index),
+        personnel_number: personnelNumbers[index],
+        name,
+        sex,
+        position: position.title,
+        pay_grade: `PG ${position.pg}`,
+        unit: dept.name,
+        group: dept.group,
+        sector: dept.sector,
+        region: dept.region,
+        employment_type: employmentType,
+        employment_status: separation ? "separated" : "active",
         hire_date: hire,
-        separation_date:
-          canSeparate && rng.chance(0.07)
-            ? randomDate(rng, `${year}-02-01`, `${year}-12-15`)
-            : undefined,
+        ...(separation ? { separation_date: separation } : {}),
         licensed: rng.chance(0.7) ? "yes" : "no",
-        pay_grade: payGradeFor(i),
-        group: UNIT_ORG[unit][0],
-        sector: UNIT_ORG[unit][1],
+        employee_email: `${slug(first, "")}.${slug(last, "")}.${personnelNumbers[index]}@${EMAIL_DOMAIN}`,
+        department_email: departmentEmail,
+        department_head: "", // filled below, once the department manager exists
       });
     }
-  }
-  return roster;
+    for (let i = rows.length - counts[deptIndex]; i < rows.length; i++) rows[i].department_head = head;
+  });
+
+  return rows; // already in Employee ID order: IDs were assigned in generation order
 }
+
+/** Engine-side risk factor for each department, used by the attendance builder. */
+export const departmentRisk = (unit: string): number =>
+  DEPARTMENTS.find((d) => d.name === unit)?.risk ?? 1;

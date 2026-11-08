@@ -140,7 +140,7 @@ describe("sample calendar", () => {
     if (!parsed.ok) return;
     const external = parsed.rows.filter((r) => r.delivery === "external").length;
     const inHouse = parsed.rows.filter((r) => r.delivery === "in_house").length;
-    expect([external, inHouse]).toEqual([12, 4]);
+    expect([external, inHouse]).toEqual([36, 12]);
     expect(external).toBe(inHouse * 3);
   });
 

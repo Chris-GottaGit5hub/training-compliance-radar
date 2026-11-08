@@ -177,6 +177,18 @@ export function validateCsv<K extends CsvKind>(
     });
   }
 
+  if (kind === "roster") {
+    const numbers = (rows as RosterRow[]).flatMap((r) => (r.personnel_number ? [r.personnel_number] : []));
+    const repeated = findDuplicates(numbers);
+    if (repeated.length > 0) {
+      globalErrors.push({
+        row: null,
+        field: "personnel_number",
+        message: `Duplicate personnel_number: ${listIds(repeated)}.`,
+      });
+    }
+  }
+
   const errors = [...globalErrors, ...rowErrors];
   if (errors.length > 0) return fail(errors);
 

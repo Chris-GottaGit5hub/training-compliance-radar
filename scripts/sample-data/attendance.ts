@@ -1,19 +1,21 @@
-import type { AttendanceRow, RosterRow } from "../../lib/schemas/rows";
-import { TRAINING_TITLES, UNITS } from "./people";
+import type { AttendanceRow } from "../../lib/schemas/rows";
+import { TRAINING_TITLES } from "./people";
 import { addDays, maxDate, minDate, randomDate, type Rng } from "./rng";
+import type { PersonnelRow } from "./roster";
 
-/** Base chance of being untrained at the Sep 30 checkpoint, scaled by each unit's risk factor. */
-const BASE_RISK = 0.18;
+/*
+ * Most covered staff train by Sep 30, a department-dependent share do not (the at-risk
+ * group), and some of those close the gap in Q4 for the back-test.
+ */
+const BASE_RISK = 0.17;
 const BOX_TICKING_CHANCE = 0.12;
 const Q4_CLOSE_CHANCE = 0.45;
 const PRIOR_YEAR_CHANCE = 0.15;
 
-function makeRow(
-  rng: Rng,
-  emp: RosterRow,
-  date: string,
-  forced?: Pick<AttendanceRow, "delivery" | "hours">,
-): AttendanceRow {
+type Person = Pick<PersonnelRow, "employee_id" | "unit" | "hire_date" | "separation_date" | "licensed">;
+type Forced = Pick<AttendanceRow, "delivery" | "hours">;
+
+function makeRow(rng: Rng, emp: Person, date: string, forced?: Forced): AttendanceRow {
   const roll = rng.next();
   const licensed = emp.licensed === "yes";
   const delivery =
@@ -29,12 +31,7 @@ function makeRow(
         ? rng.int(2, 12) / 2
         : rng.pick([8, 16, 24, 40]));
   const cost =
-    delivery === "elearning"
-      ? 0
-      : delivery === "classroom"
-        ? rng.int(30, 130) * 50
-        : rng.int(50, 300) * 100;
-
+    delivery === "elearning" ? 0 : delivery === "classroom" ? rng.int(30, 130) * 50 : rng.int(56, 336) * 100;
   return {
     employee_id: emp.employee_id,
     training_title: rng.pick(TRAINING_TITLES),
@@ -45,25 +42,30 @@ function makeRow(
   };
 }
 
-/**
- * Attendance for the whole year: most covered employees are trained by Sep 30,
- * a unit-dependent share is not (the at-risk group), and some of those close
- * the gap in Q4 so the back-test has something to measure.
- */
-export function buildAttendance(rng: Rng, roster: RosterRow[], year: number): AttendanceRow[] {
+export function buildAttendance(
+  rng: Rng,
+  people: readonly Person[],
+  year: number,
+  riskOf: (unit: string) => number,
+): AttendanceRow[] {
   const checkpoint = `${year}-09-30`;
   const q4Start = `${year}-10-01`;
   const lastDay = `${year}-12-20`;
   const rows: AttendanceRow[] = [];
+  const seen = new Set<string>();
 
-  for (const emp of roster) {
+  for (const emp of people) {
     const start = maxDate(emp.hire_date, `${year}-01-01`);
     const end = minDate(emp.separation_date ?? lastDay, lastDay);
-    const add = (date: string, forced?: Pick<AttendanceRow, "delivery" | "hours">) =>
-      rows.push(makeRow(rng, emp, date, forced));
+    const add = (date: string, forced?: Forced) => {
+      const row = makeRow(rng, emp, date, forced);
+      const key = `${row.employee_id}|${row.training_title}|${row.training_date}`;
+      if (seen.has(key)) return; // never write exact duplicates (the app would warn)
+      seen.add(key);
+      rows.push(row);
+    };
 
     if (emp.hire_date >= q4Start) {
-      // Late hire (exempt): occasionally trained shortly after joining.
       if (rng.chance(0.15)) add(randomDate(rng, emp.hire_date, minDate(addDays(emp.hire_date, 30), lastDay)));
       continue;
     }
@@ -71,7 +73,7 @@ export function buildAttendance(rng: Rng, roster: RosterRow[], year: number): At
     const separatedEarly = emp.separation_date !== undefined && emp.separation_date <= checkpoint;
     if (separatedEarly) {
       if (rng.chance(0.5)) add(randomDate(rng, start, end));
-    } else if (!rng.chance(BASE_RISK * UNITS[emp.unit].risk)) {
+    } else if (!rng.chance(BASE_RISK * riskOf(emp.unit))) {
       const roll = rng.next();
       const count = roll < 0.65 ? 1 : roll < 0.9 ? 2 : 3;
       for (let i = 0; i < count; i++) add(randomDate(rng, start, checkpoint));
@@ -83,10 +85,8 @@ export function buildAttendance(rng: Rng, roster: RosterRow[], year: number): At
     }
 
     if (emp.hire_date < `${year}-01-01` && rng.chance(PRIOR_YEAR_CHANCE)) {
-      const from = maxDate(emp.hire_date, `${year - 1}-01-01`);
-      add(randomDate(rng, from, `${year - 1}-12-31`));
+      add(randomDate(rng, maxDate(emp.hire_date, `${year - 1}-01-01`), `${year - 1}-12-31`));
     }
   }
-
   return rows;
 }

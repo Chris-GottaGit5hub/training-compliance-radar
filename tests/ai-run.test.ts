@@ -1,12 +1,14 @@
 import { APICallError } from "ai";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
 import { errorCode, formatAiLog, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
-import { runMemo, runRecommend, runSummary } from "@/lib/ai/run";
+import { REGENERATE_ONLY_BEFORE_MS, runMemo, runRecommend, runSummary } from "@/lib/ai/run";
 import type { MemoRequest, RecommendRequest, SummaryRequest } from "@/lib/schemas";
 
-const aiConfig: AiConfig = { provider: "google", modelId: "gemini-3.8-flash", apiKey: "test-key" };
+const aiConfig: AiConfig = { provider: "google", modelId: "gemini-3.8-flash", thinkingLevel: "low", apiKey: "test-key" };
+
+afterEach(() => vi.useRealTimers());
 
 /** Fake generator that returns queued outputs (or a failure) and counts calls. */
 function fakeGenerator(results: (unknown | "FAIL")[]) {
@@ -37,9 +39,20 @@ describe("resolveAiConfig", () => {
     const result = resolveAiConfig({ GOOGLE_GENERATIVE_AI_API_KEY: "k" });
     expect(result).toEqual({
       ok: true,
-      config: { provider: "google", modelId: "gemini-3.8-flash", apiKey: "k" },
+      config: { provider: "google", modelId: "gemini-3.8-flash", thinkingLevel: "low", apiKey: "k" },
     });
     expect(DEFAULT_MODELS.google).toBe("gemini-3.8-flash");
+  });
+
+  it("uses a low Gemini thinking level by default and accepts a valid override", () => {
+    const base = { GOOGLE_GENERATIVE_AI_API_KEY: "k" };
+    expect(resolveAiConfig({ ...base, AI_THINKING_LEVEL: " Minimal " })).toMatchObject({
+      ok: true,
+      config: { thinkingLevel: "minimal" },
+    });
+    expect(resolveAiConfig({ ...base, AI_THINKING_LEVEL: "banana" })).toMatchObject({
+      config: { thinkingLevel: "low" },
+    });
   });
 
   it("switches to anthropic with one env var and its own default model", () => {
@@ -76,7 +89,7 @@ describe("resolveAiConfig", () => {
     });
     expect(result).toEqual({
       ok: true,
-      config: { provider: "google", modelId: "gemini-3.8-flash", apiKey: "abc123" },
+      config: { provider: "google", modelId: "gemini-3.8-flash", thinkingLevel: "low", apiKey: "abc123" },
     });
   });
 });
@@ -144,6 +157,20 @@ describe("runMemo", () => {
     const { generate, calls } = fakeGenerator([bad, bad]);
     const result = await runMemo(memoRequest, aiConfig, generate);
     expect(calls()).toBe(2);
+    expect(result.ok && result.body.warning).toBe("unverified_numbers");
+  });
+
+  it("skips the regeneration when the first attempt was slow, returning a warning", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    let calls = 0;
+    const slowBad = (async () => {
+      calls++;
+      vi.setSystemTime(Date.now() + REGENERATE_ONLY_BEFORE_MS + 1_000); // the call "took" 16 s
+      return { ok: true, output: { ...goodMemo, body: `${goodMemo.body}
+47 staff left.` } };
+    }) as unknown as StructuredGenerator;
+    const result = await runMemo(memoRequest, aiConfig, slowBad);
+    expect(calls).toBe(1);
     expect(result.ok && result.body.warning).toBe("unverified_numbers");
   });
 

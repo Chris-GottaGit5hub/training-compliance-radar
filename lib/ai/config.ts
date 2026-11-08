@@ -1,8 +1,14 @@
 export type AiProvider = "google" | "anthropic";
 
+export type ThinkingLevel = "minimal" | "low" | "medium" | "high";
+const THINKING_LEVELS: readonly string[] = ["minimal", "low", "medium", "high"];
+export const DEFAULT_THINKING_LEVEL: ThinkingLevel = "low";
+
 export interface AiConfig {
   provider: AiProvider;
   modelId: string;
+  /** Gemini only: how much the model reasons before answering. Lower is faster. */
+  thinkingLevel: ThinkingLevel;
   /** Never log or return this. */
   apiKey: string;
 }
@@ -43,9 +49,15 @@ export function resolveAiConfig(env: Record<string, string | undefined>): AiConf
   const keyVar = KEY_VARS[provider];
   const apiKey = clean(env[keyVar]);
   if (!apiKey) return { ok: false, reason: "missing_key", keyVar };
+  const level = clean(env.AI_THINKING_LEVEL).toLowerCase();
   return {
     ok: true,
-    config: { provider, modelId: clean(env.AI_MODEL) || DEFAULT_MODELS[provider], apiKey },
+    config: {
+      provider,
+      modelId: clean(env.AI_MODEL) || DEFAULT_MODELS[provider],
+      thinkingLevel: THINKING_LEVELS.includes(level) ? (level as ThinkingLevel) : DEFAULT_THINKING_LEVEL,
+      apiKey,
+    },
   };
 }
 

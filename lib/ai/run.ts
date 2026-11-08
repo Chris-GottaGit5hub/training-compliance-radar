@@ -27,6 +27,8 @@ import {
 export type RunResult<T> = { ok: true; body: T } | { ok: false; code?: string };
 
 const MAX_ATTEMPTS = 2; // spec §5: regenerate once if numbers do not match the request
+/** Skip the regeneration if the first attempt was this slow, so the route stays under maxDuration. */
+export const REGENERATE_ONLY_BEFORE_MS = 15_000;
 
 export async function runRecommend(
   request: RecommendRequest,
@@ -50,8 +52,10 @@ async function generateGrounded<T extends { warning?: "unverified_numbers" }>(
   attempt: () => Promise<{ ok: true; value: T; text: string } | { ok: false; code?: string }>,
   request: unknown,
 ): Promise<RunResult<T>> {
+  const started = Date.now();
   let last: { value: T; text: string } | null = null;
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    if (i > 0 && Date.now() - started > REGENERATE_ONLY_BEFORE_MS) break;
     const result = await attempt();
     if (!result.ok) return { ok: false, code: result.code };
     last = result;

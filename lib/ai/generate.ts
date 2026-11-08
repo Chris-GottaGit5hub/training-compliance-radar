@@ -4,7 +4,8 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { z } from "zod";
 import type { AiConfig } from "./config";
 
-export const AI_TIMEOUT_MS = 25_000;
+/** Whole-call deadline (retries included). Must stay well under the routes' 60 s maxDuration. */
+export const AI_TIMEOUT_MS = 40_000;
 
 export type StructuredResult<T> = { ok: true; output: T } | { ok: false; code: string };
 
@@ -67,16 +68,31 @@ export const generateStructured: StructuredGenerator = async (call) => {
       }),
     );
 
-  try {
-    const result = await generateText({
+  const signal = AbortSignal.timeout(AI_TIMEOUT_MS);
+  const attempt = (withThinking: boolean) =>
+    generateText({
       model: getModel(call.config),
       instructions: call.instructions,
       prompt: call.prompt,
       output: Output.object({ schema: call.schema }),
       temperature: 0.3,
       maxRetries: 1,
-      abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS),
+      abortSignal: signal,
+      // Gemini 3 reasons by default, which made long outputs (memos) time out.
+      ...(withThinking && call.config.provider === "google"
+        ? { providerOptions: { google: { thinkingConfig: { thinkingLevel: call.config.thinkingLevel } } } }
+        : {}),
     });
+
+  try {
+    let result;
+    try {
+      result = await attempt(true);
+    } catch (error) {
+      // If the provider rejects the thinking setting, retry once without it.
+      if (call.config.provider !== "google" || errorCode(error) !== "http_400") throw error;
+      result = await attempt(false);
+    }
     log("ok");
     return { ok: true, output: result.output as z.infer<typeof call.schema> };
   } catch (error) {

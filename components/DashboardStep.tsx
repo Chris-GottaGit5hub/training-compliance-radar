@@ -1,6 +1,7 @@
 import { atRiskEmployees, buildAtRiskCsv, exportFileName } from "@/lib/analysis";
 import { BacktestCard } from "./BacktestCard";
 import { BreakdownPanel } from "./BreakdownPanel";
+import { BudgetPanel } from "./BudgetPanel";
 import { KpiCards } from "./KpiCards";
 import { MilestoneCard } from "./MilestoneCard";
 import { UnitChart } from "./UnitChart";
@@ -57,6 +58,15 @@ export function DashboardStep({ state }: { state: RadarState }) {
           title="Dashboard"
           description="Trained vs untrained as of the chosen date, against your targets, ranked by risk."
         />
+        {analysis && (
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className={`${buttonClass("secondary")} mb-3 print:hidden`}
+          >
+            Print report
+          </button>
+        )}
         {!ready && (
           <p className="text-sm text-slate-500">
             Load roster and attendance in step 1 to see the dashboard.
@@ -70,6 +80,14 @@ export function DashboardStep({ state }: { state: RadarState }) {
           <div className="mt-4 space-y-6" aria-live="polite">
             <KpiCards analysis={analysis} config={config} hasCatalog={catalog !== null} />
             <MilestoneCard milestones={analysis.milestones} />
+            {config.budgetPhp > 0 ? (
+              <BudgetPanel report={analysis.budget} hasPlan={false} />
+            ) : (
+              <Banner tone="info">
+                Set the annual training budget in Rules to see the burn-down report: money spent,
+                remaining, and people trained through the year.
+              </Banner>
+            )}
             <UnitChart
               units={analysis.org.unitsRanked}
               selectedUnit={selectedUnit}

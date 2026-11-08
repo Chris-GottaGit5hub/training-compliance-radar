@@ -8,9 +8,12 @@ export function dataYear(roster: readonly RosterRow[]): number | null {
   return latest === "" ? null : Number(latest.slice(0, 4));
 }
 
+/** Annual allocation preset for the sample data, so the burn-down report has something to show. */
+export const SAMPLE_BUDGET_PHP = 2_500_000;
+
 /**
- * Default rules: sample data starts as of Sep 30 of the data year; uploaded
- * data uses today's date (Asia/Manila) per spec §2.4.
+ * Default rules: sample data starts as of Sep 30 of the data year with a preset
+ * annual budget; uploaded data uses today's date (Asia/Manila) and no budget per spec §2.4.
  */
 export function initialConfigFor(
   source: "sample" | "upload",
@@ -19,7 +22,7 @@ export function initialConfigFor(
 ): RulesConfig {
   const year = dataYear(roster);
   return source === "sample" && year !== null
-    ? defaultRulesConfig(`${year}-09-30`)
+    ? { ...defaultRulesConfig(`${year}-09-30`), budgetPhp: SAMPLE_BUDGET_PHP }
     : defaultRulesConfig(today);
 }
 

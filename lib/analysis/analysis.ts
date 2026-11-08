@@ -12,6 +12,7 @@ import {
   type OrgSummary,
 } from "@/lib/engine";
 import type { RulesConfig } from "@/lib/schemas/config";
+import { budgetSeries, type BudgetReport } from "./budget";
 import type { AttendanceRow, CatalogRow, RosterRow } from "@/lib/schemas/rows";
 
 export interface AnalysisInput {
@@ -36,6 +37,8 @@ export interface Analysis {
   backtests: BacktestCheckpoint[];
   /** Trained vs untrained against the four target dates (spec §4.5). */
   milestones: MilestoneResult[];
+  /** Annual allocation burn-down (spec §4.7). */
+  budget: BudgetReport;
   warnings: EngineWarnings;
 }
 
@@ -66,6 +69,7 @@ export function runAnalysis({ roster, attendance, catalog, config }: AnalysisInp
       return { label, checkpoint, result: backtest(roster, attendance, config, checkpoint) };
     }),
     milestones: evaluateMilestones(roster, attendance, config, results),
+    budget: budgetSeries(roster, attendance, config, results),
     warnings,
   };
 }

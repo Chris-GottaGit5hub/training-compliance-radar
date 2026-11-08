@@ -38,24 +38,36 @@ export function RadarApp() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header
-        canSummarize={analysis !== null}
-        loading={ai.summaryState.status === "loading"}
-        onSummary={ai.summary}
-      />
+      <div className="print:hidden">
+        <Header
+          canSummarize={analysis !== null}
+          loading={ai.summaryState.status === "loading"}
+          onSummary={ai.summary}
+        />
+      </div>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
-        <Stepper steps={steps} />
+        <div className="print:hidden">
+          <Stepper steps={steps} />
+        </div>
         <div className="space-y-6">
-          <DataStep state={state} />
-          <RulesStep state={state} />
+          <div className="print:hidden">
+            <DataStep state={state} />
+          </div>
+          <div className="print:hidden">
+            <RulesStep state={state} />
+          </div>
           <DashboardStep state={state} />
           {ai.summaryState.status !== "idle" && config && analysis && (
             <SummaryCard ai={ai} analysis={analysis} config={config} />
           )}
-          <UnitPanel state={state} ai={ai} />
+          <div className="print:hidden">
+            <UnitPanel state={state} ai={ai} />
+          </div>
         </div>
       </main>
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
     </div>
   );
 }

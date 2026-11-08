@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { budgetSeries, buildCommitments, resolveRun, runAnalysis, runCost } from "@/lib/analysis";
+import { SAMPLE_BUDGET_PHP, budgetSeries, buildCommitments, resolveRun, runAnalysis, runCost } from "@/lib/analysis";
 import { validateCsv, defaultRulesConfig, type CalendarRow } from "@/lib/schemas";
 import { att, config, course, emp } from "./helpers/fixtures";
 
@@ -151,13 +151,13 @@ describe("sample calendar", () => {
     expect(itil.every((r) => r.cost_per_head === 18_000)).toBe(true);
   });
 
-  it("leaves a realistic balance of under 10% of the allocation with the sample preset", () => {
+  it("leaves a realistic balance of under 8% of the allocation with the sample preset", () => {
     const get = (k: "roster" | "attendance" | "catalog" | "calendar") => {
       const r = validateCsv(k, read(k));
       if (!r.ok) throw new Error(`${k} invalid`);
       return r.rows as never[];
     };
-    const cfg = { ...defaultRulesConfig("2026-09-30"), budgetPhp: 2_500_000 };
+    const cfg = { ...defaultRulesConfig("2026-09-30"), budgetPhp: SAMPLE_BUDGET_PHP };
     const a = runAnalysis({
       roster: get("roster"),
       attendance: get("attendance"),
@@ -166,6 +166,6 @@ describe("sample calendar", () => {
       config: cfg,
     });
     expect(a.outlook.projectedPct).toBeGreaterThan(0);
-    expect(a.outlook.projectedPct).toBeLessThan(10);
+    expect(a.outlook.projectedPct).toBeLessThan(8);
   });
 });

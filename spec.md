@@ -167,7 +167,7 @@ Allocation = `budgetPhp`. `budgetSeries(roster, attendance, config)` returns, fo
   2. *Nominations*: `nominationReservePhp`; when blank, the estimate is `external attendance cost to date ÷ as-of month × months left` (a deliberately cautious run-rate; replace it with your own figure).
   3. *Paid LinkedIn fees*: the plan's LinkedIn cost (§4.9), only when a calendar is loaded.
   Each is placed in its own month (nominations spread over the remaining months; LinkedIn fees on Nov 30; anything dated at or before the as-of month goes to the next month), and the sum is `planned` on the burn-down line.
-- **Projected year-end balance** = `budgetPhp − spent − commitments − (costToClose only when it is the catalog estimate, i.e. no calendar)`, also shown as a share of the allocation. In practice a little under 10% of the allocation is left unspent, which is what a realistic balance looks like.
+- **Projected year-end balance** = `budgetPhp − spent − commitments − (costToClose only when it is the catalog estimate, i.e. no calendar)`, also shown as a share of the allocation. In practice less than 8% to 10% of the whole annual allocation (₱100M in a real year) is left unspent, which is what a realistic balance looks like; the sample preset (₱2,450,000) is set so that under 8% is left.
 
 ### 4.8 Recommended-course windows (sector schedule)
 A catalog course with `recommended = yes` (e.g. AMLA) runs **once a year** in one window per sector, spread across the year so LinkedIn is never loaded by everyone at once. Someone who misses their window cannot take it again that year; one completion is also one qualifying training (§4 rule 5), so it can close compliance.

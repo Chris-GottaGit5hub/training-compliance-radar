@@ -9,7 +9,7 @@ export function dataYear(roster: readonly RosterRow[]): number | null {
 }
 
 /** Annual allocation preset for the sample data, so the burn-down report has something to show. */
-export const SAMPLE_BUDGET_PHP = 2_500_000;
+export const SAMPLE_BUDGET_PHP = 2_450_000;
 
 /**
  * Default rules: sample data starts as of Sep 30 of the data year with a preset

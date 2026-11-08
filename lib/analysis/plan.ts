@@ -1,10 +1,12 @@
 import { MILESTONE_POINTS, qualifyingCourses, type EmployeeResult } from "@/lib/engine";
 import type { RulesConfig } from "@/lib/schemas/config";
 import type { CalendarRow, CatalogRow, RosterRow } from "@/lib/schemas/rows";
+import { resolveRun, runCost } from "./costing";
 import type { ScheduleScheme, SectorWindow } from "./windows";
 
 export interface PlanRun {
   runId: string;
+  title?: string;
   date: string;
   delivery: CalendarRow["delivery"];
   participants: number;
@@ -86,12 +88,22 @@ export function buildPlan(
 
   // Cheapest first: runs with the lowest per-head cost when full, then date. A run is held only
   // if it takes at least min_pax people and costs less than paying the LinkedIn fee for them.
-  const fullPerHead = (r: CalendarRow) => (r.cost_per_run ?? 0) / r.max_pax + r.cost_per_head;
+  const fullPerHead = (r: CalendarRow) => {
+    const c = resolveRun(r);
+    return c.perRun / r.max_pax + c.perHead;
+  };
   const decided = new Map<string, PlanRun>();
   for (const run of [...upcoming].sort((a, b) => fullPerHead(a) - fullPerHead(b) || byDateThenId(a, b))) {
-    const base = { runId: run.run_id, date: run.date, delivery: run.delivery, participants: 0, cost: 0 };
+    const base = {
+      runId: run.run_id,
+      title: run.run_title,
+      date: run.date,
+      delivery: run.delivery,
+      participants: 0,
+      cost: 0,
+    };
     const take = Math.min(run.max_pax, pool.length);
-    const cost = round2((run.cost_per_run ?? 0) + run.cost_per_head * take);
+    const cost = runCost(resolveRun(run), take);
     if (run.date > cutoff) {
       decided.set(run.run_id, { ...base, state: "cancelled", reason: "after the Dec 14 in-person cutoff" });
     } else if (take < run.min_pax) {

@@ -120,7 +120,7 @@ export function validateCsv<K extends CsvKind>(
 
   const headers = table[0].map((h) => h.trim().toLowerCase());
   const missing = spec.columns.filter(
-    (c) => !OPTIONAL_COLUMNS.includes(c) && !headers.includes(c),
+    (c) => !OPTIONAL_COLUMNS[kind].includes(c) && !headers.includes(c),
   );
   if (missing.length > 0) {
     return fail([

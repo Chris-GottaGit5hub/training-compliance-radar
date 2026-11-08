@@ -40,6 +40,72 @@ export function NumberField({
   );
 }
 
+/** Annual platform subscriptions and the expected external nominations (spec §2.4). */
+export function BudgetItemFields({
+  subscriptions,
+  reserve,
+  subscriptionsError,
+  reserveError,
+  onSubscriptions,
+  onReserve,
+}: {
+  subscriptions: { name: string; amountPhp: number }[];
+  reserve: number | undefined;
+  subscriptionsError?: string;
+  reserveError?: string;
+  onSubscriptions: (value: { name: string; amountPhp: number }[]) => void;
+  onReserve: (value: number | undefined) => void;
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-1 text-sm font-medium text-slate-800">Other budget items (₱ per year)</legend>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {subscriptions.map((s, i) => (
+          <label key={s.name} className="text-xs text-slate-600">
+            {s.name}
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step={500}
+              value={Number.isNaN(s.amountPhp) ? "" : s.amountPhp}
+              onChange={(event) =>
+                onSubscriptions(
+                  subscriptions.map((x, j) =>
+                    j === i ? { ...x, amountPhp: event.target.value === "" ? Number.NaN : Number(event.target.value) } : x,
+                  ),
+                )
+              }
+              className={`${inputClass} mt-1`}
+            />
+          </label>
+        ))}
+        <label className="text-xs text-slate-600">
+          External nominations (₱)
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step={1000}
+            placeholder="estimate"
+            value={reserve ?? ""}
+            aria-invalid={reserveError ? true : undefined}
+            onChange={(event) => onReserve(event.target.value === "" ? undefined : Number(event.target.value))}
+            className={`${inputClass} mt-1`}
+          />
+        </label>
+      </div>
+      <p className="mt-1 text-xs text-slate-500">
+        Subscriptions are estimates billed in January. Nominations are external trainings people choose
+        that are not in the calendar; leave blank to estimate from this year&apos;s external attendance.
+      </p>
+      {(subscriptionsError || reserveError) && (
+        <p className="mt-1 text-xs font-medium text-red-700">{subscriptionsError ?? reserveError}</p>
+      )}
+    </fieldset>
+  );
+}
+
 const TARGET_DATES = ["Mar 31", "Jun 30", "Sep 30", "Nov 30"] as const;
 
 export function TargetFields({

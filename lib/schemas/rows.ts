@@ -42,25 +42,28 @@ export const CATALOG_COLUMNS = [
 export const CALENDAR_COLUMNS = [
   "run_id",
   "course_id",
+  "run_title",
   "date",
   "delivery",
+  "hours",
+  "speakers",
   "cost_per_run",
   "cost_per_head",
   "min_pax",
   "max_pax",
+  "expected_pax",
 ] as const;
 
-/** Columns that may be absent from the header (their cells are optional). */
-export const OPTIONAL_COLUMNS: readonly string[] = [
-  "separation_date",
-  "url",
-  "cost_per_run",
-  "pay_grade",
-  "group",
-  "sector",
-  "unlicensed_fee",
-  "recommended",
-];
+/** Columns that may be absent from the header, per file (their cells are optional). */
+export const OPTIONAL_COLUMNS: Record<
+  "roster" | "attendance" | "catalog" | "calendar",
+  readonly string[]
+> = {
+  roster: ["separation_date", "pay_grade", "group", "sector"],
+  attendance: [],
+  catalog: ["url", "unlicensed_fee", "recommended"],
+  calendar: ["run_title", "hours", "speakers", "cost_per_run", "expected_pax"],
+};
 
 /** `8`, `PG8` and `PG 8` (any case) all mean pay grade 8; anything else is left for the schema to reject. */
 export function parsePayGrade(value: unknown): unknown {
@@ -162,23 +165,43 @@ export const catalogRowSchema = z.object({
   recommended: lowerEnum(["yes", "no"] as const).optional(),
 });
 
+const positiveNumber = z.preprocess(
+  toNumber,
+  number().positive("must be greater than 0").max(24, "must be 24 or less"),
+);
+const smallCount = z.preprocess(
+  toNumber,
+  number().int("must be a whole number").min(0, "must be 0 or more").max(20, "must be 20 or less"),
+);
+
 export const calendarRowSchema = z
   .object({
     run_id: text,
     course_id: text,
+    run_title: text.optional(),
     date: dateString,
     delivery: lowerEnum(RUN_DELIVERIES),
+    hours: positiveNumber.optional(),
+    speakers: smallCount.optional(),
     cost_per_run: nonNegative.optional(),
-    cost_per_head: nonNegative,
+    cost_per_head: nonNegative.optional(),
     min_pax: positiveInt,
     max_pax: positiveInt,
+    expected_pax: positiveInt.optional(),
   })
   .superRefine((run, ctx) => {
     if (run.max_pax < run.min_pax) {
       ctx.addIssue({ code: "custom", path: ["max_pax"], message: "must be at least min_pax" });
     }
-    if (run.delivery === "in_house" && run.cost_per_run === undefined) {
-      ctx.addIssue({ code: "custom", path: ["cost_per_run"], message: "is required for in_house runs" });
+    if (run.expected_pax !== undefined && (run.expected_pax < run.min_pax || run.expected_pax > run.max_pax)) {
+      ctx.addIssue({ code: "custom", path: ["expected_pax"], message: "must be between min_pax and max_pax" });
+    }
+    if (run.delivery === "external" && run.cost_per_head === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["cost_per_head"],
+        message: "is required for external trainings (the fee per participant)",
+      });
     }
   });
 

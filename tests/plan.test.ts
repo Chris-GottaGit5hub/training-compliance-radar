@@ -120,12 +120,14 @@ describe("buildPlan", () => {
 describe("calendar.csv", () => {
   const header = "run_id,course_id,date,delivery,cost_per_run,cost_per_head,min_pax,max_pax";
 
-  it("validates runs and requires cost_per_run for in-house", () => {
+  it("validates runs; in-house costs may be blank but an external fee is required", () => {
     const ok = validateCsv("calendar", `${header}\nR1,IH-1,2026-10-15,in_house,3000,0,5,8\nR2,EXT,2026-11-05,external,,6500,1,4`);
     expect(ok.ok).toBe(true);
-    const bad = validateCsv("calendar", `${header}\nR1,IH-1,2026-10-15,in_house,,0,5,8`);
-    expect(bad.ok).toBe(false);
-    if (!bad.ok) expect(bad.errors[0]).toMatchObject({ field: "cost_per_run" });
+    const blankInHouse = validateCsv("calendar", `${header}\nR1,IH-1,2026-10-15,in_house,,,5,8`);
+    expect(blankInHouse.ok).toBe(true);
+    const noFee = validateCsv("calendar", `${header}\nR2,EXT,2026-11-05,external,,,1,4`);
+    expect(noFee.ok).toBe(false);
+    if (!noFee.ok) expect(noFee.errors[0]).toMatchObject({ field: "cost_per_head" });
   });
 
   it("rejects max_pax below min_pax and duplicate run ids", () => {

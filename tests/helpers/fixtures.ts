@@ -18,6 +18,7 @@ export function config(overrides: Partial<RulesConfig> = {}): RulesConfig {
     elearningCounts: true,
     minHours: 1,
     budgetPhp: 0,
+    subscriptions: [],
     milestoneTargets: [25, 50, 85, 100],
     ...overrides,
   };

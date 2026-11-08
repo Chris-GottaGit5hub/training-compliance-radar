@@ -1,7 +1,7 @@
 import { dataYear, withYear } from "@/lib/analysis";
 import { EMPLOYMENT_TYPES, type EmploymentType, type RulesConfig } from "@/lib/schemas";
 import type { useRadarState } from "./useRadarState";
-import { DateField, NumberField, TargetFields } from "./RuleFields";
+import { BudgetItemFields, DateField, NumberField, TargetFields } from "./RuleFields";
 import { Banner, Card, StepHeading, buttonClass } from "./ui";
 
 type RadarState = ReturnType<typeof useRadarState>;
@@ -83,6 +83,15 @@ function RulesForm({
           onChange={(budgetPhp) => patch({ budgetPhp })}
         />
       </div>
+
+      <BudgetItemFields
+        subscriptions={config.subscriptions}
+        reserve={config.nominationReservePhp}
+        subscriptionsError={errors.subscriptions}
+        reserveError={errors.nominationReservePhp}
+        onSubscriptions={(subscriptions) => patch({ subscriptions })}
+        onReserve={(nominationReservePhp) => patch({ nominationReservePhp })}
+      />
 
       <TargetFields
         targets={config.milestoneTargets}

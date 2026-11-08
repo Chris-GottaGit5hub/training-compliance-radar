@@ -44,8 +44,8 @@ export function BudgetPanel({ report, hasPlan }: { report: BudgetReport; hasPlan
       <h3 className="font-semibold text-slate-900">Budget burn-down</h3>
       <p className="mb-2 text-sm text-slate-600">
         The annual allocation shrinks as attendance costs are spent. Every route counts: LinkedIn fees
-        for unlicensed staff, in-house runs and external courses, and contractual staff who attend even
-        though they are never at risk.
+        for unlicensed staff, in-house runs, external courses, subscriptions, and contractual staff who
+        attend even though they are never at risk. The dashed line adds what is already promised.
       </p>
       <dl className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-5">
         <Tile label="Annual allocation">{formatPeso(allocation)}</Tile>

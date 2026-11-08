@@ -30,7 +30,8 @@ describe("default rules: only regular staff are at risk", () => {
   });
 
   it("still counts the cost of a contractual employee who attended", () => {
-    expect(budgetSeries(roster, attendance, cfg).spent).toBe(2400);
+    // 900 + 1,500 attended, plus the January subscriptions of the default rules (94,000).
+    expect(budgetSeries(roster, attendance, cfg).spent).toBe(2400 + 94_000);
   });
 });
 

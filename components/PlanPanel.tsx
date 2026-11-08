@@ -64,7 +64,7 @@ export function PlanPanel({ analysis, config }: { analysis: Analysis; config: Ru
               {plan.runs.map((r) => (
                 <tr key={r.runId}>
                   <th scope="row" className="px-3 py-2 text-left font-medium text-slate-900">
-                    {r.runId} · {r.date}
+                    {r.title ?? r.runId} · {r.date}
                     <span className={`block text-xs font-normal ${r.state === "held" ? "text-emerald-700" : "text-amber-700"}`}>
                       {DELIVERY[r.delivery]} · {r.state === "held" ? "runs" : `cancelled: ${r.reason}`}
                     </span>

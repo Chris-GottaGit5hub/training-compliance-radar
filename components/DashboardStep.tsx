@@ -1,6 +1,7 @@
 import { atRiskEmployees, buildAtRiskCsv, exportFileName } from "@/lib/analysis";
 import { BacktestCard } from "./BacktestCard";
 import { BreakdownPanel } from "./BreakdownPanel";
+import { BudgetBreakdown } from "./BudgetBreakdown";
 import { BudgetPanel } from "./BudgetPanel";
 import { KpiCards } from "./KpiCards";
 import { MilestoneCard } from "./MilestoneCard";
@@ -86,7 +87,10 @@ export function DashboardStep({ state }: { state: RadarState }) {
             <KpiCards analysis={analysis} config={config} hasCatalog={catalog !== null} />
             <MilestoneCard milestones={analysis.milestones} />
             {config.budgetPhp > 0 ? (
-              <BudgetPanel report={analysis.budget} hasPlan={analysis.plan !== null} />
+              <>
+                <BudgetPanel report={analysis.budget} hasPlan={analysis.outlook.commitments.total > 0} />
+                <BudgetBreakdown analysis={analysis} config={config} />
+              </>
             ) : (
               <Banner tone="info">
                 Set the annual training budget in Rules to see the burn-down report: money spent,

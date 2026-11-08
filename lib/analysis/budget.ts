@@ -27,6 +27,8 @@ export interface BudgetReport {
   trained: number;
   /** spent / trained, or null when no one is trained yet. */
   costPerTrained: number | null;
+  /** Annual subscriptions, billed in January and already inside `spent`. */
+  subscriptions: number;
   months: BudgetMonth[];
 }
 
@@ -70,6 +72,8 @@ export function budgetSeries(
 ): BudgetReport {
   const now = current ?? evaluateRoster(roster, attendance, config).results;
   const perMonth = monthlySpend(roster, attendance, config);
+  const subscriptions = round2(config.subscriptions.reduce((sum, s) => sum + s.amountPhp, 0));
+  perMonth[0] += subscriptions; // billed in January, so spent from the start of the year
   const asOfMonth = Number(config.asOfDate.slice(5, 7));
   const allocation = config.budgetPhp;
 
@@ -108,6 +112,7 @@ export function budgetSeries(
     percentSpent: allocation > 0 ? Math.round((cumulative * 1000) / allocation) / 10 : 0,
     trained,
     costPerTrained: trained > 0 ? round2(cumulative / trained) : null,
+    subscriptions,
     months,
   };
 }

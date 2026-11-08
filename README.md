@@ -28,6 +28,7 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 - **Training targets**: 25/50/85/100% of in-scope staff trained by Mar 31, Jun 30, Sep 30 and Nov 30 (editable), shown as met, missed or upcoming with the people still needed.
 - **Slicers**: trained vs untrained by pay-grade band (Rank and File, Officers, Senior Officers), pay grade, department, group and sector, alone or combined (optional roster columns `pay_grade`, `group`, `sector`).
 - **Budget burn-down**: the annual allocation against money spent by month, people trained, and spend per trained person, with charts and a Print report button.
+- **Realistic balance**: spend so far plus everything already promised, namely every calendar run still to come (in-house runs priced from speaker honoraria and snacks, external trainings at their fee per participant, external : in-house 3 : 1), expected external nominations outside the calendar, and annual subscriptions (Mentimeter, Kahoot!, Canva, Adobe), giving a projected year-end balance. Subscriptions and nominations are editable in Rules.
 - **Recommended-course windows and a plan** (optional catalog flag `recommended` and `calendar.csv`): one staggered monthly window per sector for the annual course (e.g. AMLA), who completed or missed it, and a deterministic plan for the rest: licensed staff on LinkedIn at no extra cost, unlicensed staff in calendar runs above their minimum size or on the paid LinkedIn fee, no in-person runs after Dec 14.
 - **Back-test card**: recall and precision at Jun 30 and Sep 30.
 - **Unit panel**: at-risk employees, CSV export, AI-drafted memo, catalog-grounded course recommendations.
@@ -139,7 +140,7 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 | AI agent rules and project conventions | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md), [`.cursorrules`](.cursorrules) |
 | Working app on the recommended stack (Next.js, TypeScript, Tailwind, Vercel AI SDK) | `app/`, `components/`, `lib/` |
 | Deployed and publicly reachable | https://training-compliance-radar.vercel.app |
-| Core logic is deterministic and tested | `lib/engine/`, `tests/` (309 tests) |
+| Core logic is deterministic and tested | `lib/engine/`, `tests/` (324 tests) |
 | AI features with structured output and grounding | `app/api/*`, `lib/ai/`, `lib/payload/` |
 | Data privacy handled (aggregates only, local name merge) | [Privacy](#privacy-and-data-handling), `lib/payload/`, `tests/payload.test.ts` |
 | Security basics (validation, size limits, rate limit, no secrets in git) | `lib/api/`, `.env.example`, gitleaks in CI |

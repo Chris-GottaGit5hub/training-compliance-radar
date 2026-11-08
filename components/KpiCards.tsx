@@ -16,7 +16,7 @@ function Kpi({ label, value, children }: { label: string; value: ReactNode; chil
 
 /** The annual allocation still unspent (spec §4.7), and what is left after closing the gap. */
 function BalanceKpi({ analysis, config }: Props) {
-  const { budget, cost } = analysis;
+  const { budget, outlook } = analysis;
   if (config.budgetPhp <= 0) {
     return (
       <Kpi label="Outstanding balance" value="—">
@@ -30,13 +30,14 @@ function BalanceKpi({ analysis, config }: Props) {
       value={<span className={budget.remaining < 0 ? "text-red-700" : ""}>{formatPeso(budget.remaining)}</span>}
     >
       {formatPercent(budget.percentSpent)} of {formatPeso(budget.allocation)} spent
-      {cost && (
-        <span className={`mt-1 block ${cost.remaining < 0 ? "font-medium text-red-700" : "text-emerald-700"}`}>
-          {cost.remaining < 0
-            ? `Short by ${formatPeso(-cost.remaining)} after closing the gap`
-            : `${formatPeso(cost.remaining)} left after closing the gap`}
-        </span>
-      )}
+      <span
+        className={`mt-1 block ${outlook.projectedBalance < 0 ? "font-medium text-red-700" : "text-emerald-700"}`}
+      >
+        {outlook.projectedBalance < 0
+          ? `Short by ${formatPeso(-outlook.projectedBalance)} by year end`
+          : `${formatPeso(outlook.projectedBalance)} (${formatPercent(outlook.projectedPct)}) left by year end`}
+        , after promised runs, nominations and subscriptions
+      </span>
     </Kpi>
   );
 }

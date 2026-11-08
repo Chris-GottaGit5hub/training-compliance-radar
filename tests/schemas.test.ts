@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_SUBSCRIPTIONS,
   defaultRulesConfig,
   isRealDate,
   isWithinYear,
@@ -65,6 +66,7 @@ describe("defaultRulesConfig", () => {
       elearningCounts: true,
       minHours: 1,
       budgetPhp: 0,
+      subscriptions: DEFAULT_SUBSCRIPTIONS,
       milestoneTargets: [25, 50, 85, 100],
     });
     expect(rulesConfigSchema.safeParse(defaults).success).toBe(true);

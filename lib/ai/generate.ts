@@ -1,8 +1,9 @@
-import { APICallError, Output, RetryError, generateText } from "ai";
+import { APICallError, Output, RetryError, generateText, type JSONValue } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
 import type { z } from "zod";
-import type { AiConfig } from "./config";
+import { targetKey, type AiConfig, type ModelTarget } from "./config";
 
 /** Whole-call deadline (retries included). Must stay well under the routes' 60 s maxDuration. */
 export const AI_TIMEOUT_MS = 40_000;
@@ -22,10 +23,15 @@ export type StructuredGenerator = <S extends z.ZodType>(
   call: StructuredCall<S>,
 ) => Promise<StructuredResult<z.infer<S>>>;
 
-function getModel(config: AiConfig) {
-  return config.provider === "google"
-    ? createGoogleGenerativeAI({ apiKey: config.apiKey })(config.modelId)
-    : createAnthropic({ apiKey: config.apiKey })(config.modelId);
+function getModel(target: ModelTarget) {
+  switch (target.provider) {
+    case "google":
+      return createGoogleGenerativeAI({ apiKey: target.apiKey })(target.modelId);
+    case "groq":
+      return createGroq({ apiKey: target.apiKey })(target.modelId);
+    case "anthropic":
+      return createAnthropic({ apiKey: target.apiKey })(target.modelId);
+  }
 }
 
 /** A short code only: provider error messages can echo the prompt, so they are never kept. */
@@ -62,11 +68,14 @@ export function formatAiLog(entry: {
   );
 }
 
-/** Errors worth a second model: overload, rate limits, server errors, slowness. */
+/**
+ * Errors worth the next model: overload, rate limits, server errors, slowness, a retired or
+ * unknown model (404), and output that did not match the schema.
+ */
 export const shouldTryFallback = (code: string): boolean =>
-  /^(http_5\d\d|http_429|timeout)/.test(code);
+  /^(http_5\d\d|http_429|http_404|timeout|invalid_output)/.test(code);
 
-/** How long the primary model gets before the fallback is tried. */
+/** How long each model except the last gets before the next one is tried. */
 export const PRIMARY_TIMEOUT_MS = 15_000;
 
 /** After a model fails with an overload-type error, skip it for this long. */
@@ -96,9 +105,9 @@ const sharedCooldown = (): ModelCooldown => {
 };
 
 /**
- * Runs `run` on each model in turn. A model that fails with an overload-type error or a
- * timeout hands over to the next one; other errors (bad request, bad key) stop right away
- * because another model would fail the same way. All models share one overall deadline.
+ * Runs `run` on each model in turn. A model that fails with an overload-type error, a
+ * timeout, a 404 or invalid output hands over to the next one; other errors (bad request,
+ * bad key) stop unless `canHandOver` allows them. All models share one overall deadline.
  */
 export async function withModelFallback<T>(
   models: readonly string[],
@@ -109,8 +118,11 @@ export async function withModelFallback<T>(
     log: (modelId: string, status: "ok" | "error", latencyMs: number, code?: string) => void;
     /** Optional: models that recently failed are skipped (the last model is always tried). */
     cooldown?: ModelCooldown;
+    /** Whether model `index` may hand over to the next after `code`. Default: shouldTryFallback. */
+    canHandOver?: (code: string, index: number) => boolean;
   },
 ): Promise<{ ok: true; value: T } | { ok: false; code: string }> {
+  const handOver = options.canHandOver ?? shouldTryFallback;
   const overall = AbortSignal.timeout(options.totalMs);
   let lastCode = "unknown";
 
@@ -126,58 +138,79 @@ export async function withModelFallback<T>(
     } catch (error) {
       lastCode = errorCode(error);
       options.log(models[i], "error", Date.now() - started, lastCode);
-      if (isLast || overall.aborted || !shouldTryFallback(lastCode)) break;
+      if (isLast || overall.aborted || !handOver(lastCode, i)) break;
       options.cooldown?.trip(models[i]);
     }
   }
   return { ok: false, code: lastCode };
 }
 
+/** Provider options that keep reasoning short (Gemini 3 and gpt-oss reason by default). */
+function reasoningOptions(
+  target: ModelTarget,
+  config: AiConfig,
+): Record<string, Record<string, JSONValue>> | undefined {
+  if (target.provider === "google") {
+    return { google: { thinkingConfig: { thinkingLevel: config.thinkingLevel } } };
+  }
+  if (target.provider === "groq") return { groq: { reasoningEffort: "low" } };
+  return undefined;
+}
+
+/** A bad request or key on one provider says nothing about the next provider. */
+export function chainCanHandOver(targets: readonly Pick<ModelTarget, "provider">[]) {
+  return (code: string, i: number): boolean =>
+    shouldTryFallback(code) ||
+    (/^http_40[013]$/.test(code) &&
+      targets[i + 1] !== undefined &&
+      targets[i + 1].provider !== targets[i].provider);
+}
+
 /**
  * Structured output via generateText + Output.object, temperature 0.3, one SDK retry, a 40 s
- * overall deadline, Gemini thinking kept low, and a same-provider fallback model.
+ * overall deadline, short reasoning, and the configured chain of backup models (spec §5).
  */
 export const generateStructured: StructuredGenerator = async (call) => {
-  const thinking = call.config.thinkingLevel;
-  const models = [
-    call.config.modelId,
-    ...(call.config.fallbackModelId ? [call.config.fallbackModelId] : []),
-  ];
+  const targets: ModelTarget[] = [call.config, ...(call.config.backups ?? [])];
+  const byKey = new Map(targets.map((t) => [targetKey(t), t]));
 
-  const attempt = (modelId: string, signal: AbortSignal, withThinking: boolean) =>
-    generateText({
-      model: getModel({ ...call.config, modelId }),
+  const attempt = (target: ModelTarget, signal: AbortSignal, withReasoning: boolean) => {
+    const providerOptions = withReasoning ? reasoningOptions(target, call.config) : undefined;
+    return generateText({
+      model: getModel(target),
       instructions: call.instructions,
       prompt: call.prompt,
       output: Output.object({ schema: call.schema }),
       temperature: 0.3,
       maxRetries: 1,
       abortSignal: signal,
-      // Gemini 3 reasons by default, which made long outputs (memos) slow.
-      ...(withThinking && call.config.provider === "google"
-        ? { providerOptions: { google: { thinkingConfig: { thinkingLevel: thinking } } } }
-        : {}),
+      ...(providerOptions ? { providerOptions } : {}),
     });
+  };
 
   const result = await withModelFallback(
-    models,
-    async (modelId, signal) => {
+    [...byKey.keys()],
+    async (key, signal) => {
+      const target = byKey.get(key)!;
       try {
-        return await attempt(modelId, signal, true);
+        return await attempt(target, signal, true);
       } catch (error) {
-        // If the provider rejects the thinking setting, retry once without it.
-        if (call.config.provider !== "google" || errorCode(error) !== "http_400") throw error;
-        return attempt(modelId, signal, false);
+        // If the provider rejects the reasoning setting, retry once without it.
+        if (!reasoningOptions(target, call.config) || errorCode(error) !== "http_400") throw error;
+        return attempt(target, signal, false);
       }
     },
     {
       cooldown: sharedCooldown(),
       totalMs: AI_TIMEOUT_MS,
       firstMs: PRIMARY_TIMEOUT_MS,
-      log: (model, status, latencyMs, code) =>
+      canHandOver: chainCanHandOver(targets),
+      log: (key, status, latencyMs, code) => {
+        const target = byKey.get(key)!;
         console.info(
-          formatAiLog({ route: call.route, provider: call.config.provider, model, latencyMs, status, code }),
-        ),
+          formatAiLog({ route: call.route, provider: target.provider, model: target.modelId, latencyMs, status, code }),
+        );
+      },
     },
   );
 

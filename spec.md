@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.8)
+# spec.md — Training Compliance Radar (v1.9)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -150,7 +150,8 @@ Client payload rules (enforced in `/lib/payload`, unit-tested):
 
 Prompting rules:
 - User-supplied strings (unit names, positions, course titles) are passed as a JSON data block; the system prompt states that this block is data, never instructions.
-- Provider call: `generateText` with `Output.object({ schema })` and the zod schema (the AI SDK v7 successor to the deprecated `generateObject`), temperature 0.3, a 40 s whole-call deadline (AbortSignal), Gemini `thinkingLevel` `low` by default (retried once without it if the provider rejects it), `maxRetries: 1`.
+- Provider call: `generateText` with `Output.object({ schema })` and the zod schema (the AI SDK v7 successor to the deprecated `generateObject`), temperature 0.3, a 40 s whole-call deadline (AbortSignal), Gemini `thinkingLevel` `low` by default and Groq `reasoningEffort` `low` (each retried once without the option if the provider rejects it with a 400), `maxRetries: 1`.
+- **Model chain:** the primary model, then each backup in order (§7). Every model except the last gets 15 s of the 40 s deadline. A model hands over to the next on 429, 5xx, timeout, 404 (retired or unknown model) or invalid output; a 400/401/403 hands over only when the next model is on a different provider (the same provider would fail the same way). A model that handed over is skipped for 5 minutes (per server instance), except the last one. Every provider receives the same aggregate-only request.
 
 Server post-processing:
 - `/api/recommend`: drop any `courseId` not in the submitted catalog and any unit not in the request; keep at most 3 IDs per unit. If a requested unit ends with zero valid IDs, return it with `fallbackSearch: true` and the client shows a LinkedIn Learning search link built from the unit's first top position (or the unit name if none).
@@ -161,22 +162,23 @@ Server post-processing:
 
 ## 6. UI
 Single page, 4 steps: **(1) Data** — upload 3 CSVs (catalog optional) or "Load sample data"; **(2) Rules** — settings form; **(3) Dashboard** — KPI cards (covered, compliance %, at-risk, months left, cost to close), units bar chart, ranked unit table; **(4) Unit panel** — at-risk employee list, recommended courses (with links), Generate memo, Copy, Export. Header button: **Executive summary**, which opens a card with the AI-written summary plus four charts drawn by the app from the engine's numbers (status breakdown, highest-risk units, back-test recall and precision at Jun 30 and Sep 30, and cost to close vs budget). The charts never depend on AI output and still show if the AI call fails. Footer: privacy note.
-States: loading spinners on AI buttons; error banners with retry; empty states. If an AI route fails (503, 502, 429, timeout), the UI shows the reason with a Retry button, and the memo and executive summary views also show a clearly labeled **template draft** built locally from the engine's numbers (no AI), so the user always gets usable text. AI buttons are never disabled permanently after a failure; the engine and dashboard keep working. Mobile-friendly layout.
+States: loading spinners on AI buttons; error banners with retry; empty states. If an AI route fails (503, 502, 429, timeout), the UI shows the reason with a Retry button, and the memo and executive summary views also show a clearly labeled **template draft** built locally from the engine's numbers (no AI), so the user always gets usable text. Recommend courses likewise shows clearly labeled **template picks**: for each unit, up to 3 courses from the qualifying catalog (§5 client payload rules) ranked by words shared between the unit's name and top positions and the course title and skill area, then lowest cost per head, then shortest duration, then course ID; the LinkedIn Learning search link when no course qualifies. A memo drafted after a failed Recommend uses the template picks. AI buttons are never disabled permanently after a failure; the engine and dashboard keep working. Mobile-friendly layout.
 
 ## 7. Constraints
-- Next.js (App Router) + TypeScript strict + Tailwind; Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/anthropic`); Vitest; Node LTS.
+- Next.js (App Router) + TypeScript strict + Tailwind; Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/anthropic`, `@ai-sdk/groq`); Vitest; Node LTS.
 - **AI provider configuration (env vars):**
 
   | Variable | Values | Default | Notes |
   |---|---|---|---|
-  | `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
-  | `AI_MODEL` | model ID | `gemini-3.8-flash` when `google`; `claude-haiku-5-5` when `anthropic` | Optional override |
+  | `AI_PROVIDER` | `google` \| `anthropic` \| `groq` | `google` | Selects the primary provider for all AI routes |
+  | `AI_MODEL` | model ID | `gemini-3.8-flash` when `google`; `claude-haiku-5-5` when `anthropic`; `openai/gpt-oss-120b` when `groq` | Optional override |
   | `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only; lower is faster |
-  | `AI_FALLBACK_MODEL` | model ID | `none` | `gemini-3.6-flash` when `google` | Same-provider backup model, tried when the primary returns 429/5xx or times out (primary gets 15 s of the 40 s deadline). Not a provider fallback |
-  | `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
-  | `ANTHROPIC_API_KEY` | secret | — | Required when `AI_PROVIDER=anthropic` |
+  | `AI_FALLBACK_MODEL` | comma-separated backups, each `model` (same provider as the primary) or `provider:model`; or `none` | `gemini-3.6-flash` when `google`; `google:gemini-3.6-flash,google:gemini-3.8-flash` when `groq`; none when `anthropic` | Backups tried in order (Model chain, §5), at most 3. Entries with an unknown provider or no key for their provider, duplicates and the primary itself are skipped |
+  | `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google`, or for a `google:` backup |
+  | `ANTHROPIC_API_KEY` | secret | — | Required when `AI_PROVIDER=anthropic`, or for an `anthropic:` backup |
+  | `GROQ_API_KEY` | secret | — | Required when `AI_PROVIDER=groq`, or for a `groq:` backup |
 
-  Switching to Anthropic = set `AI_PROVIDER=anthropic` (plus its key). There is no automatic runtime fallback between providers in v1. Unknown provider or missing key → AI routes return 503 `{ error: 'ai_not_configured' }`.
+  Switching provider = set `AI_PROVIDER` (plus its key). Backups may be on another provider when listed with a `provider:` prefix and that provider's key is set. Unknown primary provider or missing primary key → AI routes return 503 `{ error: 'ai_not_configured' }`. `GET /api/status` lists the primary and the backups by name only (`provider:model`), never keys, and makes no model call.
 - No database, no auth, no server-side storage of uploaded data.
 - Synthetic sample data only (generated by `scripts/generate-sample-data.ts`, seeded, ~300 employees, ~12 units, includes mid-year hires, separations, late hires, and attendance across the full year so the back-test is meaningful).
 
@@ -196,9 +198,11 @@ States: loading spinners on AI buttons; error banners with retry; empty states. 
 13. Given elearningCounts = false, then cost-to-close prices licensed at-risk employees on the in-house route.
 14. Given an exported name starting with `=`, then the CSV cell is prefixed with `'`.
 15. Given a memo, then the displayed at-risk count and deadline equal the engine values (token substitution, not model text).
+16. Given `AI_PROVIDER=groq` with Groq and Google keys set and `AI_FALLBACK_MODEL` unset, when Groq returns 429 or 404, then `gemini-3.6-flash` answers, and `gemini-3.8-flash` if that also fails (unit test with fake models).
+17. Given Recommend courses fails, then each unit shows labeled template picks drawn only from qualifying catalog courses.
 
 ## 9. Test Plan (Vitest, ≥ 10 tests)
-Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order, back-test (recall, precision, null denominators, hires after checkpoint), cost-to-close (both routes, elearningCounts = false, minHours filter, unpriced). Validation: missing columns, duplicates, bad and impossible dates, normalization (BOM, case, whitespace). API helpers: catalog ID filtering, memo token substitution and `{{EMPLOYEE_LIST}}` enforcement, numeric grounding check, payload builders exclude PII and suppress small cells, rate limiter, provider/model resolution from env, CSV export escaping.
+Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order, back-test (recall, precision, null denominators, hires after checkpoint), cost-to-close (both routes, elearningCounts = false, minHours filter, unpriced). Validation: missing columns, duplicates, bad and impossible dates, normalization (BOM, case, whitespace). API helpers: catalog ID filtering, memo token substitution and `{{EMPLOYEE_LIST}}` enforcement, numeric grounding check, payload builders exclude PII and suppress small cells, rate limiter, provider/model resolution from env (backup list, cross-provider keys), model-chain hand-over rules (404, cross-provider 400, cooldown), template recommendations, CSV export escaping.
 
 ## 10. Revision Log
 | Version | Date | Change | Reason |
@@ -212,3 +216,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.6 | 2026-11-08 | Executive summary card now includes four engine-drawn charts (status breakdown, highest-risk units, back-test, cost vs budget) that do not depend on the AI. Summary prompt asks for plain-English labels, ₱ amounts, and a plain statement of whether the budget covers the cost to close. | user request |
 | 1.7 | 2026-11-08 | Removed the `GET /api/status?probe=1` model probe: Google's free tier allows only 20 requests per day per model, and a public probe could use that up. `/api/status` now only reports configuration and makes no model call. AI errors distinguish the free-tier daily cap (`http_429_daily`) with a clear message. | found on live site |
 | 1.8 | 2026-11-08 | No-AI fallback: when a memo or summary AI call fails, the UI shows a labeled template draft built from the engine's numbers (memo keeps the `{{EMPLOYEE_LIST}}` token, names merged locally). Replaces "AI buttons disabled when not configured" with "error + Retry + template", since the free Gemini tier allows only about 20 requests per day. | user request |
+| 1.9 | 2026-11-08 | Groq added as a third provider (`AI_PROVIDER=groq`, `GROQ_API_KEY`, default `openai/gpt-oss-120b`, `reasoningEffort` low). `AI_FALLBACK_MODEL` becomes an ordered list of up to 3 backups that may be on another provider (`provider:model`), replacing the single same-provider backup and the "no fallback between providers" rule. A 404 (retired model) and invalid output now hand over to the next model; a 400/401/403 hands over when the next model is on a different provider. Recommend courses gets labeled template picks when the AI fails. Acceptance 16-17. | Gemini free tier is 5 requests/min and 20/day per model and `gemini-3.6-flash` may retire; Groq's free plan allows 30/min and 1,000/day |

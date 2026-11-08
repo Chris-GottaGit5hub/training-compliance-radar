@@ -1,7 +1,7 @@
 import { APICallError, RetryError } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
-import { createModelCooldown, errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
+import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, targetKey, type AiConfig } from "@/lib/ai/config";
+import { chainCanHandOver, createModelCooldown, errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
 import { REGENERATE_ONLY_BEFORE_MS, runMemo, runRecommend, runSummary } from "@/lib/ai/run";
 import type { MemoRequest, RecommendRequest, SummaryRequest } from "@/lib/schemas";
@@ -42,7 +42,7 @@ describe("resolveAiConfig", () => {
       config: {
         provider: "google",
         modelId: "gemini-3.8-flash",
-        fallbackModelId: "gemini-3.6-flash",
+        backups: [{ provider: "google", modelId: "gemini-3.6-flash", apiKey: "k" }],
         thinkingLevel: "low",
         apiKey: "k",
       },
@@ -50,17 +50,50 @@ describe("resolveAiConfig", () => {
     expect(DEFAULT_MODELS.google).toBe("gemini-3.8-flash");
   });
 
-  it("has a same-provider fallback model for Gemini only, which can be changed or turned off", () => {
+  it("has a default Gemini backup, which can be changed, listed or turned off", () => {
     const key = { GOOGLE_GENERATIVE_AI_API_KEY: "k" };
-    expect(resolveAiConfig({ ...key, AI_FALLBACK_MODEL: "gemini-3.5-flash" })).toMatchObject({
-      config: { fallbackModelId: "gemini-3.5-flash" },
-    });
-    const off = resolveAiConfig({ ...key, AI_FALLBACK_MODEL: "none" });
-    expect(off.ok && off.config.fallbackModelId).toBeUndefined();
-    const same = resolveAiConfig({ ...key, AI_MODEL: "gemini-3.6-flash" }); // fallback equals primary
-    expect(same.ok && same.config.fallbackModelId).toBeUndefined();
+    const backupIds = (env: Record<string, string>) => {
+      const r = resolveAiConfig({ ...key, ...env });
+      return r.ok ? r.config.backups?.map(targetKey) : "not configured";
+    };
+    expect(backupIds({ AI_FALLBACK_MODEL: "gemini-3.5-flash" })).toEqual(["google:gemini-3.5-flash"]);
+    expect(backupIds({ AI_FALLBACK_MODEL: " gemini-3.6-flash , gemini-3.8-flash " })).toEqual(["google:gemini-3.6-flash"]); // primary dropped
+    expect(backupIds({ AI_FALLBACK_MODEL: "none" })).toBeUndefined();
+    expect(backupIds({ AI_MODEL: "gemini-3.6-flash" })).toBeUndefined(); // default backup equals primary
     const claude = resolveAiConfig({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "k" });
-    expect(claude.ok && claude.config.fallbackModelId).toBeUndefined();
+    expect(claude.ok && claude.config.backups).toBeUndefined();
+  });
+
+  it("switches to groq with its own default model and Gemini 3.6 then 3.8 as backups (acceptance 16)", () => {
+    const result = resolveAiConfig({ AI_PROVIDER: "groq", GROQ_API_KEY: "g", GOOGLE_GENERATIVE_AI_API_KEY: "k" });
+    expect(result).toEqual({
+      ok: true,
+      config: {
+        provider: "groq",
+        modelId: "openai/gpt-oss-120b",
+        apiKey: "g",
+        backups: [
+          { provider: "google", modelId: "gemini-3.6-flash", apiKey: "k" },
+          { provider: "google", modelId: "gemini-3.8-flash", apiKey: "k" },
+        ],
+        thinkingLevel: "low",
+      },
+    });
+  });
+
+  it("skips backups whose provider has no key or is unknown, and keeps at most 3", () => {
+    const groqOnly = resolveAiConfig({ AI_PROVIDER: "groq", GROQ_API_KEY: "g" });
+    expect(groqOnly.ok && groqOnly.config.backups).toBeUndefined(); // no Google key: Gemini backups skipped
+    const mixed = resolveAiConfig({
+      GOOGLE_GENERATIVE_AI_API_KEY: "k",
+      GROQ_API_KEY: "g",
+      AI_FALLBACK_MODEL: "openai:gpt-9, groq:openai/gpt-oss-120b, anthropic:claude-haiku-5-5, gemini-3.6-flash, groq:openai/gpt-oss-20b, gemini-3.5-flash",
+    });
+    expect(mixed.ok && mixed.config.backups).toEqual([
+      { provider: "groq", modelId: "openai/gpt-oss-120b", apiKey: "g" },
+      { provider: "google", modelId: "gemini-3.6-flash", apiKey: "k" },
+      { provider: "groq", modelId: "openai/gpt-oss-20b", apiKey: "g" },
+    ]);
   });
 
   it("uses a low Gemini thinking level by default and accepts a valid override", () => {
@@ -111,7 +144,7 @@ describe("resolveAiConfig", () => {
       config: {
         provider: "google",
         modelId: "gemini-3.8-flash",
-        fallbackModelId: "gemini-3.6-flash",
+        backups: [{ provider: "google", modelId: "gemini-3.6-flash", apiKey: "abc123" }],
         thinkingLevel: "low",
         apiKey: "abc123",
       },
@@ -126,9 +159,20 @@ describe("describeAiStatus", () => {
       configured: true,
       provider: "google",
       model: "gemini-3.8-flash",
-      fallbackModel: "gemini-3.6-flash",
+      backups: ["google:gemini-3.6-flash"],
     });
     expect(JSON.stringify(status)).not.toContain("super-secret");
+  });
+
+  it("lists cross-provider backups by name only, never a key", () => {
+    const status = describeAiStatus({ AI_PROVIDER: "groq", GROQ_API_KEY: "groq-secret", GOOGLE_GENERATIVE_AI_API_KEY: "google-secret" });
+    expect(status).toEqual({
+      configured: true,
+      provider: "groq",
+      model: "openai/gpt-oss-120b",
+      backups: ["google:gemini-3.6-flash", "google:gemini-3.8-flash"],
+    });
+    expect(JSON.stringify(status)).not.toMatch(/secret/);
   });
 
   it("reports why AI is off", () => {
@@ -260,13 +304,40 @@ describe("withModelFallback", () => {
   const overloaded = () => new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 503 });
   const options = { totalMs: 2_000, firstMs: 100, log };
 
-  it("only falls back for overload-type errors", () => {
-    for (const code of ["http_503", "http_500", "http_429", "timeout", "timeout_after_http_503"]) {
+  it("falls back for overload, retired-model (404) and invalid-output errors", () => {
+    for (const code of ["http_503", "http_500", "http_429", "http_429_daily", "timeout", "timeout_after_http_503", "http_404", "invalid_output"]) {
       expect(shouldTryFallback(code), code).toBe(true);
     }
-    for (const code of ["http_400", "http_401", "http_403", "http_404", "invalid_output", "unknown"]) {
+    for (const code of ["http_400", "http_401", "http_403", "unknown"]) {
       expect(shouldTryFallback(code), code).toBe(false);
     }
+  });
+
+  it("moves past a retired model (404) to the next one in the chain", async () => {
+    const retired = new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 404 });
+    const tried: string[] = [];
+    const result = await withModelFallback(["groq:a", "google:b", "google:c"], async (model) => {
+      tried.push(model);
+      if (model !== "google:c") throw model === "groq:a" ? overloaded() : retired;
+      return "answer";
+    }, options);
+    expect(result).toEqual({ ok: true, value: "answer" });
+    expect(tried).toEqual(["groq:a", "google:b", "google:c"]);
+  });
+
+  it("lets the caller hand over on other errors, e.g. a bad key when the next model is another provider", async () => {
+    const badKey = new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 401 });
+    const tried: string[] = [];
+    const models = ["groq:a", "google:b", "google:c"];
+    const result = await withModelFallback(models, async (model) => {
+      tried.push(model);
+      throw badKey;
+    }, {
+      ...options,
+      canHandOver: (code, i) => code === "http_401" && models[i].split(":")[0] !== models[i + 1].split(":")[0],
+    });
+    expect(result).toEqual({ ok: false, code: "http_401" });
+    expect(tried).toEqual(["groq:a", "google:b"]); // google:b -> google:c is the same provider, so it stops
   });
 
   it("uses the backup model when the primary is overloaded", async () => {
@@ -376,5 +447,25 @@ describe("AI call logging", () => {
     const aborted = new RetryError({ message: "aborted", reason: "abort", errors: [overloaded] });
     expect(errorCode(aborted)).toBe("timeout_after_http_503");
     expect(errorCode(new RetryError({ message: "aborted", reason: "abort", errors: [] }))).toBe("timeout");
+  });
+});
+
+describe("chainCanHandOver (spec §5 model chain)", () => {
+  const targets = [{ provider: "groq" as const }, { provider: "google" as const }, { provider: "google" as const }];
+  const canHandOver = chainCanHandOver(targets);
+
+  it("hands a bad request or key over to a different provider, but not to the same one", () => {
+    for (const code of ["http_400", "http_401", "http_403"]) {
+      expect(canHandOver(code, 0), code).toBe(true); // groq -> google
+      expect(canHandOver(code, 1), code).toBe(false); // google -> google
+    }
+  });
+
+  it("always hands over overload, 404 and invalid-output errors, and never past the last model", () => {
+    expect(canHandOver("http_404", 1)).toBe(true);
+    expect(canHandOver("invalid_output", 1)).toBe(true);
+    expect(canHandOver("http_429_daily", 1)).toBe(true);
+    expect(canHandOver("http_400", 2)).toBe(false); // nothing after the last model
+    expect(canHandOver("unknown", 0)).toBe(false);
   });
 });

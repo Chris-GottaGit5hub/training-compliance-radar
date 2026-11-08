@@ -18,7 +18,7 @@ flowchart LR
   D -->|aggregates only| A3[/api/summary/]
   A1 & A2 & A3 --> G[Guards: zod validation,<br/>size limits, rate limit]
   G --> L[Vercel AI SDK<br/>generateText + Output.object]
-  L --> C[(Gemini API default<br/>Claude via env var)]
+  L --> C[(Groq, Gemini or Claude<br/>chosen by env vars)]
   A1 --> K[Catalog ID check]
   D --> X[CSV / text export]
   D -. analytics .-> M[Vercel Analytics<br/>+ Speed Insights]
@@ -31,7 +31,7 @@ flowchart LR
 | Charts | Recharts | Simple React charts |
 | CSV | papaparse (client-side) | Keeps raw employee data in the browser |
 | Validation | zod (client + server) | One schema source for CSV rows and API payloads |
-| LLM layer | Vercel AI SDK (`ai`, `@ai-sdk/google` default — `gemini-3.8-flash`; `@ai-sdk/anthropic` alternative — `claude-haiku-5-5`) | Structured output via `generateText + Output.object` + zod; provider swap by one env var (`AI_PROVIDER`) |
+| LLM layer | Vercel AI SDK (`ai`, `@ai-sdk/google` default — `gemini-3.8-flash`; `@ai-sdk/groq` — `openai/gpt-oss-120b`; `@ai-sdk/anthropic` — `claude-haiku-5-5`) | Structured output via `generateText + Output.object` + zod; provider swap by one env var (`AI_PROVIDER`); ordered backup chain across providers (`AI_FALLBACK_MODEL`) |
 | Orchestration | Next.js Route Handlers (`/api/*`), serverless on Vercel | No always-on server needed |
 | Data / retrieval | Curated course catalog CSV (no vector DB) | Small, controlled list; grounding by ID validation |
 | Database / Auth | **None in v1 (deliberate)** | Privacy-first; nothing to store or protect |
@@ -48,14 +48,15 @@ flowchart LR
 ## Environment variables
 | Variable | Values | Default | Notes |
 |---|---|---|---|
-| `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
-| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) | Optional override |
+| `AI_PROVIDER` | `google` \| `anthropic` \| `groq` | `google` | Selects the primary provider for all AI routes |
+| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) / `openai/gpt-oss-120b` (groq) | Optional override |
 | `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only: lower is faster. Raise it only if answers are poor |
-| `AI_FALLBACK_MODEL` | model ID | `none` | `gemini-3.6-flash` (google only) | Same-provider backup tried if the primary model returns 429/5xx or times out |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
-| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` |
+| `AI_FALLBACK_MODEL` | comma-separated `model` or `provider:model` entries, or `none` | `gemini-3.6-flash` (google); `google:gemini-3.6-flash,google:gemini-3.8-flash` (groq) | Backups tried in order (max 3) on 429/5xx, timeout, 404 (retired model) or invalid output; a bad request or key also moves on when the next backup is another provider. Entries without a key for their provider are skipped |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` or for a `google:` backup |
+| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` or for an `anthropic:` backup |
+| `GROQ_API_KEY` | secret | — | Required when `AI_PROVIDER=groq` or for a `groq:` backup |
 
-No automatic runtime fallback; unknown provider or missing key → AI routes return 503 and the engine/dashboard keep working.
+Backups run in order and may be on another provider (`provider:model`); unknown primary provider or missing primary key → AI routes return 503 and the engine/dashboard keep working.
 
 ## Security
 - API key only in env vars (`.env.local` locally; Vercel project settings in prod); never in client code (`NEXT_PUBLIC_` prefix forbidden for secrets).

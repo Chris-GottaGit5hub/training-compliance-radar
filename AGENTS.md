@@ -24,14 +24,15 @@ Training Compliance Radar — a privacy-first web app for L&D officers. Upload r
 ## Environment Variables
 | Variable | Values | Default | Notes |
 |---|---|---|---|
-| `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
-| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) | Optional override |
+| `AI_PROVIDER` | `google` \| `anthropic` \| `groq` | `google` | Selects the primary provider for all AI routes |
+| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) / `openai/gpt-oss-120b` (groq) | Optional override |
 | `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only: lower is faster. Raise it only if answers are poor |
-| `AI_FALLBACK_MODEL` | model ID | `none` | `gemini-3.6-flash` (google only) | Same-provider backup tried if the primary model returns 429/5xx or times out |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
-| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` |
+| `AI_FALLBACK_MODEL` | comma-separated `model` or `provider:model` entries, or `none` | `gemini-3.6-flash` (google); `google:gemini-3.6-flash,google:gemini-3.8-flash` (groq) | Backups tried in order (max 3) on 429/5xx, timeout, 404 (retired model) or invalid output; a bad request or key also moves on when the next backup is another provider. Entries without a key for their provider are skipped |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` or for a `google:` backup |
+| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` or for an `anthropic:` backup |
+| `GROQ_API_KEY` | secret | — | Required when `AI_PROVIDER=groq` or for a `groq:` backup |
 
-No automatic runtime fallback between providers; unknown provider or missing key → AI routes return 503 (`spec.md` §7). Template in `.env.example`.
+Backups may be on another provider (`provider:model` in `AI_FALLBACK_MODEL`); unknown primary provider or missing primary key → AI routes return 503 (`spec.md` §7). Template in `.env.example`.
 
 ## Constraints (never violate)
 1. Compliance status is computed ONLY in `/lib/engine`. Never ask the LLM to decide compliance or compute counts.

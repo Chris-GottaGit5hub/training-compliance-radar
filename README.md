@@ -61,14 +61,15 @@ The dashboard works without any key. AI buttons need one.
 
 | Variable | Values | Default | Notes |
 |---|---|---|---|
-| `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
-| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) | Optional override |
+| `AI_PROVIDER` | `google` \| `anthropic` \| `groq` | `google` | Selects the primary provider for all AI routes |
+| `AI_MODEL` | model ID | `gemini-3.8-flash` (google) / `claude-haiku-5-5` (anthropic) / `openai/gpt-oss-120b` (groq) | Optional override |
 | `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only: lower is faster. Raise it only if answers are poor |
-| `AI_FALLBACK_MODEL` | model ID | `none` | `gemini-3.6-flash` (google only) | Same-provider backup tried if the primary model returns 429/5xx or times out |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
-| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` |
+| `AI_FALLBACK_MODEL` | comma-separated `model` or `provider:model` entries, or `none` | `gemini-3.6-flash` (google); `google:gemini-3.6-flash,google:gemini-3.8-flash` (groq) | Backups tried in order (max 3) on 429/5xx, timeout, 404 (retired model) or invalid output; a bad request or key also moves on when the next backup is another provider. Entries without a key for their provider are skipped |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` or for a `google:` backup |
+| `ANTHROPIC_API_KEY` | secret | — | Required only when `AI_PROVIDER=anthropic` or for an `anthropic:` backup |
+| `GROQ_API_KEY` | secret | — | Required when `AI_PROVIDER=groq` or for a `groq:` backup |
 
-Switching to Claude is one variable (`AI_PROVIDER=anthropic`) plus its key. There is no automatic fallback between providers. With no key, the AI routes return `503` and the UI turns AI buttons off while everything else keeps working. Never commit `.env.local`; on Vercel, set these in the project's Environment Variables.
+Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its key. Backups can be on another provider (`provider:model`), so the recommended free setup is Groq first with Gemini 3.6 then 3.8 behind it (set `AI_PROVIDER=groq` and both keys). With no key, the AI routes return `503` and the UI shows template drafts and picks while everything else keeps working. `GET /api/status` shows the primary and backups by name only. Never commit `.env.local`; on Vercel, set these in the project's Environment Variables.
 
 ## Tests
 

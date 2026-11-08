@@ -14,6 +14,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.98",
     "@ai-sdk/google": "^4.0.113",
+    "@ai-sdk/groq": "^4.0.78",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.1.0",
     "ai": "^7.0.164",

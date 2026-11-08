@@ -65,6 +65,7 @@ describe("defaultRulesConfig", () => {
       elearningCounts: true,
       minHours: 1,
       budgetPhp: 0,
+      milestoneTargets: [25, 50, 85, 100],
     });
     expect(rulesConfigSchema.safeParse(defaults).success).toBe(true);
   });

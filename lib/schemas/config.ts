@@ -15,6 +15,10 @@ export const rulesConfigSchema = z
     elearningCounts: z.boolean(),
     minHours: z.number().min(0),
     budgetPhp: z.number().min(0),
+    milestoneTargets: z
+      .array(z.number().min(0, "must be 0 or more").max(100, "must be 100 or less"))
+      .length(4, "enter four targets")
+      .refine((t) => t.every((v, i) => i === 0 || v >= t[i - 1]), "targets must not decrease"),
   })
   .superRefine((config, ctx) => {
     for (const field of ["asOfDate", "lateHireCutoff"] as const) {
@@ -42,5 +46,6 @@ export function defaultRulesConfig(today: string): RulesConfig {
     elearningCounts: true,
     minHours: 1,
     budgetPhp: 0,
+    milestoneTargets: [25, 50, 85, 100],
   };
 }

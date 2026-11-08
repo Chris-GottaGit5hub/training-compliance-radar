@@ -1,12 +1,14 @@
 import {
   backtest,
   costToClose,
+  evaluateMilestones,
   evaluateRoster,
   summarizeOrg,
   type BacktestResult,
   type CostToClose,
   type EmployeeResult,
   type EngineWarnings,
+  type MilestoneResult,
   type OrgSummary,
 } from "@/lib/engine";
 import type { RulesConfig } from "@/lib/schemas/config";
@@ -32,6 +34,8 @@ export interface Analysis {
   cost: CostToClose | null;
   /** Recall and precision at Jun 30 and Sep 30 of config.year (spec §4.1). */
   backtests: BacktestCheckpoint[];
+  /** Trained vs untrained against the four target dates (spec §4.5). */
+  milestones: MilestoneResult[];
   warnings: EngineWarnings;
 }
 
@@ -61,6 +65,7 @@ export function runAnalysis({ roster, attendance, catalog, config }: AnalysisInp
       const checkpoint = `${config.year}-${monthDay}`;
       return { label, checkpoint, result: backtest(roster, attendance, config, checkpoint) };
     }),
+    milestones: evaluateMilestones(roster, attendance, config, results),
     warnings,
   };
 }

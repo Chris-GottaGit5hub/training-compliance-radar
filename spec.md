@@ -144,14 +144,14 @@ Other rules:
 
 ### 4.5 Trained vs untrained and milestones
 "Trained" = COMPLIANT and "untrained" = AT_RISK among the covered; the dashboard leads with these two counts. The covered total appears only as the denominator ("of 200 in scope").
-`evaluateMilestones(roster, attendance, config)` returns one row per milestone date with the target from `milestoneTargets`: `{ date, label, targetPct, state: 'met' | 'missed' | 'upcoming', inScope, trained, untrained, targetTrained, gap, needed }`.
+`evaluateMilestones(roster, attendance, config)` returns one row per milestone date with the target from `milestoneTargets`: `{ date, label, targetPct, state: 'met' | 'missed' | 'upcoming', inScope, trained, untrained, actualPct, targetTrained, gap, needed }` (`actualPct` = trained ÷ inScope, 1 decimal).
 - `date ≤ asOfDate`: run the engine with `asOfDate = date`; `inScope = compliant + atRisk`, `trained = compliant`, `untrained = atRisk`.
 - `date > asOfDate`: use the run at the real `asOfDate` and `state = 'upcoming'` (`needed` = people still to train to reach the target).
 - `targetTrained = ceil(targetPct × inScope / 100)`; `gap = trained − targetTrained` (negative = short); `needed = max(0, −gap)`; past dates are `met` when `gap ≥ 0`, else `missed`.
 - Counts only, no IDs.
 
 ### 4.6 Breakdown (slicers)
-`breakdown(results, roster, dimension, filter)` with `dimension ∈ band | payGrade | unit | group | sector` and `filter` any combination of those fields (exact match; `band` is derived). Only COMPLIANT and AT_RISK employees count. Rows: `{ key, inScope, trained, untrained, rate }`, sorted by untrained desc, then rate asc, then key. This is on-screen only: AI payloads stay unit-level with the ≥ 3 small-cell rule and never carry band, grade or sector cells (the president is a cell of one).
+`breakdown(results, roster, dimension, filter)` with `dimension ∈ band | payGrade | unit | group | sector` and `filter` any combination of those fields (exact match; `band` is derived). Only COMPLIANT and AT_RISK employees count. Rows: `{ key, inScope, trained, untrained, rate }`, sorted by untrained desc, then rate asc, then key in natural order (so `PG 5` sorts before `PG 10`). This is on-screen only: AI payloads stay unit-level with the ≥ 3 small-cell rule and never carry band, grade or sector cells (the president is a cell of one).
 
 ### 4.7 Budget burn-down
 Allocation = `budgetPhp`. `budgetSeries(roster, attendance, config)` returns, for each month Jan–Dec, `{ month, spent, remaining, trained, planned }`:

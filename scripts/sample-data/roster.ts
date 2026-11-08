@@ -1,5 +1,5 @@
 import type { RosterRow } from "../../lib/schemas/rows";
-import { FIRST_NAMES, LAST_NAMES, UNITS } from "./people";
+import { FIRST_NAMES, LAST_NAMES, UNITS, UNIT_ORG } from "./people";
 import { randomDate, type Rng } from "./rng";
 
 function hireDateFor(rng: Rng, year: number): { hire: string; canSeparate: boolean } {
@@ -14,6 +14,19 @@ function hireDateFor(rng: Rng, year: number): { hire: string; canSeparate: boole
   }
   const hire = randomDate(rng, `${year - 20}-01-01`, `${year - 1}-12-31`);
   return { hire, canSeparate: true };
+}
+
+/**
+ * Pay grade by position in the unit (no random numbers, so every other column of the
+ * seeded roster stays the same): the first person is the department head at PG 12,
+ * then about 70% Rank and File, 20% Officers and 5% Senior Officers.
+ */
+function payGradeFor(index: number): number {
+  if (index === 0) return 12;
+  const slot = index % 20;
+  if (slot < 15) return 4 + ((index * 5) % 6);
+  if (slot < 19) return 10 + (index % 4);
+  return 14 + (index % 3);
 }
 
 /** ~300 synthetic employees across 12 units (headcounts come from UNITS weights). */
@@ -36,6 +49,9 @@ export function buildRoster(rng: Rng, year: number): RosterRow[] {
             ? randomDate(rng, `${year}-02-01`, `${year}-12-15`)
             : undefined,
         licensed: rng.chance(0.7) ? "yes" : "no",
+        pay_grade: payGradeFor(i),
+        group: UNIT_ORG[unit][0],
+        sector: UNIT_ORG[unit][1],
       });
     }
   }

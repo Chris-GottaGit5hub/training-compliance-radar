@@ -45,6 +45,10 @@ export function buildCatalog(): CatalogRow[] {
     provider: "linkedin_learning" as const,
     url: `https://www.linkedin.com/learning/search?keywords=${encodeURIComponent(title)}`,
     cost_per_head: 0,
+    // What an unlicensed person costs the budget: PHP 500 plus PHP 50 per 10 minutes (spec §2.3).
+    unlicensed_fee: 500 + Math.round(duration_minutes / 10) * 50,
+    // The company-recommended annual course, run once a year per sector window (spec §4.8).
+    recommended: title.startsWith("Anti-Money Laundering") ? ("yes" as const) : undefined,
   }));
   const inHouse = IN_HOUSE.map(([title, skill_area, duration_minutes, cost_per_head], i) => ({
     course_id: `IH-${pad(i + 1)}`,

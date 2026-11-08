@@ -61,6 +61,25 @@ export interface BacktestResult {
   precision: number | null;
 }
 
+export type MilestoneState = "met" | "missed" | "upcoming";
+
+/** One target date (spec §4.5). Counts only, no employee IDs. */
+export interface MilestoneResult {
+  date: string;
+  label: string;
+  targetPct: number;
+  state: MilestoneState;
+  inScope: number;
+  trained: number;
+  untrained: number;
+  /** Trained share of in-scope staff, percent rounded to 1 decimal. */
+  actualPct: number;
+  targetTrained: number;
+  /** trained - targetTrained; negative means short of the target. */
+  gap: number;
+  needed: number;
+}
+
 export interface CostToClose {
   costToClose: number;
   /** At-risk employees whose route has no qualifying course (cost is a lower bound). */

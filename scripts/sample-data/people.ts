@@ -32,6 +32,22 @@ export const UNITS: Record<string, { weight: number; risk: number; positions: st
   "Corporate Communications": { weight: 24, risk: 1.2, positions: ["Communications Officer", "Content Writer", "Graphic Artist"] },
 };
 
+/** unit -> [group, sector]: 12 departments, 9 groups, 7 sectors (fictional). */
+export const UNIT_ORG: Record<string, readonly [group: string, sector: string]> = {
+  "Branch Operations": ["Branches Group", "Branch Banking Sector"],
+  "Credit Management": ["Lending Group", "Lending Sector"],
+  "Risk Management": ["Risk and Control Group", "Lending Sector"],
+  "Administrative Services": ["Operations Group", "Operations Sector"],
+  "Procurement": ["Operations Group", "Operations Sector"],
+  "Information Technology": ["Technology Group", "Technology Sector"],
+  "Finance": ["Finance Group", "Finance and Legal Sector"],
+  "Legal Services": ["Legal Group", "Finance and Legal Sector"],
+  "Human Resources": ["People Group", "People and Corporate Sector"],
+  "Corporate Communications": ["Communications Group", "People and Corporate Sector"],
+  "Corporate Planning": ["Planning Group", "People and Corporate Sector"],
+  "Internal Audit": ["Governance Group", "Governance Sector"],
+};
+
 export const TRAINING_TITLES = [
   "Data Privacy Act Awareness", "Customer Service Excellence", "Records Management Seminar",
   "Basic Occupational Safety and Health", "Leadership and Supervision Workshop",

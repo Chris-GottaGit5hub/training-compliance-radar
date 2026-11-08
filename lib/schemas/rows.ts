@@ -14,6 +14,9 @@ export const ROSTER_COLUMNS = [
   "hire_date",
   "separation_date",
   "licensed",
+  "pay_grade",
+  "group",
+  "sector",
 ] as const;
 export const ATTENDANCE_COLUMNS = [
   "employee_id",
@@ -31,10 +34,27 @@ export const CATALOG_COLUMNS = [
   "provider",
   "url",
   "cost_per_head",
+  "unlicensed_fee",
+  "recommended",
 ] as const;
 
 /** Columns that may be absent from the header (their cells are optional). */
-export const OPTIONAL_COLUMNS: readonly string[] = ["separation_date", "url"];
+export const OPTIONAL_COLUMNS: readonly string[] = [
+  "separation_date",
+  "url",
+  "pay_grade",
+  "group",
+  "sector",
+  "unlicensed_fee",
+  "recommended",
+];
+
+/** `8`, `PG8` and `PG 8` (any case) all mean pay grade 8; anything else is left for the schema to reject. */
+export function parsePayGrade(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const match = /^(?:pg\s*)?(\d{1,2})$/i.exec(value.trim());
+  return match ? Number(match[1]) : value;
+}
 
 type RawIssue = { input?: unknown };
 const missingOr = (message: string) => (issue: RawIssue) =>
@@ -70,6 +90,15 @@ const positiveInt = z.preprocess(
   number().int("must be a whole number").positive("must be greater than 0"),
 );
 
+const payGrade = z.preprocess(
+  parsePayGrade,
+  z
+    .number({ error: "must be a whole number such as 8, PG8 or PG 8" })
+    .int("must be a whole number such as 8, PG8 or PG 8")
+    .min(1, "must be between 1 and 30")
+    .max(30, "must be between 1 and 30"),
+);
+
 const isHttpsUrl = (value: string): boolean => {
   try {
     return new URL(value).protocol === "https:";
@@ -88,6 +117,9 @@ export const rosterRowSchema = z
     hire_date: dateString,
     separation_date: z.union([emptyToUndefined, dateString]).optional(),
     licensed: lowerEnum(["yes", "no"] as const),
+    pay_grade: payGrade.optional(),
+    group: text.optional(),
+    sector: text.optional(),
   })
   .refine((r) => !r.separation_date || r.separation_date >= r.hire_date, {
     path: ["separation_date"],
@@ -113,6 +145,8 @@ export const catalogRowSchema = z.object({
     .union([emptyToUndefined, z.string().refine(isHttpsUrl, "must be an https URL")])
     .optional(),
   cost_per_head: nonNegative,
+  unlicensed_fee: nonNegative.optional(),
+  recommended: lowerEnum(["yes", "no"] as const).optional(),
 });
 
 export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number];

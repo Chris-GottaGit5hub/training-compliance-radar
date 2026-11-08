@@ -7,13 +7,24 @@ import { clientIp, sharedRateLimiter } from "@/lib/api/rateLimit";
 export const maxDuration = 60;
 
 const LEVELS = ["off", "minimal", "low", "medium", "high"];
+// Probe-only allowlist so the endpoint cannot be used to call arbitrary models.
+const PROBE_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.6-flash",
+  "gemini-3.7-flash",
+  "gemini-3.8-flash",
+  "gemini-flash-latest",
+  "gemini-flash-lite-latest",
+];
 const headers = { "Cache-Control": "no-store" };
 
 /**
  * Reports whether AI is configured on this deployment and, if not, why.
  * Exposes only provider and model names or a reason code; never any key.
  *
- * `?probe=1[&thinking=off|minimal|low|medium|high]` also makes one tiny model call
+ * `?probe=1[&thinking=off|minimal|low|medium|high][&model=<allowlisted Gemini model>]` also makes one tiny model call
  * (no user data) and reports its latency and error code, to diagnose provider
  * problems. Probes share the 10 requests/min/IP limit.
  */
@@ -35,10 +46,13 @@ export async function GET(request: Request): Promise<Response> {
     | ThinkingLevel
     | "off";
 
+  const requestedModel = params.get("model") ?? "";
+  const modelId = PROBE_MODELS.includes(requestedModel) ? requestedModel : resolved.config.modelId;
+
   const started = Date.now();
   const result = await generateStructured({
     route: "probe",
-    config: resolved.config,
+    config: { ...resolved.config, modelId },
     schema: z.object({ answer: z.string() }),
     instructions: "Reply with the single word OK.",
     prompt: "ping",
@@ -48,7 +62,7 @@ export async function GET(request: Request): Promise<Response> {
   return Response.json(
     {
       ...status,
-      probe: { ok: result.ok, ...(result.ok ? {} : { code: result.code }), thinking, latencyMs: Date.now() - started },
+      probe: { model: modelId, ok: result.ok, ...(result.ok ? {} : { code: result.code }), thinking, latencyMs: Date.now() - started },
     },
     { headers },
   );

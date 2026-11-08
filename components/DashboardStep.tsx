@@ -4,6 +4,8 @@ import { BreakdownPanel } from "./BreakdownPanel";
 import { BudgetPanel } from "./BudgetPanel";
 import { KpiCards } from "./KpiCards";
 import { MilestoneCard } from "./MilestoneCard";
+import { PlanPanel } from "./PlanPanel";
+import { WindowsTable } from "./WindowsTable";
 import { UnitChart } from "./UnitChart";
 import { UnitTable } from "./UnitTable";
 import { downloadTextFile } from "./download";
@@ -81,13 +83,15 @@ export function DashboardStep({ state }: { state: RadarState }) {
             <KpiCards analysis={analysis} config={config} hasCatalog={catalog !== null} />
             <MilestoneCard milestones={analysis.milestones} />
             {config.budgetPhp > 0 ? (
-              <BudgetPanel report={analysis.budget} hasPlan={false} />
+              <BudgetPanel report={analysis.budget} hasPlan={analysis.plan !== null} />
             ) : (
               <Banner tone="info">
                 Set the annual training budget in Rules to see the burn-down report: money spent,
                 remaining, and people trained through the year.
               </Banner>
             )}
+            {analysis.windows && <WindowsTable windows={analysis.windows} />}
+            <PlanPanel analysis={analysis} config={config} />
             <UnitChart
               units={analysis.org.unitsRanked}
               selectedUnit={selectedUnit}

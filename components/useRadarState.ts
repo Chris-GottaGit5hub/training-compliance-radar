@@ -16,6 +16,7 @@ import { todayManila } from "@/lib/engine";
 import {
   validateCsv,
   type AttendanceRow,
+  type CalendarRow,
   type CatalogRow,
   type CsvKind,
   type RosterRow,
@@ -26,12 +27,18 @@ interface Files {
   roster: FileState<RosterRow>;
   attendance: FileState<AttendanceRow>;
   catalog: FileState<CatalogRow>;
+  calendar: FileState<CalendarRow>;
 }
 
 export type SampleStatus = { state: "idle" | "loading" } | { state: "error"; message: string };
 
-const KINDS: CsvKind[] = ["roster", "attendance", "catalog"];
-const NO_FILES: Files = { roster: EMPTY_FILE, attendance: EMPTY_FILE, catalog: EMPTY_FILE };
+const KINDS: CsvKind[] = ["roster", "attendance", "catalog", "calendar"];
+const NO_FILES: Files = {
+  roster: EMPTY_FILE,
+  attendance: EMPTY_FILE,
+  catalog: EMPTY_FILE,
+  calendar: EMPTY_FILE,
+};
 
 /** All page state. Data never leaves the browser; nothing here calls an API. */
 export function useRadarState() {
@@ -47,6 +54,7 @@ export function useRadarState() {
   const roster = files.roster.status === "ok" ? files.roster.rows : null;
   const attendance = files.attendance.status === "ok" ? files.attendance.rows : null;
   const catalog = files.catalog.status === "ok" ? files.catalog.rows : null;
+  const calendar = files.calendar.status === "ok" ? files.calendar.rows : null;
   const ready = roster !== null && attendance !== null;
 
   const config = useMemo<RulesConfig | null>(() => {
@@ -61,11 +69,14 @@ export function useRadarState() {
   const run = useMemo<{ analysis: Analysis | null; error: string | null }>(() => {
     if (!ready || !config || issueCount > 0) return { analysis: null, error: null };
     try {
-      return { analysis: runAnalysis({ roster, attendance, catalog, config }), error: null };
+      return {
+        analysis: runAnalysis({ roster, attendance, catalog, calendar, config }),
+        error: null,
+      };
     } catch (error) {
       return { analysis: null, error: error instanceof Error ? error.message : "Analysis failed" };
     }
-  }, [ready, roster, attendance, catalog, config, issueCount]);
+  }, [ready, roster, attendance, catalog, calendar, config, issueCount]);
 
   const loadFile = useCallback(async (kind: CsvKind, file: File) => {
     setPending((p) => ({ ...p, [kind]: true }));
@@ -95,11 +106,12 @@ export function useRadarState() {
           return res.text();
         }),
       );
-      const [r, a, c] = texts;
+      const [r, a, c, k] = texts;
       setFiles({
         roster: stateFromResult(validateCsv("roster", r), "roster.csv (sample)"),
         attendance: stateFromResult(validateCsv("attendance", a), "attendance.csv (sample)"),
         catalog: stateFromResult(validateCsv("catalog", c), "catalog.csv (sample)"),
+        calendar: stateFromResult(validateCsv("calendar", k), "calendar.csv (sample)"),
       });
       setSource("sample");
       setToday(todayManila());
@@ -125,6 +137,7 @@ export function useRadarState() {
     analysisError: run.error,
     roster,
     catalog,
+    calendar,
     selectedUnit,
     loadFile,
     clearFile,

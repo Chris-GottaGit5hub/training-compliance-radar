@@ -62,52 +62,95 @@ export function formatAiLog(entry: {
   );
 }
 
-/** Structured output via generateText + Output.object, temperature 0.3, 25 s timeout, 1 retry. */
-export const generateStructured: StructuredGenerator = async (call) => {
-  const started = Date.now();
-  const log = (status: "ok" | "error", code?: string) =>
-    console.info(
-      formatAiLog({
-        route: call.route,
-        provider: call.config.provider,
-        model: call.config.modelId,
-        latencyMs: Date.now() - started,
-        status,
-        code,
-      }),
-    );
+/** Errors worth a second model: overload, rate limits, server errors, slowness. */
+export const shouldTryFallback = (code: string): boolean =>
+  /^(http_5\d\d|http_429|timeout)/.test(code);
 
-  const signal = AbortSignal.timeout(call.timeoutMs ?? AI_TIMEOUT_MS);
+/** How long the primary model gets before the fallback is tried. */
+export const PRIMARY_TIMEOUT_MS = 15_000;
+
+/**
+ * Runs `run` on each model in turn. A model that fails with an overload-type error or a
+ * timeout hands over to the next one; other errors (bad request, bad key) stop right away
+ * because another model would fail the same way. All models share one overall deadline.
+ */
+export async function withModelFallback<T>(
+  models: readonly string[],
+  run: (modelId: string, signal: AbortSignal) => Promise<T>,
+  options: {
+    totalMs: number;
+    firstMs: number;
+    log: (modelId: string, status: "ok" | "error", latencyMs: number, code?: string) => void;
+  },
+): Promise<{ ok: true; value: T } | { ok: false; code: string }> {
+  const overall = AbortSignal.timeout(options.totalMs);
+  let lastCode = "unknown";
+
+  for (let i = 0; i < models.length; i++) {
+    const isLast = i === models.length - 1;
+    const signal = isLast ? overall : AbortSignal.any([overall, AbortSignal.timeout(options.firstMs)]);
+    const started = Date.now();
+    try {
+      const value = await run(models[i], signal);
+      options.log(models[i], "ok", Date.now() - started);
+      return { ok: true, value };
+    } catch (error) {
+      lastCode = errorCode(error);
+      options.log(models[i], "error", Date.now() - started, lastCode);
+      if (isLast || overall.aborted || !shouldTryFallback(lastCode)) break;
+    }
+  }
+  return { ok: false, code: lastCode };
+}
+
+/**
+ * Structured output via generateText + Output.object, temperature 0.3, one SDK retry, a 40 s
+ * overall deadline, Gemini thinking kept low, and a same-provider fallback model.
+ */
+export const generateStructured: StructuredGenerator = async (call) => {
   const thinking = call.thinking ?? call.config.thinkingLevel;
-  const attempt = (withThinking: boolean) =>
+  const models = [
+    call.config.modelId,
+    ...(call.config.fallbackModelId ? [call.config.fallbackModelId] : []),
+  ];
+
+  const attempt = (modelId: string, signal: AbortSignal, withThinking: boolean) =>
     generateText({
-      model: getModel(call.config),
+      model: getModel({ ...call.config, modelId }),
       instructions: call.instructions,
       prompt: call.prompt,
       output: Output.object({ schema: call.schema }),
       temperature: 0.3,
       maxRetries: 1,
       abortSignal: signal,
-      // Gemini 3 reasons by default, which made long outputs (memos) time out.
+      // Gemini 3 reasons by default, which made long outputs (memos) slow.
       ...(withThinking && call.config.provider === "google" && thinking !== "off"
         ? { providerOptions: { google: { thinkingConfig: { thinkingLevel: thinking } } } }
         : {}),
     });
 
-  try {
-    let result;
-    try {
-      result = await attempt(true);
-    } catch (error) {
-      // If the provider rejects the thinking setting, retry once without it.
-      if (call.config.provider !== "google" || errorCode(error) !== "http_400") throw error;
-      result = await attempt(false);
-    }
-    log("ok");
-    return { ok: true, output: result.output as z.infer<typeof call.schema> };
-  } catch (error) {
-    const code = errorCode(error);
-    log("error", code);
-    return { ok: false, code };
-  }
+  const result = await withModelFallback(
+    models,
+    async (modelId, signal) => {
+      try {
+        return await attempt(modelId, signal, true);
+      } catch (error) {
+        // If the provider rejects the thinking setting, retry once without it.
+        if (call.config.provider !== "google" || errorCode(error) !== "http_400") throw error;
+        return attempt(modelId, signal, false);
+      }
+    },
+    {
+      totalMs: call.timeoutMs ?? AI_TIMEOUT_MS,
+      firstMs: Math.min(PRIMARY_TIMEOUT_MS, call.timeoutMs ?? AI_TIMEOUT_MS),
+      log: (model, status, latencyMs, code) =>
+        console.info(
+          formatAiLog({ route: call.route, provider: call.config.provider, model, latencyMs, status, code }),
+        ),
+    },
+  );
+
+  return result.ok
+    ? { ok: true, output: result.value.output as z.infer<typeof call.schema> }
+    : { ok: false, code: result.code };
 };

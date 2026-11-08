@@ -1,4 +1,4 @@
-# spec.md — Training Compliance Radar (v1.4)
+# spec.md — Training Compliance Radar (v1.5)
 
 > Source of truth for implementation. When code and spec disagree, **the spec wins** — update the spec first, then the code.
 
@@ -172,6 +172,7 @@ States: loading spinners on AI buttons; error banners with retry; empty states. 
   | `AI_PROVIDER` | `google` \| `anthropic` | `google` | Selects the provider for all AI routes |
   | `AI_MODEL` | model ID | `gemini-3.8-flash` when `google`; `claude-haiku-5-5` when `anthropic` | Optional override |
   | `AI_THINKING_LEVEL` | `minimal` | `low` | `medium` | `high` | `low` | Gemini only; lower is faster |
+  | `AI_FALLBACK_MODEL` | model ID | `none` | `gemini-3.6-flash` when `google` | Same-provider backup model, tried when the primary returns 429/5xx or times out (primary gets 15 s of the 40 s deadline). Not a provider fallback |
   | `GOOGLE_GENERATIVE_AI_API_KEY` | secret | — | Required when `AI_PROVIDER=google` |
   | `ANTHROPIC_API_KEY` | secret | — | Required when `AI_PROVIDER=anthropic` |
 
@@ -207,3 +208,4 @@ Engine: rules 1–5 each, monthsRemaining (Jan/Sep/Dec), rounding, ranking order
 | 1.2 | 2026-11-08 | Acceptance criterion 2 now states the Nov 30 as-of date (a Sep 30 evaluation gives NOT_COVERED by rule 1). Back-test reports recall and precision at Jun 30 and Sep 30, with a note that 1 − precision is the group early nudges target. `summarizeUnits` and `costToClose` take the roster to read licensing. | clarifications from engine implementation |
 | 1.3 | 2026-11-08 | Provider call uses `generateText` with `Output.object` instead of `generateObject`, which the installed AI SDK (v7) marks deprecated. Behavior and schemas are unchanged. | clarifications from AI route implementation |
 | 1.4 | 2026-11-08 | AI call deadline 25 s → 40 s for the whole call; Gemini `thinkingLevel` set to `low` by default (env `AI_THINKING_LEVEL`) because Gemini 3 reasoning made memo generation exceed 25 s on the live site; memo/summary regeneration skipped after a slow first attempt; summary and memo prompts ask for plain-English labels. 503 responses carry a `reason`, 502 a short `code`, and `GET /api/status` reports configuration. | bug found on live site |
+| 1.5 | 2026-11-08 | Same-provider model fallback (`AI_FALLBACK_MODEL`, default `gemini-3.6-flash` for Gemini): live testing showed `gemini-3.8-flash` returning 503 or hanging while `gemini-3.6-flash` answered in about 1 s. There is still no fallback between providers. 502 bodies carry the underlying provider code (e.g. `timeout_after_http_503`); `GET /api/status?probe=1` tests the provider. | bug found on live site |

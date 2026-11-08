@@ -1,7 +1,7 @@
 import { APICallError, RetryError } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
-import { errorCode, formatAiLog, type StructuredGenerator } from "@/lib/ai/generate";
+import { errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
 import { REGENERATE_ONLY_BEFORE_MS, runMemo, runRecommend, runSummary } from "@/lib/ai/run";
 import type { MemoRequest, RecommendRequest, SummaryRequest } from "@/lib/schemas";
@@ -39,9 +39,28 @@ describe("resolveAiConfig", () => {
     const result = resolveAiConfig({ GOOGLE_GENERATIVE_AI_API_KEY: "k" });
     expect(result).toEqual({
       ok: true,
-      config: { provider: "google", modelId: "gemini-3.8-flash", thinkingLevel: "low", apiKey: "k" },
+      config: {
+        provider: "google",
+        modelId: "gemini-3.8-flash",
+        fallbackModelId: "gemini-3.6-flash",
+        thinkingLevel: "low",
+        apiKey: "k",
+      },
     });
     expect(DEFAULT_MODELS.google).toBe("gemini-3.8-flash");
+  });
+
+  it("has a same-provider fallback model for Gemini only, which can be changed or turned off", () => {
+    const key = { GOOGLE_GENERATIVE_AI_API_KEY: "k" };
+    expect(resolveAiConfig({ ...key, AI_FALLBACK_MODEL: "gemini-3.5-flash" })).toMatchObject({
+      config: { fallbackModelId: "gemini-3.5-flash" },
+    });
+    const off = resolveAiConfig({ ...key, AI_FALLBACK_MODEL: "none" });
+    expect(off.ok && off.config.fallbackModelId).toBeUndefined();
+    const same = resolveAiConfig({ ...key, AI_MODEL: "gemini-3.6-flash" }); // fallback equals primary
+    expect(same.ok && same.config.fallbackModelId).toBeUndefined();
+    const claude = resolveAiConfig({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "k" });
+    expect(claude.ok && claude.config.fallbackModelId).toBeUndefined();
   });
 
   it("uses a low Gemini thinking level by default and accepts a valid override", () => {
@@ -89,7 +108,13 @@ describe("resolveAiConfig", () => {
     });
     expect(result).toEqual({
       ok: true,
-      config: { provider: "google", modelId: "gemini-3.8-flash", thinkingLevel: "low", apiKey: "abc123" },
+      config: {
+        provider: "google",
+        modelId: "gemini-3.8-flash",
+        fallbackModelId: "gemini-3.6-flash",
+        thinkingLevel: "low",
+        apiKey: "abc123",
+      },
     });
   });
 });
@@ -97,7 +122,12 @@ describe("resolveAiConfig", () => {
 describe("describeAiStatus", () => {
   it("reports provider and model when configured, and never the key", () => {
     const status = describeAiStatus({ GOOGLE_GENERATIVE_AI_API_KEY: "super-secret" });
-    expect(status).toEqual({ configured: true, provider: "google", model: "gemini-3.8-flash" });
+    expect(status).toEqual({
+      configured: true,
+      provider: "google",
+      model: "gemini-3.8-flash",
+      fallbackModel: "gemini-3.6-flash",
+    });
     expect(JSON.stringify(status)).not.toContain("super-secret");
   });
 
@@ -212,6 +242,66 @@ describe("runSummary and runRecommend", () => {
       fakeGenerator([{ recommendations: [{ unit: "Finance", courseIds: ["C1", "GHOST"], rationale: "ok" }] }]).generate,
     );
     expect(result.ok && result.body.recommendations[0].courseIds).toEqual(["C1"]);
+  });
+});
+
+describe("withModelFallback", () => {
+  const log = () => {};
+  const overloaded = () => new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 503 });
+  const options = { totalMs: 2_000, firstMs: 100, log };
+
+  it("only falls back for overload-type errors", () => {
+    for (const code of ["http_503", "http_500", "http_429", "timeout", "timeout_after_http_503"]) {
+      expect(shouldTryFallback(code), code).toBe(true);
+    }
+    for (const code of ["http_400", "http_401", "http_403", "http_404", "invalid_output", "unknown"]) {
+      expect(shouldTryFallback(code), code).toBe(false);
+    }
+  });
+
+  it("uses the backup model when the primary is overloaded", async () => {
+    const tried: string[] = [];
+    const result = await withModelFallback(["primary", "backup"], async (model) => {
+      tried.push(model);
+      if (model === "primary") throw overloaded();
+      return "answer";
+    }, options);
+    expect(result).toEqual({ ok: true, value: "answer" });
+    expect(tried).toEqual(["primary", "backup"]);
+  });
+
+  it("moves on when the primary hangs past its own time limit", async () => {
+    const result = await withModelFallback(["primary", "backup"], (model, signal) =>
+      model === "primary"
+        ? new Promise<string>((_resolve, reject) => signal.addEventListener("abort", () => reject(signal.reason)))
+        : Promise.resolve("answer"), options);
+    expect(result).toEqual({ ok: true, value: "answer" });
+  });
+
+  it("does not try the backup for errors it would share (bad key, bad request)", async () => {
+    const tried: string[] = [];
+    const bad = new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 403 });
+    const result = await withModelFallback(["primary", "backup"], async (model) => {
+      tried.push(model);
+      throw bad;
+    }, options);
+    expect(result).toEqual({ ok: false, code: "http_403" });
+    expect(tried).toEqual(["primary"]);
+  });
+
+  it("reports the last error when every model fails, and logs each attempt", async () => {
+    const lines: string[] = [];
+    const result = await withModelFallback(["a", "b"], async () => { throw overloaded(); }, {
+      ...options,
+      log: (model, status, _ms, code) => lines.push(`${model}:${status}:${code}`),
+    });
+    expect(result).toEqual({ ok: false, code: "http_503" });
+    expect(lines).toEqual(["a:error:http_503", "b:error:http_503"]);
+  });
+
+  it("works with a single model", async () => {
+    const result = await withModelFallback(["only"], async () => 42, options);
+    expect(result).toEqual({ ok: true, value: 42 });
   });
 });
 

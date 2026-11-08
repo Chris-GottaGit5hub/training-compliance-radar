@@ -3,10 +3,14 @@ export type AiProvider = "google" | "anthropic";
 export type ThinkingLevel = "minimal" | "low" | "medium" | "high";
 const THINKING_LEVELS: readonly string[] = ["minimal", "low", "medium", "high"];
 export const DEFAULT_THINKING_LEVEL: ThinkingLevel = "low";
+/** Tried when the primary Gemini model is overloaded (429/5xx) or times out. */
+export const DEFAULT_FALLBACK_MODEL = "gemini-3.6-flash";
 
 export interface AiConfig {
   provider: AiProvider;
   modelId: string;
+  /** Same-provider backup model, or undefined for none (not a different provider). */
+  fallbackModelId?: string;
   /** Gemini only: how much the model reasons before answering. Lower is faster. */
   thinkingLevel: ThinkingLevel;
   /** Never log or return this. */
@@ -50,11 +54,18 @@ export function resolveAiConfig(env: Record<string, string | undefined>): AiConf
   const apiKey = clean(env[keyVar]);
   if (!apiKey) return { ok: false, reason: "missing_key", keyVar };
   const level = clean(env.AI_THINKING_LEVEL).toLowerCase();
+  const modelId = clean(env.AI_MODEL) || DEFAULT_MODELS[provider];
+  const fallbackRaw = clean(env.AI_FALLBACK_MODEL);
+  const fallback =
+    fallbackRaw.toLowerCase() === "none"
+      ? ""
+      : fallbackRaw || (provider === "google" ? DEFAULT_FALLBACK_MODEL : "");
   return {
     ok: true,
     config: {
       provider,
-      modelId: clean(env.AI_MODEL) || DEFAULT_MODELS[provider],
+      modelId,
+      ...(fallback && fallback !== modelId ? { fallbackModelId: fallback } : {}),
       thinkingLevel: THINKING_LEVELS.includes(level) ? (level as ThinkingLevel) : DEFAULT_THINKING_LEVEL,
       apiKey,
     },
@@ -62,14 +73,20 @@ export function resolveAiConfig(env: Record<string, string | undefined>): AiConf
 }
 
 export type AiStatus =
-  | { configured: true; provider: AiProvider; model: string }
+  | { configured: true; provider: AiProvider; model: string; fallbackModel?: string }
   | { configured: false; reason: AiNotConfigured["reason"]; keyVar?: string };
 
 /** Safe to expose publicly: provider and model names, or why AI is off. Never the key. */
 export function describeAiStatus(env: Record<string, string | undefined>): AiStatus {
   const result = resolveAiConfig(env);
   if (result.ok) {
-    return { configured: true, provider: result.config.provider, model: result.config.modelId };
+    const { provider, modelId, fallbackModelId } = result.config;
+    return {
+      configured: true,
+      provider,
+      model: modelId,
+      ...(fallbackModelId ? { fallbackModel: fallbackModelId } : {}),
+    };
   }
   return {
     configured: false,

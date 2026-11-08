@@ -1,13 +1,30 @@
 import type { ReactNode } from "react";
-import { formatPercent, formatPeso, type Analysis } from "@/lib/analysis";
+import { formatPercent, formatPeso, formatPesoMillions, type Analysis } from "@/lib/analysis";
 import type { RulesConfig } from "@/lib/schemas";
 
-function Kpi({ label, value, children }: { label: string; value: ReactNode; children?: ReactNode }) {
+function Kpi({
+  label,
+  value,
+  title,
+  children,
+}: {
+  label: string;
+  value: ReactNode;
+  /** Full amount shown on hover when `value` is shortened. */
+  title?: string;
+  children?: ReactNode;
+}) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
+    <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4">
       <dt className="text-sm font-medium text-slate-600">{label}</dt>
       <dd className="mt-1">
-        <span className="text-2xl font-semibold text-slate-900 sm:text-3xl">{value}</span>
+        <span
+          title={title}
+          aria-label={title ? `${label}: ${title}` : undefined}
+          className={`text-2xl font-semibold text-slate-900 sm:text-3xl ${title ? "cursor-help" : ""}`}
+        >
+          {value}
+        </span>
         {children && <span className="mt-1 block text-xs text-slate-500">{children}</span>}
       </dd>
     </div>
@@ -27,7 +44,8 @@ function BalanceKpi({ analysis, config }: Props) {
   return (
     <Kpi
       label="Outstanding balance"
-      value={<span className={budget.remaining < 0 ? "text-red-700" : ""}>{formatPeso(budget.remaining)}</span>}
+      value={<span className={budget.remaining < 0 ? "text-red-700" : ""}>{formatPesoMillions(budget.remaining)}</span>}
+      title={formatPeso(budget.remaining)}
     >
       {formatPercent(budget.percentSpent)} of {formatPeso(budget.allocation)} spent
       <span
@@ -52,7 +70,7 @@ function CostKpi({ analysis }: Props) {
     );
   }
   return (
-    <Kpi label="Cost to close" value={formatPeso(cost.costToClose)}>
+    <Kpi label="Cost to close" value={formatPesoMillions(cost.costToClose)} title={formatPeso(cost.costToClose)}>
       {costSource === "plan"
         ? "Cheapest mix of calendar runs, nominated external and LinkedIn"
         : "Estimate from catalog prices; add a calendar for run-based costs"}

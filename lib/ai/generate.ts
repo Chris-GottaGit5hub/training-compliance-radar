@@ -7,7 +7,8 @@ import type { AiConfig, ThinkingLevel } from "./config";
 /** Whole-call deadline (retries included). Must stay well under the routes' 60 s maxDuration. */
 export const AI_TIMEOUT_MS = 40_000;
 
-export type StructuredResult<T> = { ok: true; output: T } | { ok: false; code: string };
+/** `detail` is only filled for the diagnostic probe (no user data), never for real requests. */
+export type StructuredResult<T> = { ok: true; output: T } | { ok: false; code: string; detail?: string };
 
 export interface StructuredCall<S extends z.ZodType> {
   route: string;
@@ -45,6 +46,12 @@ export function errorCode(error: unknown): string {
   if (name.includes("NoObjectGenerated") || name.includes("NoOutputGenerated")) return "invalid_output";
   if (name.includes("TypeValidation") || name.includes("JSONParse")) return "invalid_output";
   return "unknown";
+}
+
+/** Provider response text (e.g. which quota was hit), truncated. Only exposed by the probe. */
+export function providerDetail(error: unknown): string | undefined {
+  const cause = RetryError.isInstance(error) ? error.lastError : error;
+  return cause instanceof APICallError ? cause.responseBody?.slice(0, 600) : undefined;
 }
 
 /** One line per AI call: route, provider, model, latency, status. Never the payload. */
@@ -110,9 +117,10 @@ export async function withModelFallback<T>(
     /** Optional: models that recently failed are skipped (the last model is always tried). */
     cooldown?: ModelCooldown;
   },
-): Promise<{ ok: true; value: T } | { ok: false; code: string }> {
+): Promise<{ ok: true; value: T } | { ok: false; code: string; detail?: string }> {
   const overall = AbortSignal.timeout(options.totalMs);
   let lastCode = "unknown";
+  let lastDetail: string | undefined;
 
   for (let i = 0; i < models.length; i++) {
     const isLast = i === models.length - 1;
@@ -125,12 +133,13 @@ export async function withModelFallback<T>(
       return { ok: true, value };
     } catch (error) {
       lastCode = errorCode(error);
+      lastDetail = providerDetail(error);
       options.log(models[i], "error", Date.now() - started, lastCode);
       if (isLast || overall.aborted || !shouldTryFallback(lastCode)) break;
       options.cooldown?.trip(models[i]);
     }
   }
-  return { ok: false, code: lastCode };
+  return { ok: false, code: lastCode, ...(lastDetail ? { detail: lastDetail } : {}) };
 }
 
 /**
@@ -183,5 +192,10 @@ export const generateStructured: StructuredGenerator = async (call) => {
 
   return result.ok
     ? { ok: true, output: result.value.output as z.infer<typeof call.schema> }
-    : { ok: false, code: result.code };
+    : {
+        ok: false,
+        code: result.code,
+        // Provider text could echo a prompt, so only the user-data-free probe may show it.
+        ...(call.route === "probe" && result.detail ? { detail: result.detail } : {}),
+      };
 };

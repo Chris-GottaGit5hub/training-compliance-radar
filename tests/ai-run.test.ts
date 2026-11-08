@@ -1,7 +1,7 @@
 import { APICallError, RetryError } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
-import { createModelCooldown, errorCode, formatAiLog, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
+import { createModelCooldown, errorCode, formatAiLog, providerDetail, shouldTryFallback, withModelFallback, type StructuredGenerator } from "@/lib/ai/generate";
 import { extractNumbers, ungroundedNumbers } from "@/lib/ai/grounding";
 import { REGENERATE_ONLY_BEFORE_MS, runMemo, runRecommend, runSummary } from "@/lib/ai/run";
 import type { MemoRequest, RecommendRequest, SummaryRequest } from "@/lib/schemas";
@@ -204,6 +204,16 @@ describe("runMemo", () => {
     expect(result.ok && result.body.warning).toBe("unverified_numbers");
   });
 
+  it("keeps the first answer, with a warning, if the regeneration fails", async () => {
+    const bad = { ...goodMemo, body: `${goodMemo.body}
+47 staff left.` };
+    const { generate, calls } = fakeGenerator([bad, "FAIL"]);
+    const result = await runMemo(memoRequest, aiConfig, generate);
+    expect(calls()).toBe(2);
+    expect(result.ok && result.body.warning).toBe("unverified_numbers");
+    expect(result.ok && result.body.subject).toBe("12 colleagues need training");
+  });
+
   it("fails (for a 502) when the model call fails", async () => {
     const { generate, calls } = fakeGenerator(["FAIL"]);
     expect(await runMemo(memoRequest, aiConfig, generate)).toEqual({ ok: false, code: "unknown" });
@@ -347,6 +357,20 @@ describe("AI call logging", () => {
     expect(errorCode(Object.assign(new Error("slow"), { name: "TimeoutError" }))).toBe("timeout");
     expect(errorCode(new Error("SECRET-UNIT"))).toBe("unknown");
     expect(errorCode(apiError)).not.toContain("SECRET");
+  });
+
+  it("exposes the provider's response text only through providerDetail (for the probe)", () => {
+    const quota = new APICallError({
+      message: "x",
+      url: "u",
+      requestBodyValues: {},
+      statusCode: 429,
+      responseBody: '{"error":{"message":"Quota exceeded for metric generate_content_free_tier_requests"}}',
+    });
+    expect(providerDetail(quota)).toContain("Quota exceeded");
+    expect(providerDetail(new RetryError({ message: "m", reason: "maxRetriesExceeded", errors: [quota] }))).toContain("Quota exceeded");
+    expect(providerDetail(new Error("plain"))).toBeUndefined();
+    expect(errorCode(quota)).not.toContain("Quota"); // the log/route code never carries it
   });
 
   it("looks through the SDK's retry wrapper to the real cause", () => {

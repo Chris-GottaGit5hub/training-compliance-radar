@@ -62,7 +62,13 @@ export async function GET(request: Request): Promise<Response> {
   return Response.json(
     {
       ...status,
-      probe: { model: modelId, ok: result.ok, ...(result.ok ? {} : { code: result.code }), thinking, latencyMs: Date.now() - started },
+      probe: {
+        model: modelId,
+        ok: result.ok,
+        ...(result.ok ? {} : { code: result.code, ...(result.detail ? { detail: result.detail } : {}) }),
+        thinking,
+        latencyMs: Date.now() - started,
+      },
     },
     { headers },
   );

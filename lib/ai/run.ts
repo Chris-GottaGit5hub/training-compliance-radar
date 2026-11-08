@@ -57,7 +57,11 @@ async function generateGrounded<T extends { warning?: "unverified_numbers" }>(
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     if (i > 0 && Date.now() - started > REGENERATE_ONLY_BEFORE_MS) break;
     const result = await attempt();
-    if (!result.ok) return { ok: false, code: result.code };
+    if (!result.ok) {
+      // A failed regeneration must not throw away an answer we already have.
+      if (last) break;
+      return { ok: false, code: result.code };
+    }
     last = result;
     if (ungroundedNumbers(result.text, request).length === 0) return { ok: true, body: result.value };
   }

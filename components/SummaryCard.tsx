@@ -1,11 +1,34 @@
 import { useEffect, useRef } from "react";
-import type { Analysis } from "@/lib/analysis";
+import { buildTemplateSummary, type Analysis } from "@/lib/analysis";
 import type { RulesConfig } from "@/lib/schemas";
 import { CopyButton } from "./CopyButton";
 import { SummaryCharts } from "./SummaryCharts";
 import { downloadTextFile } from "./download";
 import type { AiActions } from "./useAiActions";
 import { Banner, Card, buttonClass } from "./ui";
+
+function TemplateSummary({ text, asOfDate }: { text: string; asOfDate: string }) {
+  return (
+    <div className="space-y-3">
+      <p className="whitespace-pre-line text-sm leading-relaxed text-slate-800">{text}</p>
+      <div className="flex flex-wrap gap-2">
+        <CopyButton text={text} label="Copy summary" />
+        <button
+          type="button"
+          className={buttonClass("secondary")}
+          onClick={() =>
+            downloadTextFile(`executive-summary-${asOfDate}.txt`, text, "text/plain;charset=utf-8")
+          }
+        >
+          Download .txt
+        </button>
+      </div>
+      <p className="text-xs text-slate-500">
+        Template summary built from the compliance engine&apos;s numbers. No AI was used.
+      </p>
+    </div>
+  );
+}
 
 /** Executive summary written by the AI from org-level numbers only. */
 export function SummaryCard({
@@ -43,12 +66,18 @@ export function SummaryCard({
             <p className="text-sm text-slate-600">Writing the summary…</p>
           )}
           {state.status === "error" && (
-            <Banner tone="error">
-              {state.message}{" "}
-              <button type="button" onClick={ai.summary} className="font-medium underline">
-                Retry
-              </button>
-            </Banner>
+            <>
+              <Banner tone="error">
+                {state.message}{" "}
+                <button type="button" onClick={ai.summary} className="font-medium underline">
+                  Retry
+                </button>
+              </Banner>
+              <Banner tone="info">
+                The AI is unavailable, so here is a template summary built from your numbers.
+              </Banner>
+              <TemplateSummary text={buildTemplateSummary(analysis, config)} asOfDate={asOfDate} />
+            </>
           )}
           {state.status === "done" && (
             <>

@@ -7,7 +7,7 @@ import {
   type AtRiskRow,
 } from "@/lib/analysis";
 import type { UnitSummary } from "@/lib/engine";
-import type { CatalogRow } from "@/lib/schemas";
+import type { CatalogRow, RulesConfig } from "@/lib/schemas";
 import { AiPanel } from "./AiPanel";
 import { downloadTextFile } from "./download";
 import type { AiActions } from "./useAiActions";
@@ -58,6 +58,7 @@ function UnitDetails({
   unit,
   rows,
   asOfDate,
+  config,
   catalog,
   ai,
   onClose,
@@ -65,6 +66,7 @@ function UnitDetails({
   unit: UnitSummary;
   rows: AtRiskRow[];
   asOfDate: string;
+  config: RulesConfig;
   catalog: CatalogRow[] | null;
   ai: AiActions;
   onClose: () => void;
@@ -112,7 +114,7 @@ function UnitDetails({
         rows={rows}
         catalog={catalog}
         ai={ai}
-        asOfDate={asOfDate}
+        config={config}
         exportButton={
           <button
             type="button"
@@ -154,6 +156,7 @@ export function UnitPanel({ state, ai }: { state: RadarState; ai: AiActions }) {
             unit={unit}
             rows={rows}
             asOfDate={config.asOfDate}
+            config={config}
             catalog={catalog}
             ai={ai}
             onClose={() => selectUnit(null)}

@@ -2,7 +2,8 @@ import { useId, useState, type ReactNode } from "react";
 import type { AtRiskRow } from "@/lib/analysis";
 import type { UnitSummary } from "@/lib/engine";
 import { topPositions, unitKey } from "@/lib/payload";
-import type { CatalogRow, MemoRequest } from "@/lib/schemas";
+import { buildTemplateMemo } from "@/lib/analysis";
+import type { CatalogRow, MemoRequest, RulesConfig } from "@/lib/schemas";
 import { MemoView } from "./MemoView";
 import { RecommendationList } from "./RecommendationList";
 import type { AiActions } from "./useAiActions";
@@ -34,14 +35,14 @@ export function AiPanel({
   rows,
   catalog,
   ai,
-  asOfDate,
+  config,
   exportButton,
 }: {
   unit: UnitSummary;
   rows: AtRiskRow[];
   catalog: CatalogRow[] | null;
   ai: AiActions;
-  asOfDate: string;
+  config: RulesConfig;
   exportButton: ReactNode;
 }) {
   const toneId = useId();
@@ -49,6 +50,13 @@ export function AiPanel({
   const memo = ai.memos[unit.unit] ?? { status: "idle" as const };
   const recs = ai.recommendations;
   const rec = recs.status === "done" ? recs.data[unitKey(unit.unit)] : undefined;
+  const asOfDate = config.asOfDate;
+  const recCourses =
+    rec && catalog
+      ? rec.courseIds
+          .map((id) => catalog.find((c) => c.course_id === id))
+          .filter((c): c is CatalogRow => c !== undefined)
+      : [];
   const memoLoading = memo.status === "loading";
   const recLoading = recs.status === "loading";
 
@@ -105,7 +113,16 @@ export function AiPanel({
       )}
 
       {memo.status === "error" && (
-        <RetryBanner message={memo.message} onRetry={() => ai.memo(unit.unit, tone)} />
+        <>
+          <RetryBanner message={memo.message} onRetry={() => ai.memo(unit.unit, tone)} />
+          <MemoView
+            template
+            memo={buildTemplateMemo(unit, recCourses, config, tone)}
+            rows={rows}
+            unit={unit.unit}
+            asOfDate={asOfDate}
+          />
+        </>
       )}
       {memo.status === "done" && (
         <MemoView memo={memo.data} rows={rows} unit={unit.unit} asOfDate={asOfDate} />

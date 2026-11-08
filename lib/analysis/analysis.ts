@@ -51,7 +51,10 @@ export interface BacktestCheckpoint {
 export interface Analysis {
   results: EmployeeResult[];
   org: OrgSummary;
+  /** Cost to close the gap; `remaining` is the annual allocation left after spend and this cost (spec §4.2). */
   cost: CostToClose | null;
+  /** "plan" = cheapest combination of calendar runs, nominated external and LinkedIn; "catalog" = per-head estimate. */
+  costSource: "plan" | "catalog" | null;
   /** Recall and precision at Jun 30 and Sep 30 of config.year (spec §4.1). */
   backtests: BacktestCheckpoint[];
   /** Trained vs untrained against the four target dates (spec §4.5). */
@@ -109,16 +112,32 @@ export function runAnalysis({ roster, attendance, catalog, calendar, config }: A
         )
       : null;
 
+  const budget = budgetSeries(roster, attendance, config, results, plan?.plannedByMonth);
+  const baseCost = catalog && catalog.length > 0 ? costToClose(results, roster, catalog, config) : null;
+  // With a calendar, the cost is the plan's cheapest combination; otherwise a per-head estimate.
+  const fromPlan = plan !== null && calendar !== undefined && calendar !== null && calendar.length > 0;
+  const priced = fromPlan && plan ? { costToClose: plan.totalPlannedCost, unpricedCount: plan.unplaced } : baseCost;
+  // What is left of the annual allocation after the spend so far and after closing the gap.
+  const cost: CostToClose | null = priced
+    ? {
+        costToClose: priced.costToClose,
+        unpricedCount: priced.unpricedCount,
+        remaining: Math.round((budget.remaining - priced.costToClose) * 100) / 100,
+        covered: budget.remaining - priced.costToClose >= 0 && priced.unpricedCount === 0,
+      }
+    : null;
+
   return {
     results,
     org: summarizeOrg(results, roster, config),
-    cost: catalog && catalog.length > 0 ? costToClose(results, roster, catalog, config) : null,
+    cost,
+    costSource: priced === null ? null : fromPlan ? "plan" : "catalog",
     backtests: CHECKPOINTS.map(({ label, monthDay }) => {
       const checkpoint = `${config.year}-${monthDay}`;
       return { label, checkpoint, result: backtest(roster, attendance, config, checkpoint) };
     }),
     milestones: evaluateMilestones(roster, attendance, config, results),
-    budget: budgetSeries(roster, attendance, config, results, plan?.plannedByMonth),
+    budget,
     leftOut: leftOutSummary(results, roster),
     windows,
     plan,

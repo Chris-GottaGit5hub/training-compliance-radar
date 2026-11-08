@@ -44,12 +44,12 @@ export function BacktestPanel({ analysis }: { analysis: Analysis }) {
 }
 
 export function CostPanel({ analysis, config }: { analysis: Analysis; config: RulesConfig }) {
-  const bars = costBars(analysis.cost, config.budgetPhp);
+  const bars = costBars(analysis.cost, config.budgetPhp > 0 ? Math.max(0, analysis.budget.remaining) : null);
   const { cost } = analysis;
   return (
     <ChartPanel
       title="Cost to close the gap"
-      description="Cheapest catalog route for every at-risk employee, against your budget."
+      description="Cheapest mix of trainings for every at-risk employee, against the budget still left."
       summary={bars ? bars.map((b) => `${b.label} ${formatPeso(b.value)}`).join(", ") : "No catalog loaded."}
     >
       {!bars || !cost ? (
@@ -77,8 +77,8 @@ export function CostPanel({ analysis, config }: { analysis: Analysis; config: Ru
           <p className="mt-1 text-xs text-slate-600">
             {config.budgetPhp > 0
               ? cost.remaining >= 0
-                ? `Within budget, ${formatPeso(cost.remaining)} to spare.`
-                : `Short by ${formatPeso(-cost.remaining)}.`
+                ? `Within the remaining budget, ${formatPeso(cost.remaining)} to spare.`
+                : `Short of the remaining budget by ${formatPeso(-cost.remaining)}.`
               : "Set a budget in Rules to compare."}
             {cost.unpricedCount > 0 &&
               ` Lower bound: ${cost.unpricedCount} at-risk employee(s) have no qualifying course.`}

@@ -70,10 +70,10 @@ describe("buildTemplateSummary", () => {
   it("compares the cost with the budget when one is set", () => {
     const cfg = config({ budgetPhp: 5000 });
     expect(buildTemplateSummary(run(cfg), cfg)).toContain(
-      "would cost ₱2,100, which the ₱5,000 budget covers with ₱2,900 to spare.",
+      "would cost ₱2,100, which the remaining budget covers, leaving ₱2,900 of the ₱5,000 annual budget.",
     );
     const tight = config({ budgetPhp: 1000 });
-    expect(buildTemplateSummary(run(tight), tight)).toContain("which is ₱1,100 more than the ₱1,000 budget.");
+    expect(buildTemplateSummary(run(tight), tight)).toContain("which is ₱1,100 more than the remaining budget.");
   });
 
   it("omits cost without a catalog, and flags a lower bound when courses are missing", () => {

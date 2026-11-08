@@ -69,10 +69,13 @@ export interface CostBar {
   value: number;
 }
 
-/** Cost to close, plus the budget when one is set; null when there is no catalog to price from. */
-export function costBars(cost: CostToClose | null, budgetPhp: number): CostBar[] | null {
+/**
+ * Cost to close, plus the budget still available (allocation minus spend) when a budget is set;
+ * null when there is nothing to price from.
+ */
+export function costBars(cost: CostToClose | null, budgetLeft: number | null): CostBar[] | null {
   if (!cost) return null;
   const bars: CostBar[] = [{ key: "cost", label: "Cost to close", value: cost.costToClose }];
-  if (budgetPhp > 0) bars.push({ key: "budget", label: "Budget", value: budgetPhp });
+  if (budgetLeft !== null) bars.push({ key: "budget", label: "Budget left", value: budgetLeft });
   return bars;
 }

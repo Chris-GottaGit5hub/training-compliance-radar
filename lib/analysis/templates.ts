@@ -84,12 +84,12 @@ export function buildTemplateSummary(analysis: Analysis, config: RulesConfig): s
   parts.push(`There ${org.monthsRemaining === 1 ? "is" : "are"} ${months} left until the ${formatDeadline(org.deadline)} deadline.`);
 
   if (cost) {
-    let sentence = `Closing the gap with the cheapest catalog courses would cost ${formatPeso(cost.costToClose)}`;
+    let sentence = `Closing the gap with the cheapest mix of available trainings would cost ${formatPeso(cost.costToClose)}`;
     if (config.budgetPhp > 0) {
       sentence +=
         cost.remaining >= 0
-          ? `, which the ${formatPeso(config.budgetPhp)} budget covers with ${formatPeso(cost.remaining)} to spare`
-          : `, which is ${formatPeso(-cost.remaining)} more than the ${formatPeso(config.budgetPhp)} budget`;
+          ? `, which the remaining budget covers, leaving ${formatPeso(cost.remaining)} of the ${formatPeso(config.budgetPhp)} annual budget`
+          : `, which is ${formatPeso(-cost.remaining)} more than the remaining budget`;
     }
     sentence += ".";
     if (cost.unpricedCount > 0) {

@@ -88,15 +88,15 @@ describe("backtestSeries", () => {
 describe("costBars", () => {
   const cost = { costToClose: 3850, unpricedCount: 0, remaining: 46150, covered: true };
 
-  it("is null without a catalog", () => {
+  it("is null without anything to price from", () => {
     expect(costBars(null, 50_000)).toBeNull();
   });
 
-  it("shows the budget bar only when a budget is set", () => {
-    expect(costBars(cost, 0)?.map((b) => b.key)).toEqual(["cost"]);
+  it("shows the budget-left bar only when a budget is set", () => {
+    expect(costBars(cost, null)?.map((b) => b.key)).toEqual(["cost"]);
     expect(costBars(cost, 50_000)).toEqual([
       { key: "cost", label: "Cost to close", value: 3850 },
-      { key: "budget", label: "Budget", value: 50_000 },
+      { key: "budget", label: "Budget left", value: 50_000 },
     ]);
   });
 });

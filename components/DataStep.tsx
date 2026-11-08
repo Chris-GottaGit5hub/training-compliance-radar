@@ -30,7 +30,8 @@ const BOXES: { kind: CsvKind; label: string; required: boolean; columns: string 
     kind: "calendar",
     label: "Training calendar",
     required: false,
-    columns: "run_id, course_id, date, delivery, cost_per_run, cost_per_head, min_pax, max_pax",
+    columns:
+      "run_id, course_id, date, delivery, cost_per_run, cost_per_head, min_pax, max_pax. Add nominated external trainings as external rows with min_pax 1",
   },
 ];
 

@@ -47,11 +47,12 @@ const byDateThenId = (a: CalendarRow, b: CalendarRow): number =>
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /**
- * Spec §4.9. Licensed at-risk staff close through LinkedIn at the cheapest qualifying
- * price (normally 0); unlicensed staff fill calendar runs (cancelled below min_pax, none
- * after Dec 14, none costlier per head than the cheapest paid LinkedIn fee), then take
- * that fee, else they are unplaced. Assumes everyone placed completes. Counts and pesos
- * only, no employee IDs.
+ * Spec §4.9. The cheapest combination that gives every at-risk person at least one
+ * training. Licensed staff close through LinkedIn at the cheapest qualifying price
+ * (normally 0). Unlicensed staff fill calendar runs, including external trainings that
+ * people nominate (cheapest per head first; cancelled below min_pax, after Dec 14, or when
+ * the people they take would be cheaper on the LinkedIn fee), then take that fee, else
+ * they are unplaced. Assumes everyone placed completes. Counts and pesos only, no IDs.
  */
 export function buildPlan(
   results: readonly EmployeeResult[],
@@ -83,24 +84,29 @@ export function buildPlan(
     .filter((r) => r.date > config.asOfDate && r.date.startsWith(`${config.year}-`))
     .sort(byDateThenId);
 
-  for (const run of upcoming) {
+  // Cheapest first: runs with the lowest per-head cost when full, then date. A run is held only
+  // if it takes at least min_pax people and costs less than paying the LinkedIn fee for them.
+  const fullPerHead = (r: CalendarRow) => (r.cost_per_run ?? 0) / r.max_pax + r.cost_per_head;
+  const decided = new Map<string, PlanRun>();
+  for (const run of [...upcoming].sort((a, b) => fullPerHead(a) - fullPerHead(b) || byDateThenId(a, b))) {
     const base = { runId: run.run_id, date: run.date, delivery: run.delivery, participants: 0, cost: 0 };
+    const take = Math.min(run.max_pax, pool.length);
+    const cost = round2((run.cost_per_run ?? 0) + run.cost_per_head * take);
     if (run.date > cutoff) {
-      runs.push({ ...base, state: "cancelled", reason: "after the Dec 14 in-person cutoff" });
-    } else if (paidFee !== null && (run.cost_per_run ?? 0) / run.max_pax + run.cost_per_head > paidFee) {
-      const perHead = Math.round((run.cost_per_run ?? 0) / run.max_pax + run.cost_per_head);
-      runs.push({ ...base, state: "cancelled", reason: `costlier than paid LinkedIn (₱${perHead} vs ₱${paidFee} per head)` });
-    } else if (pool.length < run.min_pax) {
-      runs.push({ ...base, state: "cancelled", reason: `fewer than ${run.min_pax} people available` });
+      decided.set(run.run_id, { ...base, state: "cancelled", reason: "after the Dec 14 in-person cutoff" });
+    } else if (take < run.min_pax) {
+      decided.set(run.run_id, { ...base, state: "cancelled", reason: `fewer than ${run.min_pax} people available` });
+    } else if (paidFee !== null && cost >= paidFee * take) {
+      const perHead = Math.round(cost / take);
+      decided.set(run.run_id, { ...base, state: "cancelled", reason: `costlier than paid LinkedIn (₱${perHead} vs ₱${paidFee} per head)` });
     } else {
-      const take = Math.min(run.max_pax, pool.length);
       pool.splice(0, take);
-      const cost = round2((run.cost_per_run ?? 0) + run.cost_per_head * take);
       plannedByMonth[monthIndex(run.date)] += cost;
       held.push({ date: run.date, participants: take });
-      runs.push({ ...base, participants: take, cost, state: "held" });
+      decided.set(run.run_id, { ...base, participants: take, cost, state: "held" });
     }
   }
+  for (const run of upcoming) runs.push(decided.get(run.run_id) as PlanRun);
 
   const paidLinkedIn = paidFee === null ? 0 : pool.length;
   const unplaced = paidFee === null ? pool.length : 0;

@@ -1,4 +1,4 @@
-import { APICallError } from "ai";
+import { APICallError, RetryError } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODELS, describeAiStatus, resolveAiConfig, type AiConfig } from "@/lib/ai/config";
 import { errorCode, formatAiLog, type StructuredGenerator } from "@/lib/ai/generate";
@@ -233,5 +233,14 @@ describe("AI call logging", () => {
     expect(errorCode(Object.assign(new Error("slow"), { name: "TimeoutError" }))).toBe("timeout");
     expect(errorCode(new Error("SECRET-UNIT"))).toBe("unknown");
     expect(errorCode(apiError)).not.toContain("SECRET");
+  });
+
+  it("looks through the SDK's retry wrapper to the real cause", () => {
+    const overloaded = new APICallError({ message: "x", url: "u", requestBodyValues: {}, statusCode: 503 });
+    const gaveUp = new RetryError({ message: "failed", reason: "maxRetriesExceeded", errors: [overloaded, overloaded] });
+    expect(errorCode(gaveUp)).toBe("http_503");
+    const aborted = new RetryError({ message: "aborted", reason: "abort", errors: [overloaded] });
+    expect(errorCode(aborted)).toBe("timeout_after_http_503");
+    expect(errorCode(new RetryError({ message: "aborted", reason: "abort", errors: [] }))).toBe("timeout");
   });
 });

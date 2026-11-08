@@ -1,8 +1,8 @@
-import { APICallError, Output, generateText } from "ai";
+import { APICallError, Output, RetryError, generateText } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { z } from "zod";
-import type { AiConfig } from "./config";
+import type { AiConfig, ThinkingLevel } from "./config";
 
 /** Whole-call deadline (retries included). Must stay well under the routes' 60 s maxDuration. */
 export const AI_TIMEOUT_MS = 40_000;
@@ -15,6 +15,10 @@ export interface StructuredCall<S extends z.ZodType> {
   schema: S;
   instructions: string;
   prompt: string;
+  /** Diagnostics only: override the thinking level ("off" sends no thinking setting). */
+  thinking?: ThinkingLevel | "off";
+  /** Diagnostics only: override the whole-call deadline. */
+  timeoutMs?: number;
 }
 
 /** Injectable so route logic can be tested without a network call. */
@@ -30,6 +34,11 @@ function getModel(config: AiConfig) {
 
 /** A short code only: provider error messages can echo the prompt, so they are never kept. */
 export function errorCode(error: unknown): string {
+  if (RetryError.isInstance(error)) {
+    // The SDK wraps retried failures; report the underlying cause (e.g. http_429, http_503).
+    const inner = error.lastError === undefined ? "unknown" : errorCode(error.lastError);
+    return error.reason === "abort" && error.errors.length > 0 ? `timeout_after_${inner}` : error.reason === "abort" ? "timeout" : inner;
+  }
   if (error instanceof APICallError) return `http_${error.statusCode ?? "unknown"}`;
   const name = error instanceof Error ? error.name : "";
   if (name === "TimeoutError" || name === "AbortError") return "timeout";
@@ -68,7 +77,8 @@ export const generateStructured: StructuredGenerator = async (call) => {
       }),
     );
 
-  const signal = AbortSignal.timeout(AI_TIMEOUT_MS);
+  const signal = AbortSignal.timeout(call.timeoutMs ?? AI_TIMEOUT_MS);
+  const thinking = call.thinking ?? call.config.thinkingLevel;
   const attempt = (withThinking: boolean) =>
     generateText({
       model: getModel(call.config),
@@ -79,8 +89,8 @@ export const generateStructured: StructuredGenerator = async (call) => {
       maxRetries: 1,
       abortSignal: signal,
       // Gemini 3 reasons by default, which made long outputs (memos) time out.
-      ...(withThinking && call.config.provider === "google"
-        ? { providerOptions: { google: { thinkingConfig: { thinkingLevel: call.config.thinkingLevel } } } }
+      ...(withThinking && call.config.provider === "google" && thinking !== "off"
+        ? { providerOptions: { google: { thinkingConfig: { thinkingLevel: thinking } } } }
         : {}),
     });
 

@@ -3,7 +3,7 @@
 ## Principles
 1. **Code computes, AI communicates.** Compliance status is decided only by deterministic, unit-tested TypeScript. The LLM never decides who is compliant; it only drafts memos, recommends catalog courses, and writes summaries.
 2. **Privacy by design.** CSV files are parsed **in the browser**. API routes receive **unit-level aggregates only** — no employee names or IDs ever leave the browser. Names are merged into memos locally.
-3. **No database, no accounts (v1).** Nothing is stored server-side. This removes the need for auth and keeps employee data off third-party storage. Persistence and login are v2 items.
+3. **No database, no accounts (v1).** Nothing is stored server-side. This removes the need for auth and keeps employee data off third-party storage. Calendar what-if edits live in browser memory only (Export calendar CSV keeps them). Persistence and login are v2 items.
 4. **Grounded AI output.** Recommendations must come from the uploaded course catalog; the server validates every returned course ID.
 
 ## System diagram
@@ -13,6 +13,12 @@ flowchart LR
   P --> V[Schema validation<br/>zod, client]
   V --> E[Compliance engine<br/>pure TS, client]
   E --> D[Dashboard UI<br/>Next.js + Tailwind + Recharts]
+  V -->|optional calendar.csv| CE[Calendar edits<br/>what-if, browser memory]
+  CE --> PL[Plan + costing<br/>cheapest mix, client]
+  E --> PL
+  PL --> B[Budget burn-down<br/>commitments, balance]
+  PL --> CT[Training calendar tab<br/>4 views]
+  B --> D
   D -->|aggregates only| A1[/api/recommend/]
   D -->|aggregates only| A2[/api/memo/]
   D -->|aggregates only| A3[/api/summary/]
@@ -45,6 +51,22 @@ flowchart LR
 3. Server validates, rate-limits, calls the LLM with a zod output schema → `{ subject, body }` where body contains `{{EMPLOYEE_LIST}}`.
 4. Client replaces `{{EMPLOYEE_LIST}}` with the 12 names locally; user copies or exports.
 
+## Budget and training calendar (spec v2.0–v2.8)
+All of this runs in the browser, in pure functions under `lib/engine` and `lib/analysis`, with unit tests. No AI is involved and nothing is sent to a server.
+
+| Feature | Module | What it computes |
+|---|---|---|
+| Trained vs untrained, milestones | `lib/engine/milestones.ts` | Trained and untrained among regular staff in scope; targets of 25/50/85/100% by Mar 31, Jun 30, Sep 30 and Nov 30 (met, missed, upcoming, people still needed) |
+| Slicers | `lib/analysis/breakdown.ts`, `lib/engine/bands.ts` | Trained and untrained by pay-grade band, pay grade, department, group and sector (on screen only, never sent to the AI) |
+| Recommended-course windows | `lib/analysis/windows.ts` | One window per sector a year for a recommended course (e.g. AMLA), spread so LinkedIn is not loaded all at once; completed, pending, missed |
+| Calendar costing | `lib/analysis/costing.ts` | In-house runs: ₱500 per speaker per 2 hours plus snacks (₱75 per 4 hours, ₱150 cap); external runs: fee per participant; 3 : 1 external to in-house mix |
+| Plan and cost to close | `lib/analysis/plan.ts` | Licensed staff close through LinkedIn at ₱0; unlicensed staff fill future runs cheapest first, then a paid LinkedIn course; runs below minimum enrolment or after Dec 14 are not held |
+| Budget burn-down | `lib/analysis/budget.ts`, `commitments.ts` | Spent by month (attendance costs plus January subscriptions), commitments (future runs, nominations, LinkedIn fees), outstanding and projected year-end balance |
+| Calendar tab | `lib/analysis/calendar-view.ts`, `calendar-timeline.ts` | Run states (completed, planned, standby, blocked after Dec 14), cost at expected enrolment, monthly chart, alerts; year grid, list, course timeline and by-quarter views |
+| What-if editing | `lib/analysis/calendar-edit.ts`, `components/CalendarEditor.tsx` | Add, edit, move, duplicate or remove runs with undo, restore and reset. The app analyzes `applyCalendarEdits(calendar, edits)`, so the dashboard, plan, budget and calendar views all recalculate. Edits are validated with the same schema as an uploaded calendar |
+
+Data flow: upload or sample → validated rows → engine results → plan (uses the effective calendar) → budget and calendar views. Changing a rule or editing a run reruns the pipeline in about 300 ms for the 12,000-employee sample.
+
 ## Environment variables
 | Variable | Values | Default | Notes |
 |---|---|---|---|
@@ -68,8 +90,9 @@ Backups run in order and may be on another provider (`provider:model`); unknown 
 ## Trade-offs accepted
 | Choice | Benefit | Cost |
 |---|---|---|
-| No DB / no auth | Privacy, speed of build | Data must be re-uploaded each session |
+| No DB / no auth | Privacy, speed of build | Data must be re-uploaded each session; calendar edits are lost on reload unless exported |
+| Cheapest-first calendar plan | Simple, explainable, testable | Not a global optimum; moving or removing one run can change which other runs are needed |
 | Client-side parsing | Raw data never leaves the browser | Large files limited by browser memory (cap: 20,000 rows) |
 | Catalog CSV, no LinkedIn API | Buildable today, no approval needed | Catalog maintained manually |
 | In-memory rate limit | No extra service | Not shared across serverless instances |
-| Gemini free tier as default | ₱0 AI cost | Google may use free-tier prompts to improve its products; acceptable because only aggregates and synthetic data are sent |
+| Groq free plan as primary (production), Gemini free tier as backups | ₱0 AI cost; about 1,000 requests a day on Groq versus 20 a day per Gemini model; a retired Gemini model cannot break the AI buttons | Groq caps 8,000 tokens a minute; Google may use free-tier prompts to improve its products. Acceptable because only aggregates and synthetic data are sent |

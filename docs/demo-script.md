@@ -5,7 +5,7 @@ Live site: https://training-compliance-radar.vercel.app (open it in an **incogni
 ## Before you record (5 minutes)
 
 - [ ] `GOOGLE_GENERATIVE_AI_API_KEY` is set in Vercel and the project was redeployed (otherwise AI buttons show "not configured").
-- [ ] **Go easy on dry runs.** The free Gemini quota is about 20 requests a day per model and each AI click uses 1–2. One dry run (memo, recommend, summary) is enough; more can use up the day's allowance before you record.
+- [ ] **Go easy on dry runs.** The AI runs on Groq's free plan first (about 1,000 requests a day, but only 8,000 tokens a minute), with Gemini (20 requests a day per model) as backup. Each AI click uses 1–2 requests. A couple of dry runs are fine; leave about a minute between AI clicks so the per-minute limit does not push you onto the backup.
 - [ ] Browser zoom 100%, window wide enough to show the chart, notifications off.
 - [ ] Have `docs/validation.md` or a one-line problem statement ready if you want a title card.
 
@@ -29,11 +29,11 @@ Live site: https://training-compliance-radar.vercel.app (open it in an **incogni
 
 - **"AI is not configured"** banner: the Vercel key is missing. Skip the AI steps, say "AI features need an API key; here is the output," and show a pre-recorded memo.
 - **429 "Too many AI requests":** wait a minute. Limit is 10 per minute per IP.
-- **A slow AI call:** keep talking over the spinner; calls time out at 25 seconds and offer Retry.
+- **A slow AI call:** keep talking over the spinner; calls time out at 40 seconds and offer Retry.
 - **Warning "figures could not be checked":** that is the numeric guardrail working. Say so, click Retry.
 
 ## Talking points if asked
 
 - Why not let the AI decide compliance? "It can miscount. Code is tested; the AI only writes."
 - What about privacy? "Parsing is local; the API gets unit-level counts; positions are sent only when 3 or more at-risk staff share one."
-- Why Gemini? [CHRIS: your answer.] It is one env var to switch to Claude.
+- Why Groq, with Gemini as backup? [CHRIS: your answer.] Groq's free plan allows far more requests than Gemini's, and a chain of backups means a busy or retired model does not break the AI buttons. The provider is one env var.

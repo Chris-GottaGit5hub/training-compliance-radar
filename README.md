@@ -14,10 +14,27 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 
 ## Screenshots
 
-> **[CHRIS: add screenshots before submitting]** Save them in `docs/screenshots/` and link them here:
-> 1. Dashboard with KPIs, at-risk chart and ranked units
-> 2. Back-test card
-> 3. Unit panel with the generated memo (names merged)
+All screens use the built-in synthetic sample (12,000 fictional employees). More in [`docs/screenshots/`](docs/screenshots/).
+
+**Dashboard: trained vs untrained, targets and balance**
+![Dashboard with KPI cards and training targets](docs/screenshots/01-dashboard.png)
+
+**Budget burn-down and where the budget goes**
+![Budget burn-down, spend vs trained, and projected year-end balance](docs/screenshots/02-budget.png)
+
+**Training calendar: course timeline**
+![Course timeline with held, planned and not-needed runs by month](docs/screenshots/10-calendar-timeline.png)
+
+**What-if: one run removed, every number recalculated**
+![Edit mode with a removed run and the recalculated calendar summary](docs/screenshots/12-calendar-what-if.png)
+
+**Back-test: would early flags have predicted year-end gaps?**
+![Back-test recall and precision at Jun 30 and Sep 30](docs/screenshots/07-backtest.png)
+
+**Unit panel: at-risk staff for one department (names stay in the browser)**
+![Unit panel for Southern Luzon Branches with the at-risk list](docs/screenshots/08-unit-panel.png)
+
+> **[CHRIS: add the two AI screenshots]** Save `13-memo.png` (a generated memo) and `14-executive-summary.png` in `docs/screenshots/` and add them here.
 
 ## Features
 

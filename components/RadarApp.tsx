@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buildCalendarCsv, buildCalendarView, calendarFileName, changedRunCount } from "@/lib/analysis";
+import {
+  buildCalendarCsv,
+  buildCalendarView,
+  calendarFileName,
+  changedRunCount,
+  filesKey,
+  setupCollapsed,
+  setupSummary,
+} from "@/lib/analysis";
+import { SetupHideButton, SetupSummaryBar } from "./SetupBar";
 import { AppTabs, type AppTab } from "./AppTabs";
 import { downloadTextFile } from "./download";
 import { Banner, buttonClass } from "./ui";
@@ -45,12 +54,35 @@ export function RadarApp() {
     downloadTextFile(calendarFileName(view.year), buildCalendarCsv(view));
   };
 
+  // Steps 1 and 2 fold into a summary bar once everything is loaded and valid (spec §6, v2.10).
+  // `openedFor` remembers that the user opened them for the files now loaded.
+  const [openedFor, setOpenedFor] = useState<string | null>(null);
+  const setupInput = {
+    ready,
+    hasResults: analysis !== null,
+    ruleErrors: Object.keys(state.issues).length,
+    files: state.files,
+    sampleLoading: state.sample.state === "loading",
+  };
+  const collapsed = setupCollapsed({ ...setupInput, openedFor });
+  const canCollapse = setupCollapsed({ ...setupInput, openedFor: null });
+  const openSetup = (scrollTo?: string) => {
+    setOpenedFor(filesKey(state.files));
+    if (scrollTo) setTimeout(() => document.getElementById(scrollTo)?.scrollIntoView({ block: "start" }), 0);
+  };
+
   const steps: StepInfo[] = [
-    { href: "#step-data", label: "Data", state: ready ? "done" : "current" },
+    {
+      href: "#step-data",
+      label: "Data",
+      state: ready ? "done" : "current",
+      onActivate: collapsed ? () => openSetup("step-data") : undefined,
+    },
     {
       href: "#step-rules",
       label: "Rules",
       state: !config ? "locked" : analysis ? "done" : "current",
+      onActivate: collapsed ? () => openSetup("step-rules") : undefined,
     },
     {
       href: "#step-dashboard",
@@ -104,12 +136,17 @@ export function RadarApp() {
               <Stepper steps={steps} />
             </div>
             <div className="space-y-6">
-              <div className="print:hidden">
-                <DataStep state={state} />
-              </div>
-              <div className="print:hidden">
-                <RulesStep state={state} />
-              </div>
+              {collapsed && config ? (
+                <div className="print:hidden">
+                  <SetupSummaryBar {...setupSummary(state.files, config)} onShow={() => openSetup()} />
+                </div>
+              ) : (
+                <div id="setup-steps" className="space-y-6 print:hidden">
+                  {canCollapse && <SetupHideButton onHide={() => setOpenedFor(null)} />}
+                  <DataStep state={state} />
+                  <RulesStep state={state} />
+                </div>
+              )}
               <DashboardStep state={state} />
               {ai.summaryState.status !== "idle" && config && analysis && (
                 <SummaryCard ai={ai} analysis={analysis} config={config} />

@@ -4,6 +4,8 @@ export interface StepInfo {
   href: string;
   label: string;
   state: StepState;
+  /** Runs instead of the plain jump, e.g. to open folded steps first (spec §6, v2.10). */
+  onActivate?: () => void;
 }
 
 export function Stepper({ steps }: { steps: StepInfo[] }) {
@@ -40,6 +42,14 @@ export function Stepper({ steps }: { steps: StepInfo[] }) {
               ) : (
                 <a
                   href={step.href}
+                  onClick={
+                    step.onActivate
+                      ? (event) => {
+                          event.preventDefault();
+                          step.onActivate?.();
+                        }
+                      : undefined
+                  }
                   aria-current={step.state === "current" ? "step" : undefined}
                   className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >

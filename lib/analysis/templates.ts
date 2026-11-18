@@ -24,7 +24,7 @@ function courseLines(courses: readonly CatalogRow[]): string {
     const link = c.url ? ` - ${c.url}` : "";
     return `- ${c.title} (${c.duration_minutes} min)${link}`;
   });
-  return `Suggested courses:\n${lines.join("\n")}\n\n`;
+  return `Qualifying courses (options; each person needs to complete only one):\n${lines.join("\n")}\n\n`;
 }
 
 /** A memo draft for one unit, in the same shape the AI route returns. */
@@ -47,7 +47,7 @@ export function buildTemplateMemo(
         `still ${unit.atRisk === 1 ? "needs" : "need"} a qualifying training this year. ` +
         `The deadline is ${deadline}, about ${months} away, so there is still time.\n\n` +
         courseLines(courses) +
-        `Could you gently remind these colleagues?\n\n{{EMPLOYEE_LIST}}\n\n` +
+        `Could you gently remind these colleagues? Each one only needs the course and date listed next to their name.\n\n{{EMPLOYEE_LIST}}\n\n` +
         `Thank you for helping your team stay on track!\n\nLearning and Development Team`,
     };
   }
@@ -59,7 +59,7 @@ export function buildTemplateMemo(
       `${unit.atRisk === 1 ? "has" : "have"} not yet completed a qualifying training this year. ` +
       `The deadline is ${deadline}, about ${months} away.\n\n` +
       courseLines(courses) +
-      `Please arrange for the following employees to complete a training before the deadline:\n\n` +
+      `Please arrange for each employee below to complete the one course listed next to their name by the date shown:\n\n` +
       `{{EMPLOYEE_LIST}}\n\nThank you for your cooperation.\n\nLearning and Development Office`,
   };
 }
@@ -127,7 +127,7 @@ const sameStem = (a: string, b: string): boolean =>
  * area, then lowest cost per head, then shortest, then course ID. Same shape as the AI route.
  */
 export function buildTemplateRecommendation(
-  unit: UnitSummary,
+  unit: Pick<UnitSummary, "unit">,
   atRisk: readonly AtRiskRow[],
   catalog: readonly CatalogRow[],
   config: RulesConfig,

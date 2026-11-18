@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useRef } from "react";
 import {
+  MONTH_LABELS,
+  NO_ROUTE,
   atRiskEmployees,
   buildAtRiskCsv,
   exportFileName,
   formatPercent,
+  withAssignments,
   type AtRiskRow,
 } from "@/lib/analysis";
+import { unitKey } from "@/lib/payload";
+
+/** "2026-10-15" → "Oct 15" (the year is the rules year). */
+const shortDate = (iso: string): string => `${MONTH_LABELS[Number(iso.slice(5, 7)) - 1]} ${Number(iso.slice(8, 10))}`;
 import type { UnitSummary } from "@/lib/engine";
 import type { CatalogRow, RulesConfig } from "@/lib/schemas";
 import { AiPanel } from "./AiPanel";
@@ -38,6 +45,12 @@ function EmployeeTable({ rows }: { rows: AtRiskRow[] }) {
             <th scope="col" className="px-3 py-2 font-medium">
               Licensed
             </th>
+            <th scope="col" className="px-3 py-2 font-medium">
+              Recommended Course
+            </th>
+            <th scope="col" className="whitespace-nowrap px-3 py-2 font-medium">
+              Complete By
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -50,6 +63,12 @@ function EmployeeTable({ rows }: { rows: AtRiskRow[] }) {
               <td className="hidden px-3 py-2 text-slate-500 sm:table-cell">{r.employeeId}</td>
               <td className="hidden px-3 py-2 text-slate-500 md:table-cell">{r.personnelNumber ?? "—"}</td>
               <td className="px-3 py-2">{r.licensed ? "Yes" : "No"}</td>
+              <td className={`px-3 py-2 ${r.recommendedCourse === NO_ROUTE ? "font-medium text-red-700" : ""}`}>
+                {r.recommendedCourse ?? "—"}
+              </td>
+              <td className="whitespace-nowrap px-3 py-2 font-mono text-xs">
+                {r.completeBy ? shortDate(r.completeBy) : "—"}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -139,11 +158,17 @@ function UnitDetails({
 export function UnitPanel({ state, ai }: { state: RadarState; ai: AiActions }) {
   const { analysis, roster, catalog, config, selectedUnit, selectUnit } = state;
   const unit = analysis?.org.unitsRanked.find((u) => u.unit === selectedUnit);
-  const rows = useMemo(
-    () =>
-      analysis && roster && unit ? atRiskEmployees(analysis.results, roster, unit.unit) : [],
-    [analysis, roster, unit],
-  );
+  const recs = ai.recommendations;
+  // Each at-risk person gets one course and a date to finish by (spec §4.9 item 6), in the browser.
+  const rows = useMemo(() => {
+    if (!analysis || !roster || !unit || !config) return [];
+    return withAssignments(atRiskEmployees(analysis.results, roster, unit.unit), {
+      plan: analysis.plan,
+      catalog,
+      config,
+      preferredCourseIds: (name) => (recs.status === "done" ? recs.data[unitKey(name)]?.courseIds : undefined),
+    });
+  }, [analysis, roster, unit, config, catalog, recs]);
 
   return (
     <Card>

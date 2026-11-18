@@ -1,4 +1,4 @@
-import { atRiskEmployees, buildAtRiskCsv, exportFileName } from "@/lib/analysis";
+import { atRiskEmployees, buildAtRiskCsv, exportFileName, withAssignments } from "@/lib/analysis";
 import { BacktestCard } from "./BacktestCard";
 import { BreakdownPanel } from "./BreakdownPanel";
 import { BudgetBreakdown } from "./BudgetBreakdown";
@@ -52,7 +52,11 @@ export function DashboardStep({ state }: { state: RadarState }) {
 
   const exportAll = () => {
     if (!analysis || !roster || !config) return;
-    const rows = atRiskEmployees(analysis.results, roster);
+    const rows = withAssignments(atRiskEmployees(analysis.results, roster), {
+      plan: analysis.plan,
+      catalog,
+      config,
+    });
     downloadTextFile(exportFileName(null, config.asOfDate), buildAtRiskCsv(rows));
   };
 

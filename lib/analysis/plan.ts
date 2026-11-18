@@ -36,11 +36,23 @@ export interface Plan {
   /** Planned spend by month index 0-11 (runs on their date, LinkedIn on Nov 30). */
   plannedByMonth: number[];
   milestones: PlanMilestone[];
+  /** Each at-risk employee's route, keyed by employee_id (spec §4.9 item 5). Browser only, never sent. */
+  assignments: Map<string, PlanAssignment>;
+}
+
+/** How one at-risk employee closes the gap: a course or run title and the date to finish by. */
+export interface PlanAssignment {
+  route: "window" | "linkedin" | "run" | "paid" | "unplaced";
+  /** Run title (or its course title) for `run`, the recommended course for `window`. */
+  title?: string;
+  date?: string;
 }
 
 export interface PlanSchedule {
   windows: readonly SectorWindow[];
   label: ScheduleScheme["label"];
+  /** Title of the recommended course the windows schedule (spec §4.8). */
+  courseTitle?: string;
 }
 
 const monthIndex = (date: string): number => Number(date.slice(5, 7)) - 1;
@@ -54,7 +66,8 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
  * (normally 0). Unlicensed staff fill calendar runs, including external trainings that
  * people nominate (cheapest per head first; cancelled below min_pax, after Dec 14, or when
  * the people they take would be cheaper on the LinkedIn fee), then take that fee, else
- * they are unplaced. Assumes everyone placed completes. Counts and pesos only, no IDs.
+ * they are unplaced. Assumes everyone placed completes. `assignments` holds each person's
+ * route (spec §4.9 item 5); it stays in the browser and is never sent to an API.
  */
 export function buildPlan(
   results: readonly EmployeeResult[],
@@ -93,6 +106,8 @@ export function buildPlan(
     return c.perRun / r.max_pax + c.perHead;
   };
   const decided = new Map<string, PlanRun>();
+  const assignments = new Map<string, PlanAssignment>();
+  const courseTitles = new Map(catalog.map((c) => [c.course_id, c.title]));
   for (const run of [...upcoming].sort((a, b) => fullPerHead(a) - fullPerHead(b) || byDateThenId(a, b))) {
     const base = {
       runId: run.run_id,
@@ -112,7 +127,8 @@ export function buildPlan(
       const perHead = Math.round(cost / take);
       decided.set(run.run_id, { ...base, state: "cancelled", reason: `costlier than paid LinkedIn (₱${perHead.toLocaleString("en-PH")} vs ₱${paidFee.toLocaleString("en-PH")} per head)` });
     } else {
-      pool.splice(0, take);
+      const title = run.run_title ?? courseTitles.get(run.course_id) ?? run.course_id;
+      for (const id of pool.splice(0, take)) assignments.set(id, { route: "run", title, date: run.date });
       plannedByMonth[monthIndex(run.date)] += cost;
       held.push({ date: run.date, participants: take });
       decided.set(run.run_id, { ...base, participants: take, cost, state: "held" });
@@ -129,8 +145,16 @@ export function buildPlan(
   const windowEnd = new Map((schedule?.windows ?? []).map((w) => [w.unit, w.end]));
   const closeDates = licensed.map((e) => {
     const end = schedule ? windowEnd.get(schedule.label(e)) : undefined;
-    return end !== undefined && end > config.asOfDate ? end : nov30;
+    const inWindow = end !== undefined && end > config.asOfDate;
+    assignments.set(
+      e.employee_id,
+      inWindow && schedule?.courseTitle
+        ? { route: "window", title: schedule.courseTitle, date: end }
+        : { route: "linkedin", date: inWindow ? end : nov30 },
+    );
+    return inWindow ? end : nov30;
   });
+  for (const id of pool) assignments.set(id, paidFee === null ? { route: "unplaced" } : { route: "paid", date: nov30 });
   const trainedNow = results.filter((r) => r.status === "COMPLIANT").length;
   const scoped = trainedNow + atRisk.length;
 
@@ -156,5 +180,6 @@ export function buildPlan(
     totalPlannedCost: round2(runsCost + linkedInCost),
     plannedByMonth,
     milestones,
+    assignments,
   };
 }

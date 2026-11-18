@@ -31,10 +31,10 @@ describe("buildTemplateMemo", () => {
     expect(memo.body).toContain("about 1 month away");
   });
 
-  it("lists suggested courses with duration and link when given", () => {
+  it("lists the qualifying courses as options, with duration and link", () => {
     const withLink = { ...course("LL-1", "linkedin_learning", 90, 0), url: "https://example.com/c", title: "Excel Basics" };
     const memo = buildTemplateMemo(unit("Finance", 8, 12), [withLink, course("IH-1", "in_house", 120, 500)], cfg, "formal");
-    expect(memo.body).toContain("Suggested courses:\n- Excel Basics (90 min) - https://example.com/c\n- IH-1 (120 min)");
+    expect(memo.body).toContain("Qualifying courses (options; each person needs to complete only one):\n- Excel Basics (90 min) - https://example.com/c\n- IH-1 (120 min)");
   });
 
   it("never contains employee names, and merges names locally like an AI memo", () => {

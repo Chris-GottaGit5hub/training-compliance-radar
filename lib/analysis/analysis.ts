@@ -83,6 +83,10 @@ export interface AtRiskRow {
   employmentType: string;
   licensed: boolean;
   hireDate: string;
+  /** The one course this person should complete (spec §4.9 item 6); set by withAssignments. */
+  recommendedCourse?: string;
+  /** YYYY-MM-DD to finish by; absent when there is no route. */
+  completeBy?: string;
 }
 
 const CHECKPOINTS = [
@@ -113,7 +117,7 @@ export function runAnalysis({ roster, attendance, catalog, calendar, config }: A
           catalog ?? [],
           calendar ?? [],
           config,
-          windowPlan ? { windows: windowPlan.windows, label: scheme.label } : null,
+          windowPlan ? { windows: windowPlan.windows, label: scheme.label, courseTitle: course?.title } : null,
         )
       : null;
 

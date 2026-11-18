@@ -68,8 +68,12 @@ export function finalizeMemo(
     "{{COVERED_COUNT}}": String(request.coveredCount),
     "{{DEADLINE}}": formatDeadline(request.deadline),
   };
+  // Also rewrites the field name "monthsRemaining" if the model copies it into the text (spec §5).
   const fill = (text: string) =>
-    TOKENS.reduce((acc, token) => acc.split(token).join(values[token]), text);
+    TOKENS.reduce((acc, token) => acc.split(token).join(values[token]), text).replace(
+      /\bmonthsRemaining\b/g,
+      "months remaining",
+    );
 
   let body = output.body;
   if (TOKENS.some((token) => !body.includes(token))) {

@@ -9,6 +9,8 @@ const HEADER = [
   "employment_type",
   "licensed",
   "hire_date",
+  "recommended_course",
+  "complete_by",
 ] as const;
 
 const FORMULA_START = /^[=+\-@\t\r]/;
@@ -31,6 +33,8 @@ export function buildAtRiskCsv(rows: readonly AtRiskRow[]): string {
       r.employmentType,
       r.licensed ? "yes" : "no",
       r.hireDate,
+      r.recommendedCourse ?? "",
+      r.completeBy ?? "",
     ]
       .map(csvCell)
       .join(","),

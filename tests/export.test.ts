@@ -45,18 +45,18 @@ describe("buildAtRiskCsv", () => {
       row({ personnelNumber: "48213" }),
       row({ employeeId: "E2", licensed: false }),
     ]);
-    expect(csv.startsWith("﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date\r\n")).toBe(true);
+    expect(csv.startsWith("﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date,recommended_course,complete_by\r\n")).toBe(true);
     expect(csv.split("\r\n")).toEqual([
-      "﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date",
-      "E1,48213,Ana Cruz,Finance,Accountant,regular,yes,2020-01-05",
-      "E2,,Ana Cruz,Finance,Accountant,regular,no,2020-01-05", // no Personnel Number on this row
+      "﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date,recommended_course,complete_by",
+      "E1,48213,Ana Cruz,Finance,Accountant,regular,yes,2020-01-05,,",
+      "E2,,Ana Cruz,Finance,Accountant,regular,no,2020-01-05,,", // no Personnel Number on this row
       "",
     ]);
   });
 
   it("writes only the header for an empty list", () => {
     expect(buildAtRiskCsv([])).toBe(
-      "﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date\r\n",
+      "﻿employee_id,personnel_number,name,unit,position,employment_type,licensed,hire_date,recommended_course,complete_by\r\n",
     );
   });
 

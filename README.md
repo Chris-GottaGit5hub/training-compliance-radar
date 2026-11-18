@@ -16,22 +16,25 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 
 All screens use the built-in synthetic sample (12,000 fictional employees). More in [`docs/screenshots/`](docs/screenshots/).
 
-**Dashboard: trained vs untrained, targets and balance**
-![Dashboard with KPI cards and training targets](docs/screenshots/01-dashboard.png)
+**Overview: the navy header, the two tabs and the four steps**
+![Header with the app name, the Radar and Training Calendar tabs, and the Data step with the sample loaded](docs/screenshots/00-overview.png)
 
-**Budget burn-down and where the budget goes**
-![Budget burn-down, spend vs trained, and projected year-end balance](docs/screenshots/02-budget.png)
+**Dashboard: trained vs untrained, Training Targets and The Money**
+![Dashboard with KPI cards, training targets, target vs. actual chart and The Money panel](docs/screenshots/01-dashboard.png)
 
-**Training calendar: course timeline**
+**Budget Burn-Down and Where the Budget Goes**
+![Budget burn-down charts, spend vs trained, and the projected year-end balance](docs/screenshots/02-budget.png)
+
+**Training Calendar: Course Timeline**
 ![Course timeline with held, planned and not-needed runs by month](docs/screenshots/10-calendar-timeline.png)
 
 **What-if: one run removed, every number recalculated**
 ![Edit mode with a removed run and the recalculated calendar summary](docs/screenshots/12-calendar-what-if.png)
 
-**Back-test: would early flags have predicted year-end gaps?**
+**Back-Test: would early flags have predicted year-end gaps?**
 ![Back-test recall and precision at Jun 30 and Sep 30](docs/screenshots/07-backtest.png)
 
-**Unit panel: at-risk staff for one department (names stay in the browser)**
+**Unit Panel: at-risk staff for one department (names stay in the browser)**
 ![Unit panel for Southern Luzon Branches with the at-risk list](docs/screenshots/08-unit-panel.png)
 
 > **[CHRIS: add the two AI screenshots]** Save `13-memo.png` (a generated memo) and `14-executive-summary.png` in `docs/screenshots/` and add them here.
@@ -44,7 +47,8 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 - **Risk dashboard**: trained vs untrained, the next target, months left, cost to close, a bar chart and a ranked table of units that still have untrained staff.
 - **Training targets**: 25/50/85/100% of in-scope staff trained by Mar 31, Jun 30, Sep 30 and Nov 30 (editable), shown as met, missed or upcoming with the people still needed.
 - **Slicers**: trained vs untrained by pay-grade band (Rank and File, Officers, Senior Officers), pay grade, department, group and sector, alone or combined (optional roster columns `pay_grade`, `group`, `sector`).
-- **Budget burn-down**: the annual allocation against money spent by month, people trained, and spend per trained person, with charts and a Print report button.
+- **The Money**: one panel that says, in a sentence, a bar and a three-line table, how much of the allocation is spent, how much is already promised, and what is projected to be left at year end.
+- **Budget Burn-Down**: the annual allocation against money spent by month, people trained, and spend per trained person, with charts and a Print report button.
 - **Realistic balance**: spend so far plus everything already promised, namely every calendar run still to come (in-house runs priced from speaker honoraria and snacks, external trainings at their fee per participant, external : in-house 3 : 1), expected external nominations outside the calendar, and annual subscriptions (Mentimeter, Kahoot!, Canva, Adobe), giving a projected year-end balance. Subscriptions and nominations are editable in Rules.
 - **Training calendar tab**, with an **Edit calendar** what-if mode (add, edit, duplicate and remove runs; undo, restore and reset; every number recomputes; changes stay in the browser and are lost on reload, so export the CSV to keep them): every planned run for the year in four views (month grid, list, a course-by-month timeline, and a by-quarter list of trainings still available with estimated seats open), each run with its state (held, planned, not needed, after Dec 14), cost at expected enrolment, seats, the external : in-house mix against 3 : 1, cost by month, the sector windows for the recommended course, alerts, CSV export and print.
 - **Recommended-course windows and a plan** (optional catalog flag `recommended` and `calendar.csv`): one staggered monthly window per sector for the annual course (e.g. AMLA), who completed or missed it, and a deterministic plan for the rest: licensed staff on LinkedIn at no extra cost, unlicensed staff in calendar runs above their minimum size or on the paid LinkedIn fee, no in-person runs after Dec 14.
@@ -53,6 +57,7 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 - **Works without AI, too:** if an AI call fails or the free quota runs out, memos and the executive summary fall back to a clearly labeled template draft built from the same numbers.
 - **Executive summary** for a department head: an AI-written narrative plus four charts (status breakdown, highest-risk units, back-test, cost vs budget) drawn from the engine, so they stay accurate and still appear if the AI is unavailable.
 - **Privacy by design**: employee names and IDs never leave the browser.
+- **Civic Ledger look**: a navy header, warm paper background, ruled panels, IBM Plex type with monospaced figures, and Title Case headings, chosen from five design options.
 
 ## How it works
 
@@ -97,7 +102,7 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 ## Tests
 
-`npm test` runs **234 tests in 18 files** (Vitest). They cover:
+`npm test` runs **373 tests in 32 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);

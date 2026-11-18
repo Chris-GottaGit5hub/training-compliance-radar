@@ -4,30 +4,32 @@ Live site: https://training-compliance-radar.vercel.app (open it in an **incogni
 
 ## Before you record (5 minutes)
 
-- [ ] `GOOGLE_GENERATIVE_AI_API_KEY` is set in Vercel and the project was redeployed (otherwise AI buttons show "not configured").
+- [ ] `https://training-compliance-radar.vercel.app/api/status` shows `"provider":"groq"` with the two Gemini backups (it makes no AI call). If it says `configured: false`, a key is missing in Vercel.
 - [ ] **Go easy on dry runs.** The AI runs on Groq's free plan first (about 1,000 requests a day, but only 8,000 tokens a minute), with Gemini (20 requests a day per model) as backup. Each AI click uses 1–2 requests. A couple of dry runs are fine; leave about a minute between AI clicks so the per-minute limit does not push you onto the backup.
-- [ ] Browser zoom 100%, window wide enough to show the chart, notifications off.
+- [ ] Browser zoom 110–125%, window wide enough to show two panels side by side, notifications off.
 - [ ] Have `docs/validation.md` or a one-line problem statement ready if you want a title card.
 
 ## Script
 
 | Time | On screen | Say (suggested wording) |
 |---|---|---|
-| **0:00–0:15** | Landing page, header privacy note | "Every year, L&D teams find out who missed the one-training-per-year rule in Q4, when it is too late. Training Compliance Radar finds them months earlier. Note the banner: your files never leave this browser." |
-| **0:15–0:30** | Click **Load sample data**; step 1 shows four files loaded | "I'll use synthetic data: 12,000 employees in 50 departments, a 26-course catalog and a 48-run training calendar. You can also upload your own CSVs, and errors are row-numbered." |
-| **0:30–0:45** | Step 2 Rules (as-of Sep 30), then KPI cards | "Rules are configurable: as-of date, late-hire cutoff, covered types, minimum hours. Only regular staff can be at risk. As of Sep 30, 8,846 are in scope: 7,155 trained (80.9%), **1,691 untrained**, 3 months left. The targets table shows we are 365 people short of the 85% target." |
-| **0:45–1:00** | Bar chart, then ranked table; hover the cost and balance cards | "Only units with untrained staff are listed, ranked by risk. Southern Luzon Branches leads with 88. Cost to close is ₱332,000, the cheapest mix of runs and LinkedIn. The outstanding balance is ₱27.48M of the ₱100M allocation (hover shows the exact peso), and after promised runs, nominations and subscriptions about 7% is left by year end." |
-| **1:00–1:12** | Click the **Training calendar** tab; month grid, click one run | "The calendar tab shows all 48 runs for the year: 36 external to 12 in-house, exactly 3 to 1, ₱12.3M at expected enrolment. Each run shows its cost, seats and whether the plan needs it: only 3 of the 17 upcoming runs are needed, because the rest cost more than a paid LinkedIn course." |
-| **1:12–1:22** | Back to **Radar**; back-test card | "Does early flagging work? At Sep 30 we flag 1,691 people and catch all 891 who end the year untrained. The rest got trained: exactly the group a nudge can change." |
-| **1:22–1:34** | Click **Southern Luzon Branches**; at-risk list; **Export at-risk CSV** | "Click a unit for its at-risk list, and export it to CSV." |
-| **1:34–1:52** | **Recommend courses**, then **Generate memo** | "AI recommends courses only from my catalog, every ID is checked. The memo is drafted from counts alone; the names are merged in my browser, so the AI never sees them." |
-| **1:52–2:00** | **Executive summary**, then footer | "One click gives a department head a summary. The code computes; the AI communicates. Source and tests are on GitHub." |
+| **0:00–0:15** | Landing page: navy header, privacy strip | "Every year, L&D teams find out who missed the one-training-per-year rule in Q4, when it is too late. Training Compliance Radar finds them months earlier. Note the strip under the header: your files never leave this browser." |
+| **0:15–0:28** | Click **Load sample data**; step 1 shows four files loaded | "I'll use synthetic data: 12,000 employees in 50 departments, a 26-course catalog and a 48-run training calendar. You can also upload your own CSVs, and errors are row-numbered." |
+| **0:28–0:42** | Scroll past **Rules** (as-of Sep 30) to the KPI cards and **Training Targets** | "Rules are configurable: as-of date, late-hire cutoff, minimum hours. Only regular staff can be at risk. As of Sep 30, 8,846 are in scope: 7,155 trained, 80.9%, and **1,691 untrained**, with 3 months left. Training Targets shows we are 365 people short of the 85% target." |
+| **0:42–0:55** | **The Money** panel; hover the balance card | "The Money says it in one line: ₱72.52M of the ₱100M allocation is spent, ₱20.43M is already promised, so about ₱7.04M, 7%, is left at year end. Closing the gap costs ₱332,000, the cheapest mix of runs and LinkedIn." |
+| **0:55–1:05** | Bar chart, then **Units Ranked by Risk** | "Only units with untrained staff are listed, ranked by risk. Southern Luzon Branches leads with 88." |
+| **1:05–1:17** | **Training Calendar** tab; year grid; *optional:* **Edit calendar** → remove one planned run → point at the totals → **Reset all changes** | "The calendar shows all 48 runs: 36 external to 12 in-house, exactly 3 to 1. Only 3 of the 17 upcoming runs are needed. I can cancel a run as a what-if and every number recalculates; nothing is saved." |
+| **1:17–1:25** | Back to **Radar**; **Back-Test** card | "Does early flagging work? At Sep 30 we flag 1,691 people and catch all 891 who end the year untrained." |
+| **1:25–1:35** | Click **Southern Luzon Branches**; at-risk list; **Export at-risk CSV** | "Click a unit for its at-risk list, and export it to CSV." |
+| **1:35–1:52** | **Recommend courses**, then **Generate memo** | "AI recommends courses only from my catalog, and every ID is checked. The memo is drafted from counts alone; the names are merged in my browser, so the AI never sees them." |
+| **1:52–2:00** | **Executive Summary** (header), then the GitHub repo | "One click gives a department head a summary. The code computes; the AI communicates. Source, tests and CI are on GitHub." |
+
+Cut the optional calendar edit first if you run long.
 
 ## If something goes wrong
 
-- **"Template" memo or summary instead of an AI one:** the AI failed or the free daily quota is used up. The template is built from the same numbers and is labeled. Say so, then click Retry later or show your recording.
-
-- **"AI is not configured"** banner: the Vercel key is missing. Skip the AI steps, say "AI features need an API key; here is the output," and show a pre-recorded memo.
+- **"Template" memo, summary or course picks instead of AI ones:** the AI failed or the free quota is used up. The template is built from the same numbers and is labeled. Say so, then click Retry later or show your recording.
+- **"AI is not configured"** banner: a Vercel key is missing. Skip the AI steps, say "AI features need an API key; here is the output," and show a pre-recorded memo.
 - **429 "Too many AI requests":** wait a minute. Limit is 10 per minute per IP.
 - **A slow AI call:** keep talking over the spinner; calls time out at 40 seconds and offer Retry.
 - **Warning "figures could not be checked":** that is the numeric guardrail working. Say so, click Retry.

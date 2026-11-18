@@ -34,6 +34,7 @@ flowchart LR
 | Layer | Choice | Why |
 |---|---|---|
 | Frontend | Next.js (App Router) + TypeScript (strict) + Tailwind CSS | Recommended stack; first-class Vercel support |
+| Look (spec v2.9) | "Civic Ledger": the Tailwind palette is remapped once in `app/globals.css` (indigo → navy `#1E3A5F`, slate → warm paper greys, small radius, no shadows); IBM Plex Sans and Mono via `next/font` | One change restyles every screen consistently; components keep their classes |
 | Charts | Recharts | Simple React charts |
 | CSV | papaparse (client-side) | Keeps raw employee data in the browser |
 | Validation | zod (client + server) | One schema source for CSV rows and API payloads |
@@ -51,7 +52,7 @@ flowchart LR
 3. Server validates, rate-limits, calls the LLM with a zod output schema → `{ subject, body }` where body contains `{{EMPLOYEE_LIST}}`.
 4. Client replaces `{{EMPLOYEE_LIST}}` with the 12 names locally; user copies or exports.
 
-## Budget and training calendar (spec v2.0–v2.8)
+## Budget and training calendar (spec v2.0–v2.9)
 All of this runs in the browser, in pure functions under `lib/engine` and `lib/analysis`, with unit tests. No AI is involved and nothing is sent to a server.
 
 | Feature | Module | What it computes |
@@ -62,6 +63,7 @@ All of this runs in the browser, in pure functions under `lib/engine` and `lib/a
 | Calendar costing | `lib/analysis/costing.ts` | In-house runs: ₱500 per speaker per 2 hours plus snacks (₱75 per 4 hours, ₱150 cap); external runs: fee per participant; 3 : 1 external to in-house mix |
 | Plan and cost to close | `lib/analysis/plan.ts` | Licensed staff close through LinkedIn at ₱0; unlicensed staff fill future runs cheapest first, then a paid LinkedIn course; runs below minimum enrolment or after Dec 14 are not held |
 | Budget burn-down | `lib/analysis/budget.ts`, `commitments.ts` | Spent by month (attendance costs plus January subscriptions), commitments (future runs, nominations, LinkedIn fees), outstanding and projected year-end balance |
+| The Money panel | `lib/analysis/money.ts`, `components/MoneyPanel.tsx` | Spent, promised (commitments plus any catalog estimate) and projected left, with shares of the allocation and bar widths that always fill; count and cost of calendar runs still to come |
 | Calendar tab | `lib/analysis/calendar-view.ts`, `calendar-timeline.ts` | Run states (completed, planned, standby, blocked after Dec 14), cost at expected enrolment, monthly chart, alerts; year grid, list, course timeline and by-quarter views |
 | What-if editing | `lib/analysis/calendar-edit.ts`, `components/CalendarEditor.tsx` | Add, edit, move, duplicate or remove runs with undo, restore and reset. The app analyzes `applyCalendarEdits(calendar, edits)`, so the dashboard, plan, budget and calendar views all recalculate. Edits are validated with the same schema as an uploaded calendar |
 

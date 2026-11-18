@@ -18,6 +18,9 @@ import { inputClass } from "./ui";
 
 const CHART_ROWS = 12;
 const label = (d: Dimension) => DIMENSIONS.find((x) => x.key === d)?.label ?? d;
+/** Panel titles are Title Case (spec §6): "Pay-grade band" becomes "Pay-Grade Band". */
+const titleCase = (text: string): string => text.replace(/(^|[\s-])([a-z])/g, (_m, sep: string, ch: string) => sep + ch.toUpperCase());
+const count = (value: unknown): string => (typeof value === "number" ? value.toLocaleString("en-PH") : "");
 
 function Select({
   id,
@@ -132,16 +135,16 @@ export function BreakdownPanel({ analysis, roster }: { analysis: Analysis; roste
           </table>
         </div>
         <ChartPanel
-          title={`By ${label(dimension).toLowerCase()}`}
+          title={`By ${titleCase(label(dimension))}`}
           description={`Trained and untrained staff${rows.length > CHART_ROWS ? `, ${CHART_ROWS} largest gaps of ${rows.length}` : ""}.`}
           summary={`${total.t} trained and ${total.u} untrained across ${rows.length} groups.`}
         >
           <ResponsiveContainer width="100%" height={Math.max(120, 36 + chartRows.length * 30)}>
             <BarChart data={chartRows} layout="vertical" margin={{ top: 4, right: 12, bottom: 0, left: 0 }}>
               <CartesianGrid horizontal={false} stroke="#eceae2" />
-              <XAxis type="number" tick={{ fontSize: 12 }} />
+              <XAxis type="number" tickFormatter={count} tick={{ fontSize: 12 }} />
               <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} />
-              <Tooltip />
+              <Tooltip formatter={count} />
               <Legend iconType="square" wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="Trained" stackId="a" fill={INDIGO} />
               <Bar dataKey="Untrained" stackId="a" fill={AMBER} />

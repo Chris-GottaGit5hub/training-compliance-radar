@@ -15,6 +15,10 @@ import { formatPercent, formatPeso, formatPesoCompact, type BudgetReport } from 
 import { AMBER, ChartPanel, INDIGO, SLATE } from "./ChartPanel";
 
 const peso = (value: unknown): string => (typeof value === "number" ? formatPeso(value) : "");
+const count = (value: unknown): string => (typeof value === "number" ? value.toLocaleString("en-PH") : "");
+/** Same style as the Budget Remaining tooltip: pesos for spend, a grouped count for people. */
+const paceTooltip = (value: unknown, name: unknown): string =>
+  name === "Spent" ? peso(value) : count(value);
 
 function Tile({ label, children, sub }: { label: string; children: ReactNode; sub?: string }) {
   return (
@@ -83,15 +87,15 @@ export function BudgetPanel({ report, hasPlan }: { report: BudgetReport; hasPlan
         <ChartPanel
           title="Money Spent vs. People Trained"
           description="Cumulative spend (bars) against trained staff (line)."
-          summary={`${formatPeso(report.spent)} spent and ${report.trained} trained so far.`}
+          summary={`${formatPeso(report.spent)} spent and ${report.trained.toLocaleString("en-PH")} trained so far.`}
         >
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={pace} margin={{ top: 12, right: 0, bottom: 0, left: 0 }}>
               <CartesianGrid vertical={false} stroke="#eceae2" />
               <XAxis dataKey="label" tick={{ fontSize: 12 }} />
               <YAxis yAxisId="left" tickFormatter={formatPesoCompact} tick={{ fontSize: 12 }} width={64} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} width={44} />
-              <Tooltip />
+              <YAxis yAxisId="right" orientation="right" tickFormatter={count} tick={{ fontSize: 12 }} width={48} />
+              <Tooltip formatter={paceTooltip} />
               <Legend iconType="square" wrapperStyle={{ fontSize: 12 }} />
               <Bar yAxisId="left" dataKey="Spent" fill={SLATE} radius={[3, 3, 0, 0]} />
               <Line yAxisId="right" dataKey="Trained" stroke={INDIGO} strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />

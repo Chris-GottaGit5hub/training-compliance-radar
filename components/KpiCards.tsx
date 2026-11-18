@@ -16,7 +16,7 @@ function Kpi({
 }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4">
-      <dt className="text-xs font-semibold uppercase tracking-wider text-slate-600">{label}</dt>
+      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-600">{label}</dt>
       <dd className="mt-1">
         <span
           title={title}
@@ -106,7 +106,7 @@ export function KpiCards(props: Props) {
           {formatPercent(org.complianceRate)} of {fmt(org.covered)} in scope
         </Kpi>
         <Kpi label="Untrained (at risk)" value={fmt(org.atRisk)}>
-          {licensed} licensed · {org.atRisk - licensed} unlicensed
+          {fmt(licensed)} licensed · {fmt(org.atRisk - licensed)} unlicensed
         </Kpi>
         <TargetKpi analysis={props.analysis} />
         <Kpi label="Months left" value={org.monthsRemaining}>

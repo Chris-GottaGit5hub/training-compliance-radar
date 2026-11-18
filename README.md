@@ -37,7 +37,11 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 **Unit Panel: at-risk staff for one department (names stay in the browser)**
 ![Unit panel for Southern Luzon Branches with the at-risk list](docs/screenshots/08-unit-panel.png)
 
-> **[CHRIS: add the two AI screenshots]** Save `13-memo.png` (a generated memo) and `14-executive-summary.png` in `docs/screenshots/` and add them here.
+**AI memo: one course and a deadline per person (names merged in the browser; the AI saw only unit counts)**
+![AI-drafted memo for Southern Luzon Branches with a numbered table of each employee's assigned course and deadline, and Course Access](docs/screenshots/13-memo.png)
+
+**AI Executive Summary with four engine-drawn charts**
+![AI-written executive summary above charts of where everyone stands, highest-risk units, the Early Warning Check and the cost to close](docs/screenshots/14-executive-summary.png)
 
 ## Features
 

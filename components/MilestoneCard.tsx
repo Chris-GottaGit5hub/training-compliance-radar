@@ -34,7 +34,7 @@ export function MilestoneCard({ milestones }: { milestones: MilestoneResult[] })
   }));
   return (
     <div>
-      <h3 className="font-semibold text-slate-900">Training targets</h3>
+      <h3 className="font-semibold text-slate-900">Training Targets</h3>
       <p className="mb-2 text-sm text-slate-600">
         Trained staff against the target for each date. Nov 30 is the internal target; Dec 31 is the
         official deadline.
@@ -85,7 +85,7 @@ export function MilestoneCard({ milestones }: { milestones: MilestoneResult[] })
           </table>
         </div>
         <ChartPanel
-          title="Target vs actual"
+          title="Target vs. Actual"
           description="Percent of in-scope staff trained. Future dates show the target only."
           summary={milestones
             .map((m) => `${m.label}: target ${m.targetPct}%, ${m.state === "upcoming" ? "not yet due" : `actual ${m.actualPct}%`}`)
@@ -93,7 +93,7 @@ export function MilestoneCard({ milestones }: { milestones: MilestoneResult[] })
         >
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={data} margin={{ top: 12, right: 12, bottom: 0, left: 0 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid vertical={false} stroke="#eceae2" />
               <XAxis dataKey="label" tick={{ fontSize: 12 }} />
               <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 12 }} width={44} />
               <Tooltip formatter={(value) => percentLabel(value)} />

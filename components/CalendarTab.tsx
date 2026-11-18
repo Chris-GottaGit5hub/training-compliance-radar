@@ -212,13 +212,13 @@ function CostChart({ view }: { view: CalendarView }) {
   const busiest = [...view.months].sort((a, b) => b.inHouseCost + b.externalCost - (a.inHouseCost + a.externalCost))[0];
   return (
     <ChartPanel
-      title="Calendar cost by month"
+      title="Calendar Cost by Month"
       description="Cost of each month's runs at expected enrolment, in-house and external."
       summary={`Total ${formatPeso(view.summary.totalCost)}; the most expensive month is ${busiest?.label ?? "none"}.`}
     >
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={data} margin={{ top: 12, right: 12, bottom: 0, left: 0 }}>
-          <CartesianGrid vertical={false} stroke="#e2e8f0" />
+          <CartesianGrid vertical={false} stroke="#eceae2" />
           <XAxis dataKey="label" tick={{ fontSize: 12 }} />
           <YAxis tickFormatter={formatPesoCompact} tick={{ fontSize: 12 }} width={64} />
           <Tooltip formatter={peso} />
@@ -237,7 +237,7 @@ const WINDOW_TEXT = { upcoming: "upcoming", open: "open now", closed: "closed" }
 function WindowLane({ view, course }: { view: CalendarView; course: string }) {
   return (
     <div>
-      <h4 className="font-semibold text-slate-900">Recommended course windows</h4>
+      <h4 className="font-semibold text-slate-900">Recommended Course Windows</h4>
       <p className="mb-2 text-sm text-slate-600">
         <span className="font-medium">{course}</span> runs once a year, one month per unit.
       </p>
@@ -281,10 +281,10 @@ const STATES: RunState[] = ["completed", "planned", "standby", "blocked"];
 
 type Mode = "grid" | "list" | "timeline" | "quarter";
 const MODES: readonly (readonly [Mode, string])[] = [
-  ["grid", "Year grid"],
+  ["grid", "Year Grid"],
   ["list", "List"],
-  ["timeline", "Course timeline"],
-  ["quarter", "By quarter"],
+  ["timeline", "Course Timeline"],
+  ["quarter", "By Quarter"],
 ];
 
 export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToData: () => void }) {
@@ -328,10 +328,10 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
 
   const intro = (
     <div>
-      <h2 id="calendar-title" className="text-lg font-semibold text-slate-900">Training calendar</h2>
+      <h2 id="calendar-title" className="text-lg font-semibold text-slate-900">Training Calendar</h2>
       <p className="text-sm text-slate-600">
         Every planned in-house and external run for the year, what it costs, and whether the plan needs it.
-        This view is read-only: change the calendar file and upload it again.
+        Use Edit calendar to try changes as a what-if; nothing is saved unless you export the calendar CSV.
       </p>
     </div>
   );
@@ -443,7 +443,7 @@ export function CalendarTab({ state, onGoToData }: { state: RadarState; onGoToDa
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => openEditor("Add a run", blankDraft(allIds), false)}
+                onClick={() => openEditor("Add a Run", blankDraft(allIds), false)}
                 className={buttonClass("primary")}
               >
                 Add run

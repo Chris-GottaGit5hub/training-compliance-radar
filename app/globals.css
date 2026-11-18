@@ -1,16 +1,57 @@
 @import "tailwindcss";
 
+/*
+ * "Civic Ledger" look (spec §6, v2.9). Instead of restyling every component, the palette the
+ * app already uses is remapped here: indigo becomes the navy accent and slate becomes warm
+ * paper greys, so every screen changes together. Corners are small and there are no shadows.
+ */
+@theme {
+  --color-indigo-50: #eef2f7;
+  --color-indigo-100: #dce4ee;
+  --color-indigo-200: #b9c8db;
+  --color-indigo-300: #8da2be;
+  --color-indigo-400: #5f7a9c;
+  --color-indigo-500: #3e5c80;
+  --color-indigo-600: #1e3a5f;
+  --color-indigo-700: #18304f;
+  --color-indigo-800: #13263f;
+  --color-indigo-900: #0e1c2f;
+  --color-indigo-950: #09121f;
+
+  --color-slate-50: #f7f5f0;
+  --color-slate-100: #eceae2;
+  --color-slate-200: #dcd8cd;
+  --color-slate-300: #c6c1b4;
+  --color-slate-400: #9b9a93;
+  --color-slate-500: #696d74;
+  --color-slate-600: #556070;
+  --color-slate-700: #3e4757;
+  --color-slate-800: #2a3242;
+  --color-slate-900: #1b2433;
+  --color-slate-950: #121826;
+
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+
+  --shadow-sm: none;
+  --shadow: none;
+  --shadow-md: none;
+}
+
 :root {
   color-scheme: light;
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f4f2ec;
+  --foreground: #1b2433;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {

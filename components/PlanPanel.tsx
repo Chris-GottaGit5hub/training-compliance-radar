@@ -23,7 +23,7 @@ export function PlanPanel({ analysis, config }: { analysis: Analysis; config: Ru
   const after = budget.remaining - plan.totalPlannedCost;
   return (
     <div>
-      <h3 className="font-semibold text-slate-900">Plan to close the gap</h3>
+      <h3 className="font-semibold text-slate-900">Plan to Close the Gap</h3>
       <p className="mb-2 text-sm text-slate-600">
         Licensed staff finish on LinkedIn. Unlicensed staff fill the calendar runs, then pay the
         LinkedIn fee. In-person runs stop on Dec 14; online courses run to Dec 31. The plan assumes

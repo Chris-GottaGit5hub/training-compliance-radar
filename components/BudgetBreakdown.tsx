@@ -25,7 +25,7 @@ export function BudgetBreakdown({ analysis, config }: { analysis: Analysis; conf
 
   return (
     <div>
-      <h3 className="font-semibold text-slate-900">Where the budget goes</h3>
+      <h3 className="font-semibold text-slate-900">Where the Budget Goes</h3>
       <p className="mb-2 text-sm text-slate-600">
         Spend so far plus everything already promised: every calendar run still to come, external trainings
         people nominate outside the calendar, and platform subscriptions ({subs || "none listed"}).
@@ -57,7 +57,7 @@ export function BudgetBreakdown({ analysis, config }: { analysis: Analysis; conf
           </table>
         </div>
         <ChartPanel
-          title="Annual allocation"
+          title="Annual Allocation"
           description="Spent, promised and left."
           summary={`${formatPeso(budget.allocation)} allocation, ${formatPeso(outlook.projectedBalance)} projected to be left.`}
         >
@@ -70,7 +70,7 @@ export function BudgetBreakdown({ analysis, config }: { analysis: Analysis; conf
               {parts.map((p) => (
                 <Bar key={p.name} dataKey={p.name} stackId="a" fill={p.color} />
               ))}
-              <Bar dataKey="Left at year end" stackId="a" fill="#e2e8f0" />
+              <Bar dataKey="Left at year end" stackId="a" fill="#eceae2" />
             </BarChart>
           </ResponsiveContainer>
         </ChartPanel>

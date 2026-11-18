@@ -41,7 +41,7 @@ export function BudgetPanel({ report, hasPlan }: { report: BudgetReport; hasPlan
 
   return (
     <div>
-      <h3 className="font-semibold text-slate-900">Budget burn-down</h3>
+      <h3 className="font-semibold text-slate-900">Budget Burn-Down</h3>
       <p className="mb-2 text-sm text-slate-600">
         The annual allocation shrinks as attendance costs are spent. Every route counts: LinkedIn fees
         for unlicensed staff, in-house runs, external courses, subscriptions, and contractual staff who
@@ -62,13 +62,13 @@ export function BudgetPanel({ report, hasPlan }: { report: BudgetReport; hasPlan
       </dl>
       <div className="grid gap-4 lg:grid-cols-2">
         <ChartPanel
-          title="Budget remaining"
+          title="Budget Remaining"
           description={hasPlan ? "Actual (solid) and planned (dashed) balance by month." : "Balance at each month end."}
           summary={`Started at ${formatPeso(allocation)}; ${last ? `${formatPeso(last.remaining ?? 0)} left after ${last.label}` : "no spend yet"}.`}
         >
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={burn} margin={{ top: 12, right: 12, bottom: 0, left: 0 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid vertical={false} stroke="#eceae2" />
               <XAxis dataKey="label" tick={{ fontSize: 12 }} />
               <YAxis tickFormatter={formatPesoCompact} tick={{ fontSize: 12 }} width={64} domain={[0, "auto"]} />
               <Tooltip formatter={peso} />
@@ -81,13 +81,13 @@ export function BudgetPanel({ report, hasPlan }: { report: BudgetReport; hasPlan
           </ResponsiveContainer>
         </ChartPanel>
         <ChartPanel
-          title="Money spent vs people trained"
+          title="Money Spent vs. People Trained"
           description="Cumulative spend (bars) against trained staff (line)."
           summary={`${formatPeso(report.spent)} spent and ${report.trained} trained so far.`}
         >
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={pace} margin={{ top: 12, right: 0, bottom: 0, left: 0 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid vertical={false} stroke="#eceae2" />
               <XAxis dataKey="label" tick={{ fontSize: 12 }} />
               <YAxis yAxisId="left" tickFormatter={formatPesoCompact} tick={{ fontSize: 12 }} width={64} />
               <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} width={44} />

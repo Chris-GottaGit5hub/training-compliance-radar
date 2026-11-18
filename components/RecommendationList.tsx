@@ -28,7 +28,7 @@ export function RecommendationList({
   return (
     <div className="space-y-2 rounded-lg border border-slate-200 p-4">
       <h4 className="font-semibold text-slate-900">
-        {template ? "Recommended courses (template)" : "Recommended courses"}
+        {template ? "Recommended Courses (Template)" : "Recommended Courses"}
       </h4>
       {template && (
         <Banner tone="info">

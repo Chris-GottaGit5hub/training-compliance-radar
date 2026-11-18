@@ -11,7 +11,7 @@ import {
 import { DELIVERY_TEXT, STATE_TEXT } from "./CalendarGrid";
 
 const HATCH = {
-  indigo: "repeating-linear-gradient(45deg, #e0e7ff 0 5px, transparent 5px 10px)",
+  indigo: "repeating-linear-gradient(45deg, #dce4ee 0 5px, transparent 5px 10px)",
   amber: "repeating-linear-gradient(45deg, #fef3c7 0 5px, transparent 5px 10px)",
   red: "repeating-linear-gradient(45deg, #fee2e2 0 5px, transparent 5px 10px)",
 } as const;

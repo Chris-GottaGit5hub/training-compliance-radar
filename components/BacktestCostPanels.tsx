@@ -18,7 +18,7 @@ export function BacktestPanel({ analysis }: { analysis: Analysis }) {
   const series = backtestSeries(analysis.backtests);
   return (
     <ChartPanel
-      title="Would early flags have worked?"
+      title="Would Early Flags Have Worked?"
       description="Back-test: share of year-end gaps already flagged (recall) and of flags that stayed gaps (precision)."
       summary={series
         .map((s) => `${s.checkpoint}: recall ${percentLabel(s.recall) || "n/a"}, precision ${percentLabel(s.precision) || "n/a"}`)
@@ -26,7 +26,7 @@ export function BacktestPanel({ analysis }: { analysis: Analysis }) {
     >
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={series} margin={{ top: 16, right: 8, bottom: 0, left: 0 }}>
-          <CartesianGrid vertical={false} stroke="#e2e8f0" />
+          <CartesianGrid vertical={false} stroke="#eceae2" />
           <XAxis dataKey="checkpoint" tick={{ fontSize: 12 }} />
           <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 12 }} width={44} />
           <Tooltip formatter={(value) => percentLabel(value)} />
@@ -48,7 +48,7 @@ export function CostPanel({ analysis, config }: { analysis: Analysis; config: Ru
   const { cost } = analysis;
   return (
     <ChartPanel
-      title="Cost to close the gap"
+      title="Cost to Close the Gap"
       description="Cheapest mix of trainings for every at-risk employee, against the budget still left."
       summary={bars ? bars.map((b) => `${b.label} ${formatPeso(b.value)}`).join(", ") : "No catalog loaded."}
     >

@@ -36,7 +36,7 @@ export function MemoView({
         </Banner>
       )}
       <h4 className="font-semibold text-slate-900">
-        {template ? "Memo draft (template)" : "Memo draft"}
+        {template ? "Memo Draft (Template)" : "Memo Draft"}
       </h4>
       <pre className="whitespace-pre-wrap break-words rounded-md bg-slate-50 p-3 font-sans text-sm text-slate-800">
         {text}

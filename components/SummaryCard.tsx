@@ -59,7 +59,7 @@ export function SummaryCard({
           tabIndex={-1}
           className="mb-3 text-lg font-semibold text-slate-900 focus:outline-none"
         >
-          Executive summary
+          Executive Summary
         </h2>
         <div aria-live="polite" className="space-y-3">
           {state.status === "loading" && (
@@ -114,7 +114,7 @@ export function SummaryCard({
           )}
         </div>
 
-        <h3 className="mb-3 mt-6 text-base font-semibold text-slate-900">Key figures at a glance</h3>
+        <h3 className="mb-3 mt-6 text-base font-semibold text-slate-900">Key Figures at a Glance</h3>
         <SummaryCharts analysis={analysis} config={config} />
         <p className="mt-3 text-xs text-slate-500">
           Charts are drawn by the compliance engine from your data, as of {asOfDate}. They do not

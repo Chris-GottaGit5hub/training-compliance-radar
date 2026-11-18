@@ -14,7 +14,7 @@ export function WindowsTable({ windows }: { windows: WindowSection }) {
   const missed = rows.reduce((sum, r) => sum + r.missed, 0);
   return (
     <div>
-      <h3 className="font-semibold text-slate-900">Recommended course schedule</h3>
+      <h3 className="font-semibold text-slate-900">Recommended Course Schedule</h3>
       <p className="mb-2 text-sm text-slate-600">
         <span className="font-medium">{course.title}</span> runs once a year, one month per unit,
         spread across the year so LinkedIn is not loaded all at once. Anyone who misses their window

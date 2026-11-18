@@ -3,7 +3,7 @@ import type { StatusKey } from "@/lib/analysis";
 
 // Same hues as the rest of the app: indigo accent, amber for risk, slate for the rest.
 export const FILL: Record<StatusKey, string> = {
-  compliant: "#4f46e5",
+  compliant: "#1e3a5f",
   atRisk: "#d97706",
   exempt: "#64748b",
   excluded: "#94a3b8",
@@ -16,8 +16,8 @@ export const SWATCH: Record<StatusKey, string> = {
   excluded: "bg-slate-400",
   notCovered: "bg-slate-300",
 };
-export const INDIGO = "#4f46e5";
-export const SLATE = "#64748b";
+export const INDIGO = "#1e3a5f";
+export const SLATE = "#556070";
 export const AMBER = "#d97706";
 
 export const shorten = (name: string): string => (name.length > 22 ? `${name.slice(0, 21)}…` : name);

@@ -57,7 +57,7 @@ export function RadarApp() {
       label: "Dashboard",
       state: analysis ? (selectedUnit ? "done" : "current") : "locked",
     },
-    { href: "#step-unit", label: "Unit panel", state: selectedUnit ? "current" : "locked" },
+    { href: "#step-unit", label: "Unit Panel", state: selectedUnit ? "current" : "locked" },
   ];
 
   return (

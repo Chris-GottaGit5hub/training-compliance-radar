@@ -16,12 +16,12 @@ function Kpi({
 }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4">
-      <dt className="text-sm font-medium text-slate-600">{label}</dt>
+      <dt className="text-xs font-semibold uppercase tracking-wider text-slate-600">{label}</dt>
       <dd className="mt-1">
         <span
           title={title}
           aria-label={title ? `${label}: ${title}` : undefined}
-          className={`text-2xl font-semibold text-slate-900 sm:text-3xl ${title ? "cursor-help" : ""}`}
+          className={`font-mono text-2xl font-semibold text-slate-900 sm:text-3xl ${title ? "cursor-help" : ""}`}
         >
           {value}
         </span>
@@ -31,9 +31,9 @@ function Kpi({
   );
 }
 
-/** The annual allocation still unspent (spec §4.7), and what is left after closing the gap. */
+/** The annual allocation still unspent (spec §4.2, §4.7). The year-end projection lives in The Money panel. */
 function BalanceKpi({ analysis, config }: Props) {
-  const { budget, outlook } = analysis;
+  const { budget } = analysis;
   if (config.budgetPhp <= 0) {
     return (
       <Kpi label="Outstanding balance" value="—">
@@ -48,14 +48,6 @@ function BalanceKpi({ analysis, config }: Props) {
       title={formatPeso(budget.remaining)}
     >
       {formatPercent(budget.percentSpent)} of {formatPeso(budget.allocation)} spent
-      <span
-        className={`mt-1 block ${outlook.projectedBalance < 0 ? "font-medium text-red-700" : "text-emerald-700"}`}
-      >
-        {outlook.projectedBalance < 0
-          ? `Short by ${formatPeso(-outlook.projectedBalance)} by year end`
-          : `${formatPeso(outlook.projectedBalance)} (${formatPercent(outlook.projectedPct)}) left by year end`}
-        , after promised runs, nominations and subscriptions
-      </span>
     </Kpi>
   );
 }

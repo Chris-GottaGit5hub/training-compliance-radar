@@ -3,8 +3,8 @@ import type { UnitSummary } from "@/lib/engine";
 
 const MAX_BARS = 15;
 const ROW_HEIGHT = 30;
-const ACCENT = "#6366f1";
-const ACCENT_SELECTED = "#3730a3";
+const ACCENT = "#3e5c80";
+const ACCENT_SELECTED = "#0e1c2f";
 
 const shorten = (name: string): string => (name.length > 24 ? `${name.slice(0, 23)}…` : name);
 
@@ -48,7 +48,7 @@ export function UnitChart({
               interval={0}
             />
             <Tooltip
-              cursor={{ fill: "#f1f5f9" }}
+              cursor={{ fill: "#eceae2" }}
               formatter={(value) => [value, "At risk"]}
             />
             <Bar

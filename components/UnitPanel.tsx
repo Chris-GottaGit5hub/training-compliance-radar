@@ -151,7 +151,7 @@ export function UnitPanel({ state, ai }: { state: RadarState; ai: AiActions }) {
         <StepHeading
           id="step-unit-title"
           step={4}
-          title="Unit panel"
+          title="Unit Panel"
           description="At-risk employees for one unit, with AI drafting and export."
         />
         {unit && config ? (

@@ -16,7 +16,7 @@ export function BacktestCard({ backtests }: { backtests: BacktestCheckpoint[] })
   return (
     <section aria-labelledby="backtest-title" className="rounded-lg border border-slate-200 p-4">
       <h3 id="backtest-title" className="font-semibold text-slate-900">
-        Back-test: would early flags have predicted year-end gaps?
+        Back-Test: Would Early Flags Have Predicted Year-End Gaps?
       </h3>
       <p className="mt-1 text-sm text-slate-600">
         Recall is the share of staff untrained at year end that were already flagged at the

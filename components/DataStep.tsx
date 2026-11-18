@@ -21,14 +21,14 @@ const BOXES: { kind: CsvKind; label: string; required: boolean; columns: string 
   },
   {
     kind: "catalog",
-    label: "Course catalog",
+    label: "Course Catalog",
     required: false,
     columns:
       "course_id, title, skill_area, duration_minutes, provider, url, cost_per_head. Optional: unlicensed_fee, recommended",
   },
   {
     kind: "calendar",
-    label: "Training calendar",
+    label: "Training Calendar",
     required: false,
     columns:
       "run_id, course_id, date, delivery, cost_per_head, min_pax, max_pax. Optional: run_title, hours, speakers, cost_per_run, expected_pax. Add nominated external trainings as external rows with min_pax 1",

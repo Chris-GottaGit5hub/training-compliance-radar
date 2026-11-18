@@ -10,7 +10,7 @@ function StatusPanel({ analysis }: { analysis: Analysis }) {
   const row = { name: "Employees", ...Object.fromEntries(slices.map((s) => [s.key, s.value])) };
   return (
     <ChartPanel
-      title="Where everyone stands"
+      title="Where Everyone Stands"
       description="All employees in the roster, by status as of the chosen date."
       summary={slices.map((s) => `${s.label} ${s.value}`).join(", ")}
     >
@@ -42,7 +42,7 @@ function UnitsPanel({ analysis }: { analysis: Analysis }) {
   const bars = topAtRiskUnits(analysis.org);
   return (
     <ChartPanel
-      title="Highest-risk units"
+      title="Highest-Risk Units"
       description="At-risk employees in the units that need attention first."
       summary={bars.length === 0 ? "Nobody is at risk." : bars.map((b) => `${b.unit} ${b.atRisk}`).join(", ")}
     >
@@ -60,7 +60,7 @@ function UnitsPanel({ analysis }: { analysis: Analysis }) {
               tick={{ fontSize: 12 }}
               tickFormatter={shorten}
             />
-            <Tooltip cursor={{ fill: "#f1f5f9" }} formatter={(value) => [value, "At-risk employees"]} />
+            <Tooltip cursor={{ fill: "#eceae2" }} formatter={(value) => [value, "At-risk employees"]} />
             <Bar dataKey="atRisk" name="At risk" fill={AMBER} radius={[0, 4, 4, 0]}>
               <LabelList dataKey="atRisk" position="right" fontSize={12} />
             </Bar>

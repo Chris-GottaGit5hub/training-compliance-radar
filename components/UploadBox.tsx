@@ -21,7 +21,7 @@ export function UploadBox({ label, required, columns, state, pending, onFile, on
         <h3 className="font-medium text-slate-900">
           {label}{" "}
           <span className="text-xs font-normal text-slate-500">
-            {required ? "(required)" : "(optional)"}
+            {required ? "(Required)" : "(Optional)"}
           </span>
         </h3>
         <p className="mt-1 text-xs text-slate-500">Columns: {columns}</p>

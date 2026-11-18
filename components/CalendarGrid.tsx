@@ -74,7 +74,7 @@ export function CalendarGrid({
               </ul>
             )}
             {here.length === 0 ? (
-              <p className="text-sm text-slate-400">No runs</p>
+              <p className="text-sm text-slate-500">No runs</p>
             ) : (
               <ul className="space-y-1.5">
                 {here.map((r) => (

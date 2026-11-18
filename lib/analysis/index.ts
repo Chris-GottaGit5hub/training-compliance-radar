@@ -5,6 +5,7 @@ export * from "./calendar-timeline";
 export * from "./calendar-view";
 export * from "./budget";
 export * from "./commitments";
+export * from "./money";
 export * from "./costing";
 export * from "./plan";
 export * from "./windows";

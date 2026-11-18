@@ -2,7 +2,7 @@ export type AppTab = "radar" | "calendar";
 
 const TABS: { id: AppTab; label: string }[] = [
   { id: "radar", label: "Radar" },
-  { id: "calendar", label: "Training calendar" },
+  { id: "calendar", label: "Training Calendar" },
 ];
 
 /** Two top-level views of the same data. Tab panels are rendered by the parent. */

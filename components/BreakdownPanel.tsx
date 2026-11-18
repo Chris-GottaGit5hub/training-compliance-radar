@@ -72,7 +72,7 @@ export function BreakdownPanel({ analysis, roster }: { analysis: Analysis; roste
 
   return (
     <div>
-      <h3 className="font-semibold text-slate-900">Trained vs untrained, sliced</h3>
+      <h3 className="font-semibold text-slate-900">Trained vs. Untrained, Sliced</h3>
       <p className="mb-2 text-sm text-slate-600">
         Pick what to break down by, then narrow it with the filters. Combine any of them.
       </p>
@@ -138,7 +138,7 @@ export function BreakdownPanel({ analysis, roster }: { analysis: Analysis; roste
         >
           <ResponsiveContainer width="100%" height={Math.max(120, 36 + chartRows.length * 30)}>
             <BarChart data={chartRows} layout="vertical" margin={{ top: 4, right: 12, bottom: 0, left: 0 }}>
-              <CartesianGrid horizontal={false} stroke="#e2e8f0" />
+              <CartesianGrid horizontal={false} stroke="#eceae2" />
               <XAxis type="number" tick={{ fontSize: 12 }} />
               <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} />
               <Tooltip />

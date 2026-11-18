@@ -5,6 +5,7 @@ import { BudgetBreakdown } from "./BudgetBreakdown";
 import { BudgetPanel } from "./BudgetPanel";
 import { KpiCards } from "./KpiCards";
 import { MilestoneCard } from "./MilestoneCard";
+import { MoneyPanel } from "./MoneyPanel";
 import { PlanPanel } from "./PlanPanel";
 import { WindowsTable } from "./WindowsTable";
 import { UnitChart } from "./UnitChart";
@@ -88,6 +89,7 @@ export function DashboardStep({ state }: { state: RadarState }) {
             <MilestoneCard milestones={analysis.milestones} />
             {config.budgetPhp > 0 ? (
               <>
+                <MoneyPanel analysis={analysis} />
                 <BudgetPanel report={analysis.budget} hasPlan={analysis.outlook.commitments.total > 0} />
                 <BudgetBreakdown analysis={analysis} config={config} />
               </>
@@ -104,7 +106,7 @@ export function DashboardStep({ state }: { state: RadarState }) {
             )}
             <div>
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-semibold text-slate-900">Units ranked by risk</h3>
+                <h3 className="font-semibold text-slate-900">Units Ranked by Risk</h3>
                 <button
                   type="button"
                   onClick={exportAll}

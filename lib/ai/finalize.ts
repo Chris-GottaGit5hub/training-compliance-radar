@@ -68,12 +68,13 @@ export function finalizeMemo(
     "{{COVERED_COUNT}}": String(request.coveredCount),
     "{{DEADLINE}}": formatDeadline(request.deadline),
   };
-  // Also rewrites the field name "monthsRemaining" if the model copies it into the text (spec §5).
+  // Months remaining: the {{MONTHS_REMAINING}} token and variants the model invents
+  // ({{monthsRemaining}}, {{months remaining}}...) become the number; a bare field name
+  // becomes plain words (spec §5, v2.17).
   const fill = (text: string) =>
-    TOKENS.reduce((acc, token) => acc.split(token).join(values[token]), text).replace(
-      /\bmonthsRemaining\b/g,
-      "months remaining",
-    );
+    TOKENS.reduce((acc, token) => acc.split(token).join(values[token]), text)
+      .replace(/\{\{\s*months[\s_-]?remaining\s*\}\}/gi, String(request.monthsRemaining))
+      .replace(/\bmonthsRemaining\b/g, "months remaining");
 
   let body = output.body;
   if (TOKENS.some((token) => !body.includes(token))) {

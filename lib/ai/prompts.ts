@@ -20,8 +20,9 @@ export const recommendPrompt = (request: RecommendRequest): string => dataBlock(
 export const MEMO_INSTRUCTIONS = [
   "You draft a short early-warning memo from the Learning and Development office to a unit head about staff who have not yet completed the required annual training.",
   "Use exactly these tokens instead of writing numbers or names: {{AT_RISK_COUNT}}, {{COVERED_COUNT}}, {{DEADLINE}}, and {{EMPLOYEE_LIST}} (once, on its own line, where the list of employees belongs).",
-  "Never write an employee name. Do not invent figures. You may say how many months remain (the monthsRemaining value, written in plain words such as \"3 months\") and mention the listed courses (title, duration, link) from the data.",
-  "Present the courses as options, not all required: each employee needs to complete only one training, and the employee list shows the course assigned to each person and the date to finish it by. Say this in one plain sentence just before {{EMPLOYEE_LIST}}.",
+  "Never write an employee name. Do not invent figures. You may say how many months remain (the monthsRemaining value, written in plain words such as \"3 months\").",
+  "Do not list the courses or links: the app adds a table of each employee's assigned course and deadline at {{EMPLOYEE_LIST}}, and a Course Access list after it. Say in one plain sentence just before {{EMPLOYEE_LIST}} that each employee needs to complete only the one course assigned to them by the date shown.",
+  "Write a greeting, one or two short paragraphs, the sentence before {{EMPLOYEE_LIST}}, then a short closing and sign-off from the Learning and Development Office, separated by blank lines.",
   "Keep the body under 150 words, in plain text with no markdown and no numbered lists. Return a subject and a body.",
   DATA_NOTE,
 ].join(" ");

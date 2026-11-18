@@ -18,19 +18,14 @@ function joinList(items: readonly string[]): string {
   return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }
 
-function courseLines(courses: readonly CatalogRow[]): string {
-  if (courses.length === 0) return "";
-  const lines = courses.slice(0, 5).map((c) => {
-    const link = c.url ? ` - ${c.url}` : "";
-    return `- ${c.title} (${c.duration_minutes} min)${link}`;
-  });
-  return `Qualifying courses (options; each person needs to complete only one):\n${lines.join("\n")}\n\n`;
-}
-
-/** A memo draft for one unit, in the same shape the AI route returns. */
+/**
+ * A memo draft for one unit, in the same shape the AI route returns. Courses are not listed in
+ * the body: the memo view's Course Access section lists them (spec §6, v2.13), so `_courses` is
+ * kept only for the call signature.
+ */
 export function buildTemplateMemo(
   unit: UnitSummary,
-  courses: readonly CatalogRow[],
+  _courses: readonly CatalogRow[],
   config: RulesConfig,
   tone: MemoRequest["tone"],
 ): { subject: string; body: string } {
@@ -46,7 +41,6 @@ export function buildTemplateMemo(
         `A quick early heads-up from the Learning and Development team: ${who} ` +
         `still ${unit.atRisk === 1 ? "needs" : "need"} a qualifying training this year. ` +
         `The deadline is ${deadline}, about ${months} away, so there is still time.\n\n` +
-        courseLines(courses) +
         `Could you gently remind these colleagues? Each one only needs the course and date listed next to their name.\n\n{{EMPLOYEE_LIST}}\n\n` +
         `Thank you for helping your team stay on track!\n\nLearning and Development Team`,
     };
@@ -58,7 +52,6 @@ export function buildTemplateMemo(
       `The Learning and Development office is writing to inform you that ${who} ` +
       `${unit.atRisk === 1 ? "has" : "have"} not yet completed a qualifying training this year. ` +
       `The deadline is ${deadline}, about ${months} away.\n\n` +
-      courseLines(courses) +
       `Please arrange for each employee below to complete the one course listed next to their name by the date shown:\n\n` +
       `{{EMPLOYEE_LIST}}\n\nThank you for your cooperation.\n\nLearning and Development Office`,
   };

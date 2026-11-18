@@ -128,11 +128,20 @@ export function AiPanel({
             rows={rows}
             unit={unit.unit}
             asOfDate={asOfDate}
+            catalog={catalog}
+            courses={recCourses}
           />
         </>
       )}
       {memo.status === "done" && (
-        <MemoView memo={memo.data} rows={rows} unit={unit.unit} asOfDate={asOfDate} />
+        <MemoView
+          memo={memo.data}
+          rows={rows}
+          unit={unit.unit}
+          asOfDate={asOfDate}
+          catalog={catalog}
+          courses={recCourses}
+        />
       )}
     </div>
   );

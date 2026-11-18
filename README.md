@@ -54,7 +54,7 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 - **Training calendar tab**, with an **Edit calendar** what-if mode (add, edit, duplicate and remove runs; undo, restore and reset; every number recomputes; changes stay in the browser and are lost on reload, so export the CSV to keep them): every planned run for the year in four views (month grid, list, a course-by-month timeline, and a by-quarter list of trainings still available with estimated seats open), each run with its state (held, planned, not needed, after Dec 14), cost at expected enrolment, seats, the external : in-house mix against 3:1, cost by month, the sector windows for the recommended course, alerts, CSV export and print.
 - **Recommended-course windows and a plan** (optional catalog flag `recommended` and `calendar.csv`): one staggered monthly window per sector for the annual course (e.g. AMLA), who completed or missed it, and a deterministic plan for the rest: licensed staff on LinkedIn at no extra cost, unlicensed staff in calendar runs above their minimum size or on the paid LinkedIn fee, no in-person runs after Dec 14.
 - **Back-test card**: recall and precision at Jun 30 and Sep 30.
-- **Unit panel**: at-risk employees, each with a **Recommended Course** and a **Complete By** date (licensed staff on a LinkedIn course by Nov 30, unlicensed staff in the calendar run the plan places them in, by its date), CSV export with the same columns, an AI-drafted memo whose name lines carry each person's course and date, and catalog-grounded course recommendations.
+- **Unit panel**: at-risk employees, each with a **Recommended Course** and a **Complete By** date (licensed staff on a LinkedIn course by Nov 30, unlicensed staff in the calendar run the plan places them in, by its date), CSV export with the same columns, an AI-drafted memo laid out as justified paragraphs, a numbered table of each person's assigned course and deadline, and a Course Access list (copy and download keep the same order), and catalog-grounded course recommendations.
 - **Works without AI, too:** if an AI call fails or the free quota runs out, memos and the executive summary fall back to a clearly labeled template draft built from the same numbers.
 - **Executive summary** for a department head: an AI-written narrative plus four charts (status breakdown, highest-risk units, back-test, cost vs budget) drawn from the engine, so they stay accurate and still appear if the AI is unavailable.
 - **Privacy by design**: employee names and IDs never leave the browser.
@@ -103,7 +103,7 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 ## Tests
 
-`npm test` runs **392 tests in 34 files** (Vitest). They cover:
+`npm test` runs **398 tests in 35 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);

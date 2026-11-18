@@ -18,14 +18,14 @@ Government agencies require every employee to complete at least one training a y
 | F4 | Budget: burn-down, outstanding and projected year-end balance, cost to close from the cheapest mix of calendar runs and LinkedIn | Every peso is computed in code from the uploaded files |
 | F5 | Training calendar: year grid, list, course timeline and by-quarter views, plus a what-if edit mode (add, move, cancel runs) | Every number recalculates from the edited calendar |
 | F6 | AI course recommendations from the catalog | Every course ID exists in the catalog; a labeled template is shown if the AI fails |
-| F7 | AI early-warning memos and an executive summary | Counts and deadline come from the engine; names are merged in the browser, never sent to the AI |
-| F8 | Export the untrained list, calendar and memos | The CSV opens in Excel with the rows shown on screen |
+| F7 | AI early-warning memos (each person's one course and deadline in a table) and an executive summary | Counts and deadlines come from the engine; names are merged in the browser, never sent to the AI |
+| F8 | Export the untrained list (with each person's course and complete-by date), calendar and memos | The CSV opens in Excel with the rows shown on screen |
 
 ## 4. Out of scope (v1)
 Accounts, login and any database; live LinkedIn Learning or HRIS integration; sending emails; real employee data (synthetic only).
 
 ## 5. Success metrics
-1. **Prediction:** back-test recall of at least 80% at the Jun 30 and Sep 30 checkpoints (precision reported).
+1. **Prediction:** back-test recall of at least 80% at the Jun 30 and Sep 30 checkpoints (precision reported; shown as the Early Warning Check).
 2. **Speed:** from upload to dashboard and memos in under 5 minutes, instead of days of manual cross-matching.
 3. **Safety:** all rule tests pass; zero invented course links; zero names sent to an AI provider.
 

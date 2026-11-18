@@ -1,33 +1,31 @@
 # Reflection — DRAFT
 
-> **DRAFT written from the project record. [CHRIS: personalize]** Every `[CHRIS: ...]` marker is a place for your own voice, memory or opinion. Cut anything that is not true to your experience. Target: one page.
+> **DRAFT written from the project record. [CHRIS: personalize]** Each `[CHRIS: ...]` marker is a place for your own voice. Cut anything that is not true to your experience. Target: one page.
 
 ## What I built and how
 
-Training Compliance Radar turns three CSVs into an early warning for the one-training-per-year rule. I kept one principle throughout: **code computes, AI communicates.** A deterministic, tested engine decides who is compliant; the AI only drafts memos, picks courses from the catalog, and summarizes. I worked spec-first: validation, PRD, architecture and a `spec.md` that I revised as I learned. [CHRIS: one sentence on how the Week 4A/4B material shaped this.]
+Training Compliance Radar turns roster, attendance, catalog and calendar CSVs into an early warning for the at least, one-training-per-employee-per-year rule. One principle held throughout: **code computes, AI communicates.** A tested engine decides who is compliant; the AI only drafts memos, picks catalog courses and summarizes. I worked spec-first and revised `spec.md` as I learned. [CHRIS: one sentence on how the Week 4A/4B material shaped this.]
 
 ## What AI did well
 
-- **Speed on well-specified work.** With the spec and `AGENTS.md` in place, the AI produced the schemas, engine, CSV validator, sample-data generator and a large test suite quickly and consistently. [CHRIS: what did this save you in hours or days?]
-- **Breadth of checking.** It tested its own work in a real browser and with `curl`, including a request sent with a fake key to confirm the logs contain no payload or key.
-- **Catching mismatches with reality.** It read the installed AI SDK docs and found `generateObject` is deprecated in v7, so we moved to `generateText` with `Output.object` (spec v1.3) instead of coding against stale knowledge.
+- **Speed on well-specified work.** With the spec and `AGENTS.md` in place, it produced the schemas, engine, CSV validator, sample data and a large test suite quickly. [CHRIS: what did this save you in hours or days?]
+- **Checking against reality.** It tested in a real browser and found that `generateObject` was deprecated in the installed AI SDK, so we moved to `generateText` with `Output.object`.
 
 ## What AI did poorly, or needed checking
 
-- **Green on the first run is not proof.** The first test suites passed immediately, which proved little. I had the AI break the engine on purpose (change `>=` to `>`, floor instead of round) to confirm tests fail. They did.
-- **Confident defaults.** The first spec draft left real gaps (cost-to-close ignored e-learning rules, the back-test was undefined, dates and time zones were loose). The AI's own senior-engineer review found them, but only after I asked for the review. [CHRIS: any other place the AI was confidently wrong?]
-- **Things it cannot do for me.** It cannot hold my Vercel account or API keys, so the live AI features depend on a step only I can take.
+- **Green tests prove little at first.** I had it break the engine on purpose to confirm the tests fail. They did.
+- **Confident gaps.** Its first spec left real holes (an undefined back-test, loose dates), found only when I asked for a review. Later an AI memo called the 358 covered staff "fulfilled" and printed "{{months remaining}}"; both needed prompt and server fixes. [CHRIS: any other place the AI was confidently wrong?]
 
 ## Where human judgment was needed
 
-1. **Gemini, then Groq.** I started with Google Gemini for cost: a free tier suits a student project, and the app sends only aggregates and synthetic data, so the free-tier data-use terms are acceptable. Testing then showed the real limits: 5 requests a minute and 20 a day per model, and `gemini-3.6-flash` might be retired before grading. So I added Groq (`openai/gpt-oss-120b`, free plan of 30 requests a minute and 1,000 a day) as the primary provider, with Gemini 3.6 and 3.8 behind it as backups. If a model is busy, retired or returns bad output, the next one answers, and if all fail the app shows a labeled template. One live check confirmed Groq answered in about 2 seconds. [CHRIS: your real reasons: budget, quota, quality?]
-2. **Reframing the back-test metric.** Recall alone came out at 100%, because anyone untrained stays untrained until they train. That is true but uninformative. We added **precision** at two checkpoints (Jun 30: 25%; Sep 30: 57%), and read `1 − precision` as the group early nudges can actually change. [CHRIS: how this changes the story you tell about the product.]
-3. **Spec revisions v1.1 to v1.3.** v1.1 came from the senior-engineer review, v1.2 from clarifications while building the engine (e.g. the Oct 15 late hire is `EXEMPT` only if the as-of date is on or after Oct 15), and v1.3 from the SDK change. Each time I updated the spec before the code. [CHRIS: which revision mattered most?]
-4. **Privacy trade-offs.** I decided names never leave the browser, positions are sent only when 3 or more at-risk employees share them, and unknown request fields are rejected outright. [CHRIS: connect this to the Data Privacy Act and your real work context.]
-5. **Policy questions I could not answer from code**, such as whether e-learning counts and which employee types are covered. They are settings, not assumptions. [CHRIS: what you would confirm with the policy owner first.]
+1. **Gemini, then Groq.** I started on Gemini's free tier, then hit its limits (5 requests a minute, 20 a day per model) and a possible model retirement before grading. Groq became the primary provider (1,000 requests a day), with Gemini 3.6 and 3.8 as backups and labeled templates if every model fails. [CHRIS: your real reasons: budget, quota, quality?]
+2. **Making the back-test honest.** Recall is close to 100% almost by definition, so it proves little. I reframed it as the Early Warning Check: of 1,691 people flagged on Sep 30, 800 caught up on their own and 891 did not, so September is when to act. [CHRIS: how this changes the story you tell about the product.]
+3. **Spec revisions.** The spec grew from v1.0 to v2.17, each change written down before the code. [CHRIS: which revision mattered most?]
+4. **Privacy trade-offs.** Names never leave the browser, positions are sent only when 3 or more at-risk employees share them, and the sample data is synthetic. [CHRIS: connect this to the Data Privacy Act and your real work context.]
+5. **Policy questions code cannot answer**, such as whether e-learning counts and who is covered, became settings rather than assumptions. [CHRIS: what you would confirm with the policy owner first.]
 
 ## What I would do differently
 
-- Test with real (anonymized) data from my own L&D work before claiming results; the back-test here is on synthetic data.
+- Test with anonymized real data from my own L&D work before claiming results; the checks here use synthetic data.
 - Add a shared rate limiter and persistence only after the privacy model is agreed.
 - [CHRIS: your own lesson learned.]

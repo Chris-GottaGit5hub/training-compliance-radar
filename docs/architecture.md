@@ -64,6 +64,8 @@ All of this runs in the browser, in pure functions under `lib/engine` and `lib/a
 | Plan and cost to close | `lib/analysis/plan.ts` | Licensed staff close through LinkedIn at ₱0; unlicensed staff fill future runs cheapest first, then a paid LinkedIn course; runs below minimum enrolment or after Dec 14 are not held |
 | Budget burn-down | `lib/analysis/budget.ts`, `commitments.ts` | Spent by month (attendance costs plus January subscriptions), commitments (future runs, nominations, LinkedIn fees), outstanding and projected year-end balance |
 | Collapsed Data and Rules | `lib/analysis/setup.ts`, `components/SetupBar.tsx` | When steps 1 and 2 fold (everything loaded, valid and analyzed, not opened for the same files), and the one-line summary of files and key rules |
+| Early Warning Check | `lib/engine/backtest.ts`, `lib/analysis/early-warning.ts` | The back-test in plain counts: flagged at Jun 30 and Sep 30, caught up on their own, still untrained at year end, missed; recall and precision kept for the PRD metric |
+| Memo layout | `lib/analysis/memo-layout.ts`, `components/MemoView.tsx` | Justified paragraphs, a numbered table of each person's course and deadline, and Course Access; copy and download keep the same order |
 | Per-person course and date | `lib/analysis/plan.ts` (assignments), `lib/analysis/assign.ts` | Each at-risk employee's route (recommended-course window, LinkedIn, calendar run, paid LinkedIn, none) and from it one recommended course and a complete-by date, shown in the Unit Panel, memo lines and CSV; browser only |
 | The Money panel | `lib/analysis/money.ts`, `components/MoneyPanel.tsx` | Spent, promised (commitments plus any catalog estimate) and projected left, with shares of the allocation and bar widths that always fill; count and cost of calendar runs still to come |
 | Calendar tab | `lib/analysis/calendar-view.ts`, `calendar-timeline.ts` | Run states (completed, planned, standby, blocked after Dec 14), cost at expected enrolment, monthly chart, alerts; year grid, list, course timeline and by-quarter views |
@@ -89,7 +91,8 @@ Backups run in order and may be on another provider (`provider:model`); unknown 
 - Server-side zod validation + payload size limits on every route; `maxDuration` raised for AI routes.
 - Best-effort in-memory rate limit per IP (documented limitation on serverless; v2: Upstash/Vercel KV).
 - gitleaks in CI; `npm audit` reported in CI.
-- Synthetic data only in the public repo.
+- AI output safeguards: the model writes tokens (`{{AT_RISK_COUNT}}`, `{{COVERED_COUNT}}`, `{{DEADLINE}}`, `{{MONTHS_REMAINING}}`, `{{EMPLOYEE_LIST}}`) that the server or browser fills from engine values; every number in a memo or summary is checked against the request; the prompts spell out what each count means (spec v2.16–v2.17).
+- Synthetic data only in the public repo; real source files stay outside git.
 
 ## Trade-offs accepted
 | Choice | Benefit | Cost |

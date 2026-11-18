@@ -7,7 +7,7 @@ Everything here is **synthetic**: invented names, `@agency.example` emails (a re
 | `roster.csv` | 12,000 | Employees (about 2.7 MB) |
 | `attendance.csv` | about 16,000 | Trainings attended, with costs (about 1 MB) |
 | `catalog.csv` | 26 | Courses: 16 LinkedIn Learning, 10 in-house |
-| `calendar.csv` | 48 | Planned runs for the year: 36 external, 12 in-house (3 : 1) |
+| `calendar.csv` | 48 | Planned runs for the year: 36 external, 12 in-house (3:1) |
 
 The app accepts up to 20,000 rows and 5 MB per file.
 

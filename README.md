@@ -118,7 +118,7 @@ CI runs lint, typecheck, tests, build, a report-only `npm audit`, and gitleaks o
 
 On the seeded synthetic data (12,000 employees, year 2026), the app goes back to each checkpoint, takes everyone untrained then, and compares them with who was actually untrained at Dec 31. The dashboard shows this as the **Early Warning Check** card in plain words:
 
-| Checkpoint | Flagged | Caught up on their own | Still untrained Dec 31 | Missed | Recall | Precision |
+| Checkpoint | Flagged | Caught up on their own | Still untrained at year end | Missed | Recall | Precision |
 |---|---|---|---|---|---|---|
 | Jun 30 | 3,631 | 2,759 (76%) | 872 (24%) | 19 (all joined after Jun 30) | 98% | 24% |
 | Sep 30 | 1,691 | 800 (47%) | 891 (53%) | none | 100% | 53% |

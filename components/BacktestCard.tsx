@@ -9,6 +9,7 @@ const share = (pct: number | null): string => (pct === null ? "" : ` (${pct}%)`)
  * on Dec 31. Recall and precision stay in small print for the PRD success metric.
  */
 export function BacktestCard({ backtests }: { backtests: BacktestCheckpoint[] }) {
+  const year = backtests[0]?.checkpoint.slice(0, 4) ?? "";
   return (
     <section aria-labelledby="backtest-title" className="rounded-lg border border-slate-200 p-4">
       <h3 id="backtest-title" className="font-semibold text-slate-900">
@@ -16,7 +17,7 @@ export function BacktestCard({ backtests }: { backtests: BacktestCheckpoint[] })
       </h3>
       <p className="mt-1 text-sm text-slate-600">
         Would the warnings have been right? The app goes back to each date, takes everyone who was
-        untrained then, and compares them with who was still untrained on Dec 31.
+        untrained then, and compares them with who was still untrained at year end.
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {backtests.map(({ label, result }) => {
@@ -35,7 +36,7 @@ export function BacktestCard({ backtests }: { backtests: BacktestCheckpoint[] })
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs font-medium text-slate-600">Still untrained on Dec 31</dt>
+                  <dt className="text-xs font-medium text-slate-600">Still untrained at year end</dt>
                   <dd className="font-mono text-xl font-semibold text-red-700">
                     {n(s.stillUntrained)}
                     <span className="text-sm font-normal">{share(s.stillUntrainedPct)}</span>
@@ -59,9 +60,9 @@ export function BacktestCard({ backtests }: { backtests: BacktestCheckpoint[] })
       </div>
       <p className="mt-3 text-xs text-slate-500">
         What it shows: the list only misses people who join after the date, and the later the
-        date, the more of the flagged people stay untrained unless someone acts. It uses the
-        file&apos;s attendance through Dec 31, so it checks the method on a past year, not this
-        year&apos;s outcome.
+        date, the more of the flagged people stay untrained unless someone acts. The sample data is
+        a simulated full year (through Dec 31, {year}), so this check can run today. With your own
+        data, run it on a finished year, such as last year&apos;s files, to test the method.
       </p>
     </section>
   );

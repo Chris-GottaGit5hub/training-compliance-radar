@@ -19,7 +19,7 @@ export function BacktestPanel({ analysis }: { analysis: Analysis }) {
   return (
     <ChartPanel
       title="Early Warning Check"
-      description="Year-end gaps already on the early list, and flagged people still untrained on Dec 31."
+      description="Year-end gaps already on the early list, and flagged people still untrained at year end."
       summary={series
         .map((s) => `${s.checkpoint}: recall ${percentLabel(s.recall) || "n/a"}, precision ${percentLabel(s.precision) || "n/a"}`)
         .join("; ")}

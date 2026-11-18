@@ -59,7 +59,7 @@ function Summary({ view }: { view: CalendarView }) {
       <Tile
         label="External : in-house"
         value={s.ratioText}
-        sub={`${s.external} external, ${s.inHouse} in-house (target ${view.targetRatio} : 1)`}
+        sub={`${s.external} external, ${s.inHouse} in-house (target ${view.targetRatio}:1)`}
         warn={mixOff}
       />
       <Tile

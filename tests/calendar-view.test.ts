@@ -118,16 +118,21 @@ describe("buildCalendarView: mix of runs", () => {
   ];
   const view = (rows: CalendarRow[]) => buildCalendarView(rows, analyze(rows), rules);
 
-  it("shows 3.0 : 1 for 36 external and 12 in-house runs, with no mix alert", () => {
+  it("shows 3:1 for 36 external and 12 in-house runs, with no mix alert", () => {
     const v = view([...mix(12, 0), ...Array.from({ length: 36 }, (_, i) => run(`E${i}`, `2026-11-${String((i % 28) + 1).padStart(2, "0")}`, { delivery: "external", cost_per_run: undefined, cost_per_head: 6500, min_pax: 1 }))]);
-    expect(v.summary).toMatchObject({ inHouse: 12, external: 36, ratioText: "3.0 : 1" });
+    expect(v.summary).toMatchObject({ inHouse: 12, external: 36, ratioText: "3:1" });
     expect(v.alerts.some((a) => a.text.includes("face-to-face mix"))).toBe(false);
   });
 
-  it("shows 1.0 : 1 for equal mixes and raises a mix alert", () => {
+  it("keeps one decimal when the mix is not a whole number", () => {
+    const external = Array.from({ length: 40 }, (_, i) => run(`E${i}`, `2026-11-${String((i % 28) + 1).padStart(2, "0")}`, { delivery: "external", cost_per_run: undefined, cost_per_head: 6500, min_pax: 1 }));
+    expect(view([...mix(12, 0), ...external]).summary.ratioText).toBe("3.3:1");
+  });
+
+  it("shows 1:1 for equal mixes and raises a mix alert", () => {
     const v = view(mix(10, 10));
-    expect(v.summary.ratioText).toBe("1.0 : 1");
-    expect(v.alerts.some((a) => a.text.includes("face-to-face mix is 1.0 : 1"))).toBe(true);
+    expect(v.summary.ratioText).toBe("1:1");
+    expect(v.alerts.some((a) => a.text.includes("face-to-face mix is 1:1"))).toBe(true);
   });
 
   it("handles a calendar with no in-house runs", () => {
@@ -144,7 +149,7 @@ describe("buildCalendarView: sample calendar", () => {
     if (!parsed.ok) throw new Error("sample calendar invalid");
     const rows = parsed.rows as CalendarRow[];
     const v = buildCalendarView(rows, analyze(rows), rules);
-    expect(v.summary).toMatchObject({ total: 48, inHouse: 12, external: 36, ratioText: "3.0 : 1" });
+    expect(v.summary).toMatchObject({ total: 48, inHouse: 12, external: 36, ratioText: "3:1" });
     expect(v.alerts.some((a) => a.text.includes("face-to-face mix"))).toBe(false);
   });
 });

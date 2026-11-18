@@ -125,6 +125,11 @@ export interface CalendarView {
 
 export const TARGET_MIX = 3;
 const MIX_TOLERANCE = 0.5;
+/** External : in-house mix (spec v2.11): "3:1" when it rounds to a whole number, else "3.3:1". */
+export const formatMix = (ratio: number): string => {
+  const rounded = Math.round(ratio * 10) / 10;
+  return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}:1`;
+};
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 const plural = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
 
@@ -204,7 +209,7 @@ export function buildCalendarView(
     inHouse,
     external,
     ratio,
-    ratioText: ratio === null ? (external > 0 ? "no in-house runs" : "—") : `${ratio.toFixed(1)} : 1`,
+    ratioText: ratio === null ? (external > 0 ? "no in-house runs" : "—") : formatMix(ratio),
     seatsExpected: live.reduce((sum, r) => sum + r.expectedPax, 0),
     seatsCapacity: live.reduce((sum, r) => sum + r.maxPax, 0),
     totalCost,
@@ -274,7 +279,7 @@ function calendarAlerts(
   if (s.total > 0 && off) {
     alerts.push({
       tone: "warning",
-      text: `The face-to-face mix is ${s.ratioText} (external to in-house); the company target is ${TARGET_MIX} : 1.`,
+      text: `The face-to-face mix is ${s.ratioText} (external to in-house); the company target is ${TARGET_MIX}:1.`,
     });
   }
   if (s.unplaced > 0) {

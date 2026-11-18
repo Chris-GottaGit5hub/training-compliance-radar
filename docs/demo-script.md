@@ -20,7 +20,7 @@ Live site: https://training-compliance-radar.vercel.app (open it in an **incogni
 | **0:55–1:05** | Bar chart, then **Units Ranked by Risk** | "Only units with untrained staff are listed, ranked by risk. Southern Luzon Branches leads with 88." |
 | **1:05–1:17** | **Training Calendar** tab; year grid; *optional:* **Edit calendar** → remove one planned run → point at the totals → **Reset all changes** | "The calendar shows all 48 runs: 36 external to 12 in-house, exactly 3 to 1. Only 3 of the 17 upcoming runs are needed. I can cancel a run as a what-if and every number recalculates; nothing is saved." |
 | **1:17–1:25** | Back to **Radar**; **Back-Test** card | "Does early flagging work? At Sep 30 we flag 1,691 people and catch all 891 who end the year untrained." |
-| **1:25–1:35** | Click **Southern Luzon Branches**; at-risk list; **Export at-risk CSV** | "Click a unit for its at-risk list, and export it to CSV." |
+| **1:25–1:35** | Click **Southern Luzon Branches**; point at **Recommended Course** and **Complete By**; **Export at-risk CSV** | "Click a unit for its at-risk list. Each person gets one course and a date: licensed staff take a LinkedIn course by November 30, the rest go into the calendar run the plan picked. Export it to CSV." |
 | **1:35–1:52** | **Recommend courses**, then **Generate memo** | "AI recommends courses only from my catalog, and every ID is checked. The memo is drafted from counts alone; the names are merged in my browser, so the AI never sees them." |
 | **1:52–2:00** | **Executive Summary** (header), then the GitHub repo | "One click gives a department head a summary. The code computes; the AI communicates. Source, tests and CI are on GitHub." |
 

@@ -103,7 +103,7 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 ## Tests
 
-`npm test` runs **401 tests in 36 files** (Vitest). They cover:
+`npm test` runs **404 tests in 37 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);

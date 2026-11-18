@@ -18,8 +18,8 @@ export function BacktestPanel({ analysis }: { analysis: Analysis }) {
   const series = backtestSeries(analysis.backtests);
   return (
     <ChartPanel
-      title="Would Early Flags Have Worked?"
-      description="Back-test: share of year-end gaps already flagged (recall) and of flags that stayed gaps (precision)."
+      title="Early Warning Check"
+      description="Year-end gaps already on the early list, and flagged people still untrained on Dec 31."
       summary={series
         .map((s) => `${s.checkpoint}: recall ${percentLabel(s.recall) || "n/a"}, precision ${percentLabel(s.precision) || "n/a"}`)
         .join("; ")}
@@ -31,10 +31,10 @@ export function BacktestPanel({ analysis }: { analysis: Analysis }) {
           <YAxis domain={[0, 100]} unit="%" tick={{ fontSize: 12 }} width={44} />
           <Tooltip formatter={(value) => percentLabel(value)} />
           <Legend iconType="square" wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="recall" name="Recall" fill={INDIGO} radius={[4, 4, 0, 0]}>
+          <Bar dataKey="recall" name="Year-end gaps already flagged (recall)" fill={INDIGO} radius={[4, 4, 0, 0]}>
             <LabelList dataKey="recall" position="top" fontSize={12} formatter={percentLabel} />
           </Bar>
-          <Bar dataKey="precision" name="Precision" fill={SLATE} radius={[4, 4, 0, 0]}>
+          <Bar dataKey="precision" name="Flagged and still untrained (precision)" fill={SLATE} radius={[4, 4, 0, 0]}>
             <LabelList dataKey="precision" position="top" fontSize={12} formatter={percentLabel} />
           </Bar>
         </BarChart>

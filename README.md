@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Chris-GottaGit5hub/training-compliance-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/Chris-GottaGit5hub/training-compliance-radar/actions/workflows/ci.yml)
 
-Privacy-first AI app that flags employees at risk of missing the one-training-per-year rule, months before year-end.
+Privacy-first AI app that flags employees at risk of missing the at least, one-training-per-year rule, months before year-end.
 
 **Live demo:** https://training-compliance-radar.vercel.app — click **Load sample data** to try it with a synthetic agency. No sign-in, nothing to install. (AI features use a free Gemini quota of about 20 requests a day; if it is used up they show a "daily limit reached" message and everything else still works.)
 
@@ -31,8 +31,8 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 **What-if: one run removed, every number recalculated**
 ![Edit mode with a removed run and the recalculated calendar summary](docs/screenshots/12-calendar-what-if.png)
 
-**Back-Test: would early flags have predicted year-end gaps?**
-![Back-test recall and precision at Jun 30 and Sep 30](docs/screenshots/07-backtest.png)
+**Early Warning Check: would the warnings have been right?**
+![Early Warning Check at Jun 30 and Sep 30: flagged, caught up on their own, still untrained, missed](docs/screenshots/07-backtest.png)
 
 **Unit Panel: at-risk staff for one department (names stay in the browser)**
 ![Unit panel for Southern Luzon Branches with the at-risk list](docs/screenshots/08-unit-panel.png)
@@ -53,10 +53,10 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 - **Realistic balance**: spend so far plus everything already promised, namely every calendar run still to come (in-house runs priced from speaker honoraria and snacks, external trainings at their fee per participant, external : in-house 3:1), expected external nominations outside the calendar, and annual subscriptions (Mentimeter, Kahoot!, Canva, Adobe), giving a projected year-end balance. Subscriptions and nominations are editable in Rules.
 - **Training calendar tab**, with an **Edit calendar** what-if mode (add, edit, duplicate and remove runs; undo, restore and reset; every number recomputes; changes stay in the browser and are lost on reload, so export the CSV to keep them): every planned run for the year in four views (month grid, list, a course-by-month timeline, and a by-quarter list of trainings still available with estimated seats open), each run with its state (held, planned, not needed, after Dec 14), cost at expected enrolment, seats, the external : in-house mix against 3:1, cost by month, the sector windows for the recommended course, alerts, CSV export and print.
 - **Recommended-course windows and a plan** (optional catalog flag `recommended` and `calendar.csv`): one staggered monthly window per sector for the annual course (e.g. AMLA), who completed or missed it, and a deterministic plan for the rest: licensed staff on LinkedIn at no extra cost, unlicensed staff in calendar runs above their minimum size or on the paid LinkedIn fee, no in-person runs after Dec 14.
-- **Back-test card**: recall and precision at Jun 30 and Sep 30.
+- **Early Warning Check** (the back-test, in plain words): for Jun 30 and Sep 30, how many people were flagged, how many caught up on their own, how many were still untrained on Dec 31, and whether anyone was missed; recall and precision in small print.
 - **Unit panel**: at-risk employees, each with a **Recommended Course** and a **Complete By** date (licensed staff on a LinkedIn course by Nov 30, unlicensed staff in the calendar run the plan places them in, by its date), CSV export with the same columns, an AI-drafted memo laid out as justified paragraphs, a numbered table of each person's assigned course and deadline, and a Course Access list (copy and download keep the same order), and catalog-grounded course recommendations.
 - **Works without AI, too:** if an AI call fails or the free quota runs out, memos and the executive summary fall back to a clearly labeled template draft built from the same numbers.
-- **Executive summary** for a department head: an AI-written narrative plus four charts (status breakdown, highest-risk units, back-test, cost vs budget) drawn from the engine, so they stay accurate and still appear if the AI is unavailable.
+- **Executive summary** for a department head: an AI-written narrative plus four charts (status breakdown, highest-risk units, early warning check, cost vs budget) drawn from the engine, so they stay accurate and still appear if the AI is unavailable.
 - **Privacy by design**: employee names and IDs never leave the browser.
 - **Civic Ledger look**: a navy header, warm paper background, ruled panels, IBM Plex type with monospaced figures, and Title Case headings, chosen from five design options.
 
@@ -103,7 +103,7 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 ## Tests
 
-`npm test` runs **398 tests in 35 files** (Vitest). They cover:
+`npm test` runs **401 tests in 36 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);
@@ -114,14 +114,14 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 CI runs lint, typecheck, tests, build, a report-only `npm audit`, and gitleaks on every push.
 
-## Back-test results
+## Back-test results (Early Warning Check)
 
-On the seeded synthetic data (12,000 employees, year 2026), rules as of each checkpoint compared with who was actually untrained at Dec 31:
+On the seeded synthetic data (12,000 employees, year 2026), the app goes back to each checkpoint, takes everyone untrained then, and compares them with who was actually untrained at Dec 31. The dashboard shows this as the **Early Warning Check** card in plain words:
 
-| Checkpoint | Flagged at-risk | Untrained at year end | Caught early | Recall | Precision |
-|---|---|---|---|---|---|
-| Jun 30 | 3,631 | 891 | 872 | 98% | 24% |
-| Sep 30 | 1,691 | 891 | 891 | 100% | 53% |
+| Checkpoint | Flagged | Caught up on their own | Still untrained Dec 31 | Missed | Recall | Precision |
+|---|---|---|---|---|---|---|
+| Jun 30 | 3,631 | 2,759 (76%) | 872 (24%) | 19 (all joined after Jun 30) | 98% | 24% |
+| Sep 30 | 1,691 | 800 (47%) | 891 (53%) | none | 100% | 53% |
 
 - **Recall** (share of year-end gaps already flagged) meets the PRD target of at least 80%. It is structurally high: an untrained employee stays at risk until trained, so recall mainly drops for people hired after the checkpoint.
 - **Precision** is the informative number. `1 − precision` is the share of flagged staff who were trained before year-end: the group early nudges target (76% at Jun 30, 47% at Sep 30).

@@ -1,5 +1,12 @@
 # Overnight Report — Nov 8, 2026
 
+> **Historical record (note added Nov 18, 2026).** This report was written on the night of Nov 8 and is kept unchanged as evidence of the build process. Several points below no longer apply:
+> - The deadline was extended to **Nov 23, 2026**.
+> - Production now uses **Groq (`openai/gpt-oss-120b`) first**, with `gemini-3.6-flash` and `gemini-3.8-flash` as backups. The 20-requests-a-day Gemini limit no longer blocks the demo.
+> - The spec is at **v2.17**, with 406 tests.
+>
+> For the current state, see the [README](../README.md), [architecture notes](architecture.md) and the Revision Log in [`spec.md`](../spec.md).
+
 Checkpoints 2–4 from [`build-plan.md`](build-plan.md) are done and pushed to `main` (HEAD at the time of writing: the commit that adds this file). The deadline is **Nov 9, 2026**.
 
 ## Update (Nov 8, later): AI is now working on the live site

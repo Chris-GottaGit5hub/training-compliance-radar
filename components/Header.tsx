@@ -22,7 +22,7 @@ export function Header({
               Training Compliance Radar
             </h1>
             <p className="text-sm text-indigo-100 print:text-slate-600">
-              Early Warning for the One-Training-per-Year Rule
+              Spotting Employees at Risk of Missing Their Annual Training, Months Early
             </p>
           </div>
         </div>

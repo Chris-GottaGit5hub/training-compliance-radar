@@ -16,8 +16,8 @@ Training Compliance Radar answers one question early: **who is still untrained, 
 
 All screens use the built-in synthetic sample (12,000 fictional employees). More in [`docs/screenshots/`](docs/screenshots/).
 
-**Overview: the navy header, the two tabs and the four steps**
-![Header with the app name, the Radar and Training Calendar tabs, and the Data step with the sample loaded](docs/screenshots/00-overview.png)
+**Overview: once data is loaded, Data and Rules fold into one bar and the dashboard comes up**
+![Header, tabs, steps, the folded Data and Rules summary bar, and the top of the dashboard](docs/screenshots/00-overview.png)
 
 **Dashboard: trained vs untrained, Training Targets and The Money**
 ![Dashboard with KPI cards, training targets, target vs. actual chart and The Money panel](docs/screenshots/01-dashboard.png)
@@ -42,6 +42,7 @@ All screens use the built-in synthetic sample (12,000 fictional employees). More
 ## Features
 
 - **Upload and validate** roster, attendance and (optional) course catalog and training calendar CSVs in the browser, with row-numbered errors; or load the built-in sample: 12,000 synthetic employees in 50 departments under 7 sectors, with Employee IDs A100 to N399 and unique 5-digit Personnel Numbers. Field list: [`docs/data-dictionary.md`](docs/data-dictionary.md).
+- **Data and Rules fold away** once everything is loaded and valid, into a one-line summary with a Show/Hide toggle, so the dashboard is what you see; they reopen on any error.
 - **Churn-aware compliance engine** (deterministic TypeScript): late-hire exemptions, exclusion of separated staff, covered employment types, minimum hours, and an e-learning toggle, as of any date.
 - **Who is covered:** only regular staff can be at risk. Contractual staff may attend (their costs count as spend) but are never at risk. A footnote says who is left out of scope and why.
 - **Risk dashboard**: trained vs untrained, the next target, months left, cost to close, a bar chart and a ranked table of units that still have untrained staff.
@@ -102,7 +103,7 @@ Switching provider is one variable (`AI_PROVIDER=groq` or `anthropic`) plus its 
 
 ## Tests
 
-`npm test` runs **373 tests in 32 files** (Vitest). They cover:
+`npm test` runs **381 tests in 33 files** (Vitest). They cover:
 
 - every compliance rule and their order, ranking, rounding, back-test and cost-to-close;
 - CSV validation (missing columns, duplicates, impossible dates, limits);

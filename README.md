@@ -6,6 +6,8 @@ Privacy-first AI app that flags employees at risk of missing the at least, one-t
 
 **Live demo:** https://training-compliance-radar.vercel.app — click **Load sample data** to try it with a synthetic agency. No sign-in, nothing to install. (AI features run on Groq's free plan, with Gemini as backup; if every model is busy or out of quota, the app shows a labeled template built from the same numbers and everything else still works.)
 
+**2-minute demo video:** https://drive.google.com/file/d/1gecp01gxgB5zJGGtD134m79k7OZMQYfj/view?usp=sharing (narrated walkthrough of the live site: dashboard, budget, training calendar, Early Warning Check, AI recommendations, memo and executive summary).
+
 ## The problem
 
 Philippine government agencies expect every employee to complete at least one planned learning and development (L&D) intervention a year. L&D teams usually find out who missed it in Q4, when it is too late to fix, and then send "explain why" memos. The covered population changes monthly (hires, separations, transfers) and records sit in several sources, so spreadsheets struggle.
@@ -177,7 +179,7 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 | Synthetic data only | `scripts/generate-sample-data.ts`, `public/sample/` |
 | Build process documented | [`docs/build-plan.md`](docs/build-plan.md) |
 | Reflection | [`docs/reflection.md`](docs/reflection.md) (draft) |
-| Demo | [`docs/demo-script.md`](docs/demo-script.md) |
+| Demo | [2-minute video](https://drive.google.com/file/d/1gecp01gxgB5zJGGtD134m79k7OZMQYfj/view?usp=sharing) · script: [`docs/demo-script.md`](docs/demo-script.md) |
 | Next steps | [v2 GitHub issue #1](https://github.com/Chris-GottaGit5hub/training-compliance-radar/issues/1); [Roadmap](#roadmap) |
 
 ## License

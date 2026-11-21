@@ -159,28 +159,57 @@ v2 ideas (persistence, auth, LinkedIn Learning API sync, explanation-reply analy
 
 ## Submission checklist
 
-> **[CHRIS: verify this table against the official assignment brief]** It was assembled from the requirements recorded in the repo's own docs; rename or add rows if the brief words things differently.
+Mapped to the *Tasks to Complete* in the Graded Assignment 4.2 brief.
 
-| Requirement | Where it is met |
+**Phase 1: Validate and Define**
+
+| Brief bullet | Where it is met |
 |---|---|
-| Validated idea (problem, user, market, competition, edge, test, risks) | [`docs/validation.md`](docs/validation.md) |
-| Product requirements and success metrics | [`docs/prd.md`](docs/prd.md) |
-| Architecture and stack rationale | [`docs/architecture.md`](docs/architecture.md) |
-| Spec as source of truth, with revision log (v1.0 to v1.3) | [`spec.md`](spec.md) |
-| AI agent rules and project conventions | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md), [`.cursorrules`](.cursorrules) |
-| Working app on the recommended stack (Next.js, TypeScript, Tailwind, Vercel AI SDK) | `app/`, `components/`, `lib/` |
-| Deployed and publicly reachable | https://training-compliance-radar.vercel.app |
-| Core logic is deterministic and tested | `lib/engine/`, `tests/` (368 tests) |
-| AI features with structured output and grounding | `app/api/*`, `lib/ai/`, `lib/payload/` |
-| Data privacy handled (aggregates only, local name merge) | [Privacy](#privacy-and-data-handling), `lib/payload/`, `tests/payload.test.ts` |
-| Security basics (validation, size limits, rate limit, no secrets in git) | `lib/api/`, `.env.example`, gitleaks in CI |
-| CI/CD | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) plus Vercel Git deploys |
-| Monitoring | Vercel Web Analytics and Speed Insights in `app/layout.tsx`; per-call AI logs |
-| Synthetic data only | `scripts/generate-sample-data.ts`, `public/sample/` |
-| Build process documented | [`docs/build-plan.md`](docs/build-plan.md) |
-| Reflection | [`docs/reflection.md`](docs/reflection.md) (draft) |
-| Demo | [2-minute video](https://drive.google.com/file/d/1gecp01gxgB5zJGGtD134m79k7OZMQYfj/view?usp=sharing) · script: [`docs/demo-script.md`](docs/demo-script.md) |
-| Next steps | [v2 GitHub issue #1](https://github.com/Chris-GottaGit5hub/training-compliance-radar/issues/1); [Roadmap](#roadmap) |
+| Complete all 7 idea validation steps | [`docs/validation.md`](docs/validation.md), Steps 1–7 and verdict |
+| Document user, problem, and market evidence | [`docs/validation.md`](docs/validation.md) Steps 1–3, with numbered sources |
+| Define your differentiating angle | [`docs/validation.md`](docs/validation.md) Step 5 (churn-aware early warning, code computes and AI communicates, names never leave the browser) |
+| Write a 1-page PRD | [`docs/prd.md`](docs/prd.md) (about 500 words) |
+
+**Phase 2: Spec and Architecture**
+
+| Brief bullet | Where it is met |
+|---|---|
+| Create architecture notes | [`docs/architecture.md`](docs/architecture.md) (diagram, layers, data flow, security, trade-offs) |
+| Write spec.md | [`spec.md`](spec.md) (v2.17) |
+| Create CLAUDE.md or agents.md | [`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md) |
+| Create .cursorrules | [`.cursorrules`](.cursorrules) |
+| Revise the spec after review | [`spec.md`](spec.md) Revision Log: v1.1 after a senior-engineer review, then each later change written down before the code |
+
+**Phase 3: Build**
+
+| Brief bullet | Where it is met |
+|---|---|
+| Scaffold the application | Next.js App Router, TypeScript and Tailwind; commit `3947eaa` "scaffold Next.js app" |
+| Implement the core AI feature | Catalog-grounded course recommendations, early-warning memos and an executive summary (`app/api/*`, `lib/ai/`), with a deterministic engine underneath (`lib/engine/`) |
+| Create at least 5 meaningful commits | 85+ conventional commits on `main` |
+| Write at least 3 unit tests | 406 Vitest tests in 37 files (`tests/`), all passing |
+| Check secrets and input validation | Keys only in env vars ([`.env.example`](.env.example)), gitleaks in CI; zod validation, body-size limits and a rate limit on every API route (`lib/api/`); row-numbered CSV errors |
+
+**Phase 4: Deploy**
+
+| Brief bullet | Where it is met |
+|---|---|
+| Configure GitHub Actions | [`.github/workflows/ci.yml`](.github/workflows/ci.yml): lint, typecheck, test, build, npm audit, gitleaks |
+| Deploy to a live host | https://training-compliance-radar.vercel.app (Vercel, deploys on every push to `main`) |
+| Set environment variables | `AI_PROVIDER`, `AI_MODEL`, `AI_FALLBACK_MODEL` and the provider keys in Vercel project settings; check with [`/api/status`](https://training-compliance-radar.vercel.app/api/status) (no AI call, no secrets) |
+| Test the live app | Live checks of every AI route and the full demo recorded on the live site |
+| Add basic monitoring or analytics | Vercel Web Analytics and Speed Insights (`app/layout.tsx`); one structured log line per AI call (provider, latency, status) |
+
+**Phase 5: Document and Reflect**
+
+| Brief bullet | Where it is met |
+|---|---|
+| Complete README | This file |
+| Record a 2-minute demo | [2-minute video](https://drive.google.com/file/d/1gecp01gxgB5zJGGtD134m79k7OZMQYfj/view?usp=sharing) · script: [`docs/demo-script.md`](docs/demo-script.md) |
+| Write a 1-page reflection | [`docs/reflection.md`](docs/reflection.md) |
+| Add one GitHub issue for a v2 improvement | [Issue #1](https://github.com/Chris-GottaGit5hub/training-compliance-radar/issues/1) |
+
+**Project constraints:** a real problem for a specific user (L&D compliance officers), AI capability, usable web UI, live URL, public repo, GitHub Actions, no hardcoded secrets, and this README. Synthetic data only.
 
 ## License
 

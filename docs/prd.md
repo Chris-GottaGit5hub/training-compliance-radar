@@ -1,6 +1,6 @@
 # PRD — Training Compliance Radar
 
-**Owner:** Christopher Pamatmat · **Version:** 2 (Nov 16, 2026) · **Course:** AIM Graded Assignment 4.2
+**Owner:** Christopher Pamatmat · **Version:** 2.1 (Nov 22, 2026; matches spec v2.17) · **Course:** AIM Graded Assignment 4.2
 
 ## 1. Problem
 Government agencies require every employee to complete at least one training a year, but L&D teams find the gaps only at year-end, when it is too late. Staff join, leave and transfer every month, records sit in several files, and budgets are planned without knowing who still needs training.
@@ -15,7 +15,7 @@ Government agencies require every employee to complete at least one training a y
 | F1 | Upload and validate roster, attendance, catalog and optional calendar CSVs, or load a 12,000-employee synthetic sample | A missing column or over 20,000 rows gives a clear error and nothing is processed |
 | F2 | Deterministic compliance engine (as-of date, late-hire cutoff, separations, regular staff in scope) | Each rule is covered by unit tests; the AI never decides status |
 | F3 | Dashboard: trained vs untrained, milestone targets (25/50/85/100%), slicers by pay grade, department, group and sector, units ranked by risk | Totals equal the engine's counts exactly |
-| F4 | Budget: burn-down, outstanding and projected year-end balance, cost to close from the cheapest mix of calendar runs and LinkedIn | Every peso is computed in code from the uploaded files |
+| F4 | Budget: The Money panel (spent, promised, left at year end), burn-down, outstanding balance, cost to close from the cheapest mix of calendar runs and LinkedIn | Every peso is computed in code from the uploaded files |
 | F5 | Training calendar: year grid, list, course timeline and by-quarter views, plus a what-if edit mode (add, move, cancel runs) | Every number recalculates from the edited calendar |
 | F6 | AI course recommendations from the catalog | Every course ID exists in the catalog; a labeled template is shown if the AI fails |
 | F7 | AI early-warning memos (each person's one course and deadline in a table) and an executive summary | Counts and deadlines come from the engine; names are merged in the browser, never sent to the AI |
@@ -25,7 +25,7 @@ Government agencies require every employee to complete at least one training a y
 Accounts, login and any database; live LinkedIn Learning or HRIS integration; sending emails; real employee data (synthetic only).
 
 ## 5. Success metrics
-1. **Prediction:** back-test recall of at least 80% at the Jun 30 and Sep 30 checkpoints (precision reported; shown as the Early Warning Check).
+1. **Early warning:** on a past year, the Jun 30 and Sep 30 lists catch at least 80% of the people still untrained at year end, shown as the Early Warning Check (flagged, caught up on their own, still untrained, missed).
 2. **Speed:** from upload to dashboard and memos in under 5 minutes, instead of days of manual cross-matching.
 3. **Safety:** all rule tests pass; zero invented course links; zero names sent to an AI provider.
 

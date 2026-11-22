@@ -38,4 +38,4 @@ Cut the optional calendar edit first if you run long.
 
 - Why not let the AI decide compliance? "It can miscount. Code is tested; the AI only writes."
 - What about privacy? "Parsing is local; the API gets unit-level counts; positions are sent only when 3 or more at-risk staff share one."
-- Why Groq, with Gemini as backup? [CHRIS: your answer.] Groq's free plan allows far more requests than Gemini's, and a chain of backups means a busy or retired model does not break the AI buttons. The provider is one env var.
+- Why Groq, with Gemini as backup? Because Groq offers a generous serving of about 1,000 requests a day compared to Gemini's 20. Groq's free plan allows far more requests than Gemini's, and a chain of backups means a busy or retired model does not break the AI buttons. The provider is one env var.

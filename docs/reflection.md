@@ -1,6 +1,4 @@
-# Reflection — DRAFT
-
-> **DRAFT written from the project record. [CHRIS: personalize]** Each `[CHRIS: ...]` marker is a place for your own voice. Cut anything that is not true to your experience. Target: one page.
+# Reflection
 
 ## What I built and how
 

@@ -1,7 +1,6 @@
 # Idea Validation — Training Compliance Radar
 
-> Phase 1 deliverable for AIM Graded Assignment 4.2. Follows the 7-step validation framework from Week 4A.
-> Evidence is cited at the end. Figures marked **(author data)** come from the author's direct work experience in L&D at a large Philippine government-owned and -controlled corporation (GOCC), anonymized here.
+> Phase 1 deliverable for AIM Graded Assignment 4.2. Follows the 7-step validation framework from Week 4A. Evidence is cited at the end. Figures marked **(author data)** come from the author's direct work experience in L&D at a large Philippine government-owned and -controlled corporation (GOCC), anonymized here.
 
 ---
 
@@ -13,7 +12,7 @@ A web app that tells L&D teams, **months before year-end**, which employees are 
 ## Step 1 — Define the Problem
 **Testing:** a real, specific pain point exists that people actively try to solve.
 
-**Problem statement.** Philippine government agencies are expected to ensure every employee completes at least one planned learning and development (L&D) intervention each year [1]. In practice, L&D teams only discover non-compliance at year-end, when it is too late to fix: in the author's organization, **a couple of hundred employees end each year untrained (author data)**, and L&D then sends memos to their units asking them to explain why.
+**Problem statement.** Philippine government agencies are expected to ensure every employee completes at least one planned learning and development (L&D) intervention each year [1]. In practice, L&D teams only discover non-compliance at year-end, when it is too late to fix: in the author's organization, **an average of 133.5 personnel ended each year untrained from 2022 to 2025 (author data)**, and L&D then sends memos to their units asking them to explain why.
 
 **Why it's hard today:**
 - The covered population **changes every month** — new hires, separations, and transfers — so "who must comply" is a moving target that static spreadsheets handle poorly.
